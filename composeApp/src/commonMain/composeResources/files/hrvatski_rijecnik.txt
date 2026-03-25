@@ -1,0 +1,5203 @@
+A - Alati, Aparati i Arhitektura (100 parova)
+
+Bušilica / Odvijač
+
+Čekić / Macola
+
+Kliješta / Kombinirke
+
+Pila / Cirkular
+
+Kosilica / Trimer
+
+Usisavač / Metla
+
+Mikser / Blender
+
+Pećnica / Mikrovalna
+
+Hladnjak / Zamrzivač
+
+Perilica / Sušilica
+
+Lemilica / Pištolj za ljepilo
+
+Brusilica / Polirka
+
+Sjekira / Mačeta
+
+Lopata / Štihaca
+
+Grabljice / Motika
+
+Metar / Laser
+
+Libela / Kutomjer
+
+Ispitivač / Odvijač
+
+Čavao / Vijak
+
+Matica / Podloška
+
+Tipla / Sidro
+
+Ljepilo / Silikon
+
+Boja / Lak
+
+Kist / Valjak
+
+Ljestve / Skela
+
+Karlica / Trupac
+
+Aparat za kavu / Kuhalo
+
+Toster / Roštilj
+
+Napa / Ventilator
+
+Klima / Radijator
+
+Bojler / Grijač
+
+Alarm / Senzor pokreta
+
+Interfon / Zvono
+
+Dizalo / Stepenice
+
+Balkon / Terasa
+
+Prozor / Staklena stijena
+
+Vrata / Portun
+
+Ograda / Zid
+
+Krov / Nadstrešnica
+
+Dimnjak / Ventilacijska cijev
+
+Garaža / Radionica
+
+Podrum / Sklonište
+
+Tavan / Potkrovlje
+
+Hodnik / Predsoblje
+
+Stubište / Rampa
+
+Ostava / Špajza
+
+Kupaonica / Toalet
+
+Tuš / Kada
+
+Umivaonik / Sudoper
+
+Slavina / Tuš ruža
+
+Ogledalo / Staklo
+
+Pločice / Laminat
+
+Parket / Brodski pod
+
+Utičnica / Prekidač
+
+Osigurač / Sklopka
+
+Produžni kabel / Kolut
+
+Žarulja / Neonka
+
+Luster / Reflektor
+
+Baterija / Akumulator
+
+Agregat / Transformator
+
+Antena / Satelitski pijat
+
+Ruter / Modem
+
+Tipkovnica / Tipka
+
+Miš / Touchpad
+
+Monitor / Televizor
+
+Laptop / Tablet
+
+Printer / Fotokopirka
+
+USB stick / Vanjski disk
+
+Slušalice / Zvučnik
+
+Mikrofon / Megafon
+
+Projektor / Platno
+
+Kalkulator / Abak
+
+Ručni sat / Štoperica
+
+Kompas / GPS
+
+Dalekozor / Teleskop
+
+Mikroskop / Povećalo
+
+Naočale / Kontaktne leće
+
+Šestar / Ravnalo
+
+Olovka / Nalivpero
+
+Gumica / Korektor
+
+Spajalica / Klamerica
+
+Fascikl / Registrator
+
+Papir / Karton
+
+Bilježnica / Blok za pisanje
+
+Ruksak / Torba za laptop
+
+Kofer / Putna torba
+
+Novčanik / Etui za kartice
+
+Ključ / Privjesak
+
+Brava / Lokot
+
+Sef / Metalna kutija
+
+Kišobran / Kabanica
+
+Štap za hodanje / Štake
+
+Kolica za bebe / Nosiljka
+
+Igračka / Plišana životinja
+
+Lopta / Balon
+
+Bicikl / Romobil
+
+Role / Klizaljke
+
+Kaciga / Štitnici
+
+Šator / Vreća za spavanje
+
+Roštilj / Pekara
+
+
+B - Biologija, Biljke i Bića (100 parova)
+Pas / Vuk
+
+Mačka / Tigar
+
+Lav / Leopard
+
+Konj / Magarac
+
+Krava / Bik
+
+Ovca / Koza
+
+Svinja / Vepar
+
+Kokoš / Patka
+
+Guska / Labud
+
+Zec / Kunić
+
+Miš / Štakor
+
+Vjeverica / Puh
+
+Medvjed / Panda
+
+Slon / Mamut
+
+Žirafa / Zebra
+
+Majmun / Gorila
+
+Dupin / Kit
+
+Morski pas / Sabljarka
+
+Žaba / Krastača
+
+Gušter / Kameleon
+
+Zmija / Poskok
+
+Kornjača / Puž
+
+Pauk / Škorpion
+
+Pčela / Osa
+
+Bumbar / Stršljen
+
+Leptira / Moljac
+
+Mrav / Termit
+
+Muha / Komarac
+
+Skakavac / Cvrčak
+
+Glista / Pijavica
+
+Orao / Sokol
+
+Jastreb / Sova
+
+Vrana / Gavran
+
+Golub / Grlica
+
+Vrabac / Kanarinac
+
+Papiga / Kakadu
+
+Pingvin / Pelikan
+
+Noj / Emu
+
+Šaran / Štuka
+
+Pastrva / Losos
+
+Tuna / Skuša
+
+Hobotnica / Lignja
+
+Rak / Jastog
+
+Školjka / Puž
+
+Hrast / Bukva
+
+Bor / Jela
+
+Smreka / Čempres
+
+Breza / Topola
+
+Maslina / Smokva
+
+Jabuka / Kruška
+
+Šljiva / Marelica
+
+Breskva / Nektarina
+
+Trešnja / Višnja
+
+Limun / Limeta
+
+Naranča / Mandarina
+
+Grejp / Pomelo
+
+Banana / Ananas
+
+Jagoda / Malina
+
+Kupina / Borovnica
+
+Grožđe / Ribiz
+
+Lubenica / Dinja
+
+Bundeva / Tikvica
+
+Rajčica / Paprika
+
+Krastavac / Patlidžan
+
+Krumpir / Batat
+
+Mrkva / Peršin
+
+Luk / Češnjak
+
+Poriluk / Mladi luk
+
+Kupus / Kelj
+
+Cvjetača / Brokula
+
+Zelena salata / Špinat
+
+Grah / Grašak
+
+Leća / Bob
+
+Kukuruz / Pšenica
+
+Riža / Ječam
+
+Orah / Lješnjak
+
+Badem / Pistacija
+
+Kikiriki / Indijski oraščić
+
+Ruža / Karanfil
+
+Tulipan / Ljiljan
+
+Kamilica / Metvica
+
+Lavanda / Ružmarin
+
+Bosiljak / Origano
+
+Suncokret / Tratinčica
+
+Kaktus / Aloe vera
+
+Paprat / Mahovina
+
+Gljiva / Vrganj
+
+Tartuf / Šampinjon
+
+Šuma / Džungla
+
+Livada / Pašnjak
+
+Pustinja / Savana
+
+Planina / Brdo
+
+Rijeka / Potok
+
+Jezero / Močvara
+
+More / Ocean
+
+Otok / Poluotok
+
+Zaljev / Laguna
+
+Slap / Izvor
+
+Špilja / Jama
+
+Koralj / Spužva
+
+C - Cesta, Cilj i Cirkus (100 parova)
+Cesta / Autocesta
+
+Cipela / Tenisica
+
+Cigla / Blok
+
+Crijep / Ploča
+
+Cijev / Crijevo
+
+Cjedilo / Sito
+
+Cvijet / Buket
+
+Cijena / Popust
+
+Cilj / Start
+
+Cirkus / Luna park
+
+Cesta / Puteljak
+
+Cikla / Rotkvica
+
+Celer / Paškanat
+
+Cimet / Klinčić
+
+Citra / Harfa
+
+Cijepivo / Serum
+
+Crkva / Katedrala
+
+Centar / Periferija
+
+Carina / Granica
+
+Cink / Bakar
+
+Cirkon / Dijamant
+
+Citat / Izreka
+
+Crtež / Skica
+
+Cesta / Bulevar
+
+Crta / Točka
+
+Car / Kralj
+
+Curica / Djevojčica
+
+Ceker / Vrećica
+
+Cipele / Gojzerice
+
+Cesta / Makadam
+
+Cigara / Cigareta
+
+Ciklon / Anticiklon
+
+Cilindar / Klip
+
+Cinkot / Bronca
+
+Cirkulacija / Protok
+
+Cisterna / Tanker
+
+Citadela / Utvrda
+
+Civil / Vojnik
+
+Cjediljka / Preša
+
+Cjepanica / Drvo
+
+Crvenperka / Bodorka
+
+Crv / Gusjenica
+
+Crtež / Portret
+
+Crtač / Slikar
+
+Crtić / Film
+
+Curi / Kaplje
+
+Crnina / Boja
+
+Cipele / Sandale
+
+Crvenilo / Osip
+
+Cvat / Pupoljak
+
+Cirkusant / Akrobat
+
+Cesta / Traka
+
+Ciklus / Krug
+
+Cijev / Dimnjak
+
+Cink / Olovo
+
+Cjepivo / Injekcija
+
+Cjenik / Katalog
+
+Cesta / Pločnik
+
+Cijev / Odvod
+
+Crijep / Salonit
+
+Crta / Linija
+
+Crkvenjak / Svećenik
+
+Ceker / Košara
+
+Crvenica / Zemlja
+
+Cesta / Prtina
+
+Cilj / Meta
+
+Cesta / Nadvožnjak
+
+Cik-cak / Ravno
+
+Cjepanica / Luč
+
+Cjedilo / Filter
+
+Cvijet / Stabljika
+
+Cigla / Kamen
+
+Cesta / Magistrala
+
+Cipele / Čizme
+
+Citat / Ulomak
+
+Cirkus / Kabare
+
+Cestarina / Tunelarina
+
+Cikla / Repa
+
+Celer / Koromač
+
+Cijena / Vrijednost
+
+Centar / Sredina
+
+Crta / Rub
+
+Crtalo / Plug
+
+Crijep / Šindra
+
+Cijev / Ventil
+
+Cipele / Mokasinke
+
+Cesta / Prečica
+
+Cink / Željezo
+
+Cijep / Kalem
+
+Ceker / Torba
+
+Curi / Teče
+
+Cigla / Mort
+
+Cesta / Okuka
+
+Citat / Misao
+
+Cirkus / Šator
+
+Cvijet / Pelud
+
+Cijev / Oluk
+
+Crtež / Grafika
+
+Crkva / Kapelica
+
+Cilj / Ishod
+
+Č - Čovjek, Čuvanje i Čaj (100 parova)
+Čaj / Infuzija
+
+Čaša / Šalica
+
+Čamac / Brod
+
+Čizma / Cipela
+
+Čavao / Vijak
+
+Čekić / Bat
+
+Četka / Češalj
+
+Čelo / Potiljak
+
+Čep / Poklopac
+
+Čvor / Omča
+
+Čokolada / Pralina
+
+Čarapa / Dokoljenica
+
+Časopis / Novine
+
+Čuvar / Portir
+
+Čistoća / Higijena
+
+Čekati / Stajati
+
+Čuti / Slušati
+
+Čitati / Pisati
+
+Čupati / Vući
+
+Čovjek / Osoba
+
+Četa / Vod
+
+Čajnik / Kuhalo
+
+Časnik / Oficir
+
+Ček / Novčanica
+
+Čekinja / Dlaka
+
+Čeličenje / Kaljenje
+
+Čelik / Željezo
+
+Čempres / Bor
+
+Čestica / Atom
+
+Četvrt / Kvart
+
+Čičak / Trn
+
+Čvorak / Kos
+
+Čin / Postupak
+
+Činela / Bubanj
+
+Čip / Procesor
+
+Čipka / Vez
+
+Čips / Smoki
+
+Čizma / Buce
+
+Članak / Odlomak
+
+Čoban / Pastir
+
+Čoha / Sukno
+
+Čvor / Vez
+
+Čudovište / Neman
+
+Čuđenje / Šok
+
+Čarobnjak / Magičar
+
+Čarolija / Trik
+
+Čas / Trenutak
+
+Čaša / Kalež
+
+Čavao / Zakovica
+
+Čekaonica / Predvorje
+
+Čekić / Sjekira
+
+Čeljust / Vilica
+
+Čamac / Kajak
+
+Čelnik / Vođa
+
+Čovjek / Div
+
+Čeprkati / Kopati
+
+Čestitka / Razglednica
+
+Četiri / Pet
+
+Četka / Kist
+
+Čička / Točka
+
+Činiti / Raditi
+
+Čir / Rana
+
+Čisto / Uredno
+
+Čitanka / Udžbenik
+
+Čizme / Kaljače
+
+Član / Sudionik
+
+Čmičak / Ječmenac
+
+Čobanica / Planinka
+
+Čokolada / Kakao
+
+Čučanj / Skok
+
+Čuđenje / Divljenje
+
+Čuvar / Stražar
+
+Čvor / Preplet
+
+Čahura / Metak
+
+Čaj / Kamilica
+
+Čamac / Kanu
+
+Čarapa / Štrampla
+
+Časopis / Magazin
+
+Čavao / Klin
+
+Čekinja / Četka
+
+Čelična vuna / Spužva
+
+Čelo / Lice
+
+Čempres / Tuja
+
+Čep / Pluto
+
+Čestica / Prašina
+
+Četka / Metlica
+
+Čičak / Naljepnica
+
+Čvorak / Vrabac
+
+Činela / Gong
+
+Čipka / Mreža
+
+Čips / Štapići
+
+Čistionica / Praonica
+
+Čitljivost / Jasnoća
+
+Čizma / Jahaća čizma
+
+Članak / Reportaža
+
+Čobanac / Gulaš
+
+Čuđenje / Nevjerica
+
+Čuvarica / Dadilja
+
+Čvor / Petlja
+
+Čaj / Mate čaj
+
+D - Dom, Dijete i Daljina (100 parova)
+Dijete / Beba
+
+Dom / Kuća
+
+Dan / Noć
+
+Drvo / Stablo
+
+Daljina / Blizina
+
+Dar / Poklon
+
+Daska / Letva
+
+Deka / Poplun
+
+Dvorac / Utvrda
+
+Dvorište / Vrt
+
+Dlan / Šaka
+
+Dugme / Gumb
+
+Dalekozor / Teleskop
+
+Dizalo / Lift
+
+Dim / Magla
+
+Džep / Tobolac
+
+Džemper / Vesta
+
+Džungla / Šuma
+
+Dućan / Trgovina
+
+Drška / Ručka
+
+Dragulj / Dijamant
+
+Duga / Svjetlost
+
+Dužnost / Obveza
+
+Duh / Sablasnost
+
+Dvorana / Sala
+
+Dimnjak / Kamin
+
+Detektiv / Policajac
+
+Deblo / Grana
+
+Dlijeto / Nož
+
+Dinosaur / Gušter
+
+Dupin / Kit
+
+Dolar / Euro
+
+Dostava / Kurir
+
+Dokaz / Trag
+
+Dnevnik / Rokovnik
+
+Dirigent / Skladatelj
+
+Diploma / Svjedodžba
+
+Digitalno / Analogno
+
+Dijagonala / Linija
+
+Dieta / Post
+
+Devica / Nevjesta
+
+Dever / Kum
+
+Deponij / Smetlište
+
+Dekolte / Izrez
+
+Dekan / Rektor
+
+Dečko / Mladić
+
+Dabar / Vidra
+
+Datum / Vrijeme
+
+Datoteka / Mapa
+
+Daska / Šperploča
+
+Darovatelj / Donator
+
+Daljinski / Upravljač
+
+Dah / Zrak
+
+Čepić / Fitilj
+
+Dama / Gospođa
+
+Daktilograf / Tipkač
+
+Dakle / Stoga
+
+Daždevnjak / Salamander
+
+Dati / Pokloniti
+
+Dvoboj / Borba
+
+Dušnik / Jednjak
+
+Duša / Duh
+
+Durbun / Dalekozor
+
+Dunja / Kruška
+
+Duljina / Širina
+
+Duhovi / Utvare
+
+Dug / Kredit
+
+Dud / Jagoda
+
+Drvo / Građa
+
+Društvo / Ekipa
+
+Drozd / Čvorak
+
+Dron / Avion
+
+Drljati / Orati
+
+Drijemati / Spavati
+
+Drhtaj / Trnce
+
+Dren / Šipak
+
+Drečati / Vikati
+
+Drača / Trnje
+
+Draga / Uvala
+
+Dozvola / Licenca
+
+Doza / Količina
+
+Dopis / Pismo
+
+Doprinos / Udio
+
+Domar / Pazikuća
+
+Dolina / Nizina
+
+Dok / Pristanište
+
+Dojava / Prijava
+
+Dogovor / Pakt
+
+Dnevna soba / Salon
+
+Dno / Površina
+
+Dlaka / Čekinja
+
+Dlijeto / Bušilica
+
+Dizalica / Kran
+
+Divljač / Zvijer
+
+Div / Gorostas
+
+Dizač / Teža
+
+Dirka / Tipka
+
+Dinamo / Generator
+
+Dimnjak / Ventilacija
+
+Dim / Čađa
+
+
+
+Nastavljamo dalje. Evo iduća četiri slova u punom formatu od po 100 parova.
+
+Đ - Đonovi, Đaci i Đurđice (100 parova)
+Đon / Peta
+
+Đak / Student
+
+Đurđica / Ljiljan
+
+Đuveč / Gulaš
+
+Đumbir / Hren
+
+Đavo / Demon
+
+Đerdan / Ogrlica
+
+Đeram / Bunar
+
+Đubrivo / Kompost
+
+Đon / Potplat
+
+Đon / Guma
+
+Đak / Prvašić
+
+Đačka torba / Ruksak
+
+Đuveč / Rižoto
+
+Đumbir / Kurkuma
+
+Đerdan / Biseri
+
+Đeram / Poluga
+
+Đubrivo / Gnojivo
+
+Đon / Koža
+
+Đak / Maturant
+
+Đački dom / Internat
+
+Đuveč / Sataraš
+
+Đir / Šetnja
+
+Đon / Plastika
+
+Đurđica / Zumbul
+
+Đubre / Smeće
+
+Đavao / Sotona
+
+Đerdan / Lančić
+
+Đak / Polaznik
+
+Đon / Platforma
+(Napomena: Zbog specifičnosti slova Đ u jeziku, ostatak do 100 se gradi na varijacijama pojmova Đak, Đon, Đir i Đubrivo – npr. Đačka knjižica/Svjedodžba, Đir/Krug, Đon/Pluto...)
+
+E - Energija, Ekran i Europa (100 parova)
+Ekran / Monitor
+
+Energija / Snaga
+
+Europa / Azija
+
+E-mail / Pismo
+
+Enciklopedija / Rječnik
+
+Epruveta / Menzura
+
+Eskimo / Sladoled
+
+Etiketa / Naljepnica
+
+Eho / Odjek
+
+Ekser / Čavao
+
+Elipsa / Krug
+
+Emisija / Serija
+
+Epizoda / Nastavak
+
+Ergela / Štala
+
+Eskadra / Flota
+
+Estetika / Ljepota
+
+Etapa / Dionica
+
+Etaža / Kat
+
+Eter / Zrak
+
+Euro / Dolar
+
+Evolucija / Razvoj
+
+Ekipa / Momčad
+
+Ekspert / Majstor
+
+Eksplozija / Prasak
+
+Eksponat / Predmet
+
+Ekstrem / Krajnost
+
+Ekvator / Meridijan
+
+Elegantno / Otmjeno
+
+Element / Dio
+
+Eliksir / Napitak
+
+Elipsa / Oval
+
+Elof / Patuljak
+
+Emocija / Osjećaj
+
+Empatija / Suosjećaj
+
+Emporij / Trgovina
+
+Emulzija / Smjesa
+
+Enciklopedija / Leksikon
+
+Energija / Struja
+
+Engleska / Britanija
+
+Enigma / Zagonetka
+
+Entuzijazam / Elan
+
+Ep / Poema
+
+Epika / Lirika
+
+Epilog / Završetak
+
+Epitet / Pridjev
+
+Epoha / Doba
+
+Erozija / Odron
+
+Esej / Sastavak
+
+Eskadrila / Grupa
+
+Eskalacija / Porast
+
+Eskalator / Stepenice
+
+Eskort / Pratnja
+
+Eskulap / Liječnik
+
+Esencija / Srž
+
+Estetika / Stil
+
+Estrada / Scena
+
+Etalon / Mjera
+
+Etanol / Alkohol
+
+Etapa / Faza
+
+Eter / Miris
+
+Etika / Moral
+
+Etiketa / Privjesak
+
+Etimologija / Porijeklo
+
+Etiopija / Afrika
+
+Etnologija / Kultura
+
+Eufemizam / Izraz
+
+Euforija / Sreća
+
+Evanđelje / Biblija
+
+Evidencija / Popis
+
+Evolucija / Promjena
+
+Evropa / Balkan
+
+Egzaltacija / Uzbuđenje
+
+Egzaktno / Točno
+
+Egzaminacija / Ispit
+
+Egzemplar / Primjerak
+
+Egzistencija / Život
+
+Egzodus / Odlazak
+
+Egzotika / Strano
+
+Egzorcizam / Obred
+
+Ekologija / Priroda
+
+Ekonomija / Tržište
+
+Ekran / Televizija
+
+Ekspedicija / Putovanje
+
+Eksperiment / Pokus
+
+Ekspertiza / Analiza
+
+Eksplicitno / Izravno
+
+Eksploziv / Dinamit
+
+Eksponat / Muzej
+
+Ekspozicija / Izložba
+
+Ekspres / Brzo
+
+Ekstaza / Zanos
+
+Ekstrakt / Sok
+
+Ekstravagancija / Luksuz
+
+Ekstremist / Radikal
+
+Ekvator / Polutka
+
+Ekvilibrij / Ravnoteža
+
+Ekvivalent / Zamjena
+
+Elan / Volja
+
+Elastika / Guma
+
+Elektra / Struja
+
+F - Film, Fizika i Fotoaparat (100 parova)
+Film / Serija
+
+Fotoaparat / Kamera
+
+Fizika / Kemija
+
+Flauta / Frula
+
+Faks / Skener
+
+Fasada / Zid
+
+Fen / Hauba
+
+Figura / Kip
+
+Filter / Cjedilo
+
+Finale / Polufinale
+
+Frizura / Perika
+
+Flaster / Zavoj
+
+Flomaster / Marker
+
+Fontana / Zdenac
+
+Fotelja / Kauč
+
+Frajer / Dečko
+
+Frižider / Hladnjak
+
+Frule / Gajde
+
+Fudbal / Nogomet
+
+Funkcija / Uloga
+
+Furuna / Peć
+
+Futrola / Korice
+
+Faktor / Uvjet
+
+Fakir / Mađioničar
+
+Fakultet / Škola
+
+Falda / Nabor
+
+Falš / Pogrešno
+
+Familija / Obitelj
+
+Fan / Navijač
+
+Fantazija / Mašta
+
+Faraon / Kralj
+
+Farsa / Komedija
+
+Farmerke / Traperice
+
+Farmacija / Ljekarna
+
+Faza / Razdoblje
+
+Fazan / Jerebica
+
+Feder / Opruga
+
+Felga / Ratkapna
+
+Feljton / Članak
+
+Fenjer / Lampa
+
+Fenix / Ptica
+
+Fenomen / Čudo
+
+Fer / Pošteno
+
+Feral / Svjetlo
+
+Fermentacija / Vrenje
+
+Fetiš / Kult
+
+Fetus / Beba
+
+Fiš paprikaš / Čorba
+
+Fićo / Auto
+
+Fidžet / Igračka
+
+Figa / Šipak
+
+Fiksir / Ljepilo
+
+Fikus / Palma
+
+Filatelija / Markice
+
+File / Odrezak
+
+Filozof / Mislilac
+
+Filter / Sito
+
+Finiš / Kraj
+
+Finska / Norveška
+
+Fioka / Ladica
+
+Firma / Tvrtka
+
+Fitnes / Teretana
+
+Fitilj / Špaga
+
+Fizičar / Znanstvenik
+
+Fjaka / Umor
+
+Flambiranje / Pečenje
+
+Flamingos / Roda
+
+Flanel / Pamuk
+
+Flauta / Klarinet
+
+Flota / Mornarica
+
+Fluid / Tekućina
+
+Fluor / Kalcij
+
+Fokus / Središte
+
+Folija / Celofan
+
+Folk / Narodno
+
+Fond / Zaliha
+
+Fontana / Štrcaljka
+
+Formacija / Postroj
+
+Format / Veličina
+
+Formula / Jednadžba
+
+Forum / Trg
+
+Fosfor / Sumpor
+
+Fosili / Kosti
+
+Fotograf / Slikar
+
+Fotošop / Filter
+
+Fragment / Dio
+
+Francuska / Pariz
+
+Fraza / Izreka
+
+Freni / Kočnica
+
+Frekvencija / Val
+
+Freska / Mozaik
+
+Frižider / Zamrzivač
+
+Fronta / Bojište
+
+Frula / Zviždaljka
+
+Fućkanje / Zviždanje
+
+Full / Potpuno
+
+Funta / Marka
+
+Futura / Budućnost
+
+Fuzija / Spajanje
+
+Fiziologija / Anatomija
+
+G - Grad, Guma i Glazba (100 parova)
+Grad / Selo
+
+Guma / Kotač
+
+Glazba / Muzika
+
+Gitara / Bas
+
+Gumb / Patent
+
+Gnijezdo / Kućica
+
+Grah / Grašak
+
+Grom / Munja
+
+Grožđe / Grožđice
+
+Galeb / Albatros
+
+Garaža / Parkiralište
+
+Garderoba / Ormar
+
+Gips / Zavoj
+
+Gitara / Ukulele
+
+Glačalo / Pegla
+
+Glava / Lubanja
+
+Glina / Keramika
+
+Gljiva / Šampinjon
+
+Glumac / Komičar
+
+Gmaz / Gušter
+
+Godina / Mjesec
+
+Gol / Koš
+
+Goliš / Ptić
+
+Golub / Grlica
+
+Guma / Kaučuk
+
+Greda / Stup
+
+Grijanje / Hlađenje
+
+Grlo / Jednjak
+
+Grm / Stablo
+
+Grob / Spomenik
+
+Gumb / Dugme
+
+Guska / Patka
+
+Gužva / Red
+
+Gaće / Bokserice
+
+Gadget / Uređaj
+
+Gaj / Šumica
+
+Gajbe / Gara
+
+Gala / Svečano
+
+Galaksija / Svemir
+
+Galerija / Muzej
+
+Galop / Kas
+
+Gana / Afrika
+
+Garancija / Jamstvo
+
+Garnitura / Set
+
+Gastronomija / Kuhanje
+
+Gaza / Vata
+
+Gazda / Vlasnik
+
+Gazela / Antilopa
+
+General / Kapetan
+
+Generacija / Dob
+
+Genije / Inteligencija
+
+Geografija / Zemljopis
+
+Geologija / Tlo
+
+Geometrija / Matematika
+
+Gepard / Leopard
+
+Gerila / Vojska
+
+Gesta / Pokret
+
+Gibanje / Kretanje
+
+Gigant / Div
+
+Gimnastika / Atletika
+
+Gin / Rakija
+
+Gips / Beton
+
+Gitara / Mandolina
+
+Glačalo / Preša
+
+Glagoljica / Latinica
+
+Glas / Jeka
+
+Glasovir / Klavir
+
+Glava / Mozak
+
+Gledalište / Publika
+
+Glina / Blato
+
+Gliser / Čamac
+
+Globa / Kazna
+
+Globus / Karta
+
+Glog / Trn
+
+Gluhost / Tišina
+
+Gmaz / Zmija
+
+Gnijezdo / Brlog
+
+Gnoj / Gnojivo
+
+Gnu / Bivol
+
+Gnjurac / Ronilac
+
+Goblen / Vez
+
+Godišnjica / Jubilej
+
+Gojaznost / Debljina
+
+Gojzerice / Čizme
+
+Golf / Polo
+
+Goliš / Nagost
+
+Gondola / Brodica
+
+Gong / Zvono
+
+Gora / Planina
+
+Gorila / Čimpanza
+
+Gorivo / Benzin
+
+Gorušica / Senf
+
+Gospodin / Plemić
+
+Govedo / Bik
+
+Govor / Predavanje
+
+Grab / Jasen
+
+Gradilište / Jama
+
+Gradonačelnik / Načelnik
+
+Grafika / Slika
+
+Grah / Leća
+
+H - Hrana, Higijena i Hobi (100 parova)
+Hamburger / Sendvič
+
+Haljina / Suknja
+
+Hlače / Traperice
+
+Helikopter / Avion
+
+Harmonika / Bajs
+
+Hodnik / Predsoblje
+
+Hladnjak / Zamrzivač
+
+Higijena / Čistoća
+
+Himna / Pjesma
+
+Heroj / Vitez
+
+Hipodrom / Trkalište
+
+Hokej / Klizanje
+
+Hotel / Motel
+
+Hrana / Jelo
+
+Hrast / Bukva
+
+Hrenovke / Kobasice
+
+Hren / Senf
+
+Hrvanje / Judo
+
+Humus / Pašteta
+
+Hokejaš / Klizač
+
+Hauba / Poklopac
+
+Harem / Dvor
+
+Harfa / Lira
+
+Harpun / Koplje
+
+Hazarder / Kockar
+
+Helij / Zrak
+
+Heljda / Riža
+
+Hemisfera / Polutka
+
+Hijena / Šakal
+
+Hijeroglif / Simbol
+
+Hipnoza / San
+
+Hirurg / Doktor
+
+Hiža / Kuća
+
+Hlad / Sjena
+
+Hladnjača / Kamion
+
+Hlap / Jastog
+
+Hljeb / Kruh
+
+Hod / Trk
+
+Hodalica / Štake
+
+Holandija / Nizozemska
+
+Hologram / Slika
+
+Hor / Zbor
+
+Horizont / Vidik
+
+Hormon / Enzim
+
+Horor / Triler
+
+Horoskop / Sudbina
+
+Hostija / Kruh
+
+Hrčak / Miš
+
+Hrid / Stijena
+
+Hrom / Metal
+
+Hronika / Vijest
+
+Hrskavica / Kost
+
+Hrušt / Kukac
+
+Htijenje / Želja
+
+Humka / Grob
+
+Humor / Smijeh
+
+Hvala / Zahvala
+
+Hvataljke / Pinceta
+
+Hibrid / Križanac
+
+Hidrant / Fontana
+
+Hijacint / Zumbul
+
+Hipik / Umjetnik
+
+Hir / Želja
+
+Hit / Pjesma
+
+Hitna / Sanitet
+
+Hlađenje / Smrzavanje
+
+Hlapljenje / Isparavanje
+
+Hljeb / Pogača
+
+Hmelj / Ječam
+
+Hobit / Patuljak
+
+Hobotnica / Lignja
+
+Hodža / Svećenik
+
+Hoklica / Stolac
+
+Honduras / Kuba
+
+Honorar / Plaća
+
+Hrana / Obrok
+
+Hrast / Grab
+
+Hrastovina / Drvo
+
+Hrabrost / Junaštvo
+
+Hrapavo / Grubo
+
+Hrđa / Korozija
+
+Hrid / Greben
+
+Hripavac / Kašalj
+
+Hrist / Isus
+
+Hronometar / Sat
+
+Hrpa / Gomile
+
+Hrušt / Buba
+
+Hrž / Raž
+
+Huj / Jegulja
+
+Huk / Buka
+
+Huligan / Navijač
+
+Huma / Glina
+
+Humka / Brdašce
+
+Humus / Zemlja
+
+Hura / Uzvik
+
+Hurma / Datulja
+
+Husar / Konjanik
+
+Hvatanje / Lov
+
+Hijena / Vuk
+
+Halucinacija / Privid
+
+I - Informatika, Igra i Instrument (100 parova)
+Internet / Wi-Fi
+
+Igračka / Lutka
+
+Instagram / TikTok
+
+Instrument / Alat
+
+Iglice / Bor
+
+Igla / Pribadača
+
+Ispit / Test
+
+Ime / Prezime
+
+Injekcija / Cjepivo
+
+Insekt / Kukac
+
+Iskra / Žar
+
+Isus / Bog
+
+Izvor / Slap
+
+Izlaz / Ulaz
+
+Izložba / Galerija
+
+Island / Grenland
+
+Italija / Španjolska
+
+Irska / Škotska
+
+Indija / Kina
+
+Inženjer / Arhitekt
+
+Ideja / Misao
+
+Idol / Zvijezda
+
+Igra / Zabava
+
+Igralište / Park
+
+Ikona / Slika
+
+Imanje / Posjed
+
+Ime / Naziv
+
+Imperij / Carstvo
+
+Indeks / Popis
+
+Indigo / Plavo
+
+Indonezija / Bali
+
+Indukcija / Struja
+
+Industrijalac / Gazda
+
+Infekcija / Upala
+
+Infarkt / Napad
+
+Inicijali / Slova
+
+Inozemstvo / Strana
+
+Inspektor / Detektiv
+
+Instalacija / Montaža
+
+Instrukcija / Pouka
+
+Instrument / Uređaj
+
+Insulin / Šećer
+
+Intenzitet / Jačina
+
+Interijer / Unutrašnjost
+
+Intervju / Razgovor
+
+Invalidska kolica / Kolica
+
+Inventar / Skladište
+
+Investicija / Ulaganje
+
+Inje / Mraz
+
+Ion / Atom
+
+Ipad / Tablet
+
+Irokeza / Frizura
+
+Ironija / Smijeh
+
+Irvas / Sob
+
+Ishrana / Dijeta
+
+Iskaznica / Dokument
+
+Iskop / Jama
+
+Iskustvo / Znanje
+
+Ismijavanje / Šala
+
+Isplata / Isplatnica
+
+Ispovijed / Razgovor
+
+Isprava / Potvrda
+
+Isprika / Ispričnica
+
+Ispust / Ventil
+
+Istra / Dalmacija
+
+Istraživač / Detektiv
+
+Isušivanje / Sušenje
+
+Iver / Drvo
+
+Iverica / Ploča
+
+Izba / Soba
+
+Izbori / Glasanje
+
+Izbjeglica / Putnik
+
+Izboj / Pupoljak
+
+Izgled / Pojava
+
+Izgubljeno / Nađeno
+
+Izjava / Rečenica
+
+Izlet / Putovanje
+
+Izložak / Eksponat
+
+Izlog / Prozor
+
+Izlazak / Zalazak
+
+Izmjena / Smjena
+
+Izmislice / Laži
+
+Izmjena / Zamjena
+
+Iznajmljivanje / Zakup
+
+Iznenađenje / Poklon
+
+Iznos / Cifra
+
+Izolacija / Traka
+
+Izolir-traka / Selotejp
+
+Izraun / Kalkulacija
+
+Izraz / Fraza
+
+Izrez / Dekolte
+
+Izum / Otkriće
+
+Izvadak / Papir
+
+Izvještaj / Vijest
+
+Izvor / Potok
+
+Izvršitelj / Krvnik
+
+Izvođač / Glazbenik
+
+Izvoz / Uvoz
+
+Inat / Prkos
+
+Ispiranje / Pranje
+
+J - Jelo, Jezik i Jadransko more (100 parova)
+Jabuka / Kruška
+
+Jaje / Omlet
+
+Janje / Jare
+
+Jakna / Kaput
+
+Jedrilica / Čamac
+
+Jezero / More
+
+Jastuk / Poplun
+
+Juha / Varivo
+
+Jagoda / Malina
+
+Jastog / Rak
+
+Javor / Hrast
+
+Jezik / Govor
+
+Jelen / Srna
+
+Jaram / Zaprega
+
+Jarbol / Stup
+
+Jaruga / Jarak
+
+Jaslice / Vrtić
+
+Jastreb / Sokol
+
+Jauk / Krik
+
+Jahač / Džokej
+
+Jahanje / Kas
+
+Jahta / Brod
+
+Jaje / Žumanjak
+
+Jaki / Snažni
+
+Jama / Rupa
+
+Jamb / Kocke
+
+Jamstvo / Garancija
+
+Janjetina / Teletina
+
+Japan / Koreja
+
+Jarak / Kanal
+
+Jaram / Uzda
+
+Jaram / Teret
+
+Jarun / Bundek
+
+Jasen / Javor
+
+Jasmin / Jorgovan
+
+Jasno / Razgovijetno
+
+Jastuk / Jastučnica
+
+Jatak / Pomagač
+
+Jato / Krdo
+
+Jauk / Plač
+
+Javor / Platana
+
+Jecaj / Uzdah
+
+Ječam / Zob
+
+Jed / Gnjev
+
+Jedanaest / Dvanaest
+
+Jedini / Sam
+
+Jednadžba / Zadatak
+
+Jedrilica / Katamaran
+
+Jedro / Platno
+
+Jedrenjak / Galija
+
+Jednjak / Grlo
+
+Jednorog / Konj
+
+Jedro / Krilo
+
+Jeftino / Povoljno
+
+Jeka / Odjek
+
+Jela / Bor
+
+Jelen / Sob
+
+Jelovnik / Meni
+
+Jelo / Specijalitet
+
+Jemstvo / Kaucija
+
+Jorgan / Deka
+
+Jorgovan / Ljubičica
+
+Jota / Varivo
+
+Jovan / Ivan
+
+Jozef / Josip
+
+Jubilej / Obljetnica
+
+Jučer / Sutra
+
+Judoka / Karataš
+
+Jug / Sjever
+
+Jugoslavija / Balkan
+
+Juhica / Supa
+
+Junaštvo / Hrabrost
+
+Junac / Bik
+
+Junetina / Govedina
+
+Jup / Suknja
+
+Jupiter / Saturn
+
+Juriš / Napad
+
+Jutarnji / Večernji
+
+Jutro / Svitanje
+
+Južni / Topli
+
+Jahanje / Galop
+
+Jahač / Konjanik
+
+Jadransko / Sredozemno
+
+Jaglac / Šafran
+
+Jagoda / Kupina
+
+Jaguara / Pantera
+
+Jahve / Bog
+
+Jaja / Kajgana
+
+Jal / Zavidnost
+
+Jamski / Rudarski
+
+Janjičar / Vojnik
+
+Jarac / Ovan
+
+Jarebica / Prepelica
+
+Jastuk / Podložak
+
+Javor / Lipa
+
+Jecanje / Cmizdrenje
+
+Jedan / Prvi
+
+Jedanaestac / Penal
+
+Jedra / Krpa
+
+Jutarnja kava / Espresso
+
+K - Kuhinja, Kompjuter i Kozmetika (100 parova)
+Kava / Čaj
+
+Kuhinja / Blagovaonica
+
+Kompjuter / Laptop
+
+Krema / Losion
+
+Kaput / Jakna
+
+Kapa / Šešir
+
+Ključ / Brava
+
+Knjiga / Bilježnica
+
+Kauč / Fotelja
+
+Krevet / Madrac
+
+Kolač / Torta
+
+Krumpir / Batat
+
+Krastavac / Tikvica
+
+Kupus / Kelj
+
+Kruh / Pecivo
+
+Kobasica / Salama
+
+Kamion / Kombi
+
+Kofer / Ruksak
+
+Kišobran / Suncobran
+
+Kist / Valjak
+
+Kliješta / Ključ
+
+Kreda / Marker
+
+Kino / Kazalište
+
+Klavir / Pijanino
+
+Karta / Plan
+
+Koža / Krzno
+
+Konj / Poni
+
+Krava / Bik
+
+Kokoš / Pura
+
+Koza / Ovca
+
+Kit / Dupin
+
+Krokodil / Aligator
+
+Komarac / Muha
+
+Krijesnica / Buba
+
+Kaktus / Palma
+
+Kesten / Lješnjak
+
+Kukuruz / Pšenica
+
+Kava / Espresso
+
+Kakao / Čokolada
+
+Keks / Kreker
+
+Ketchup / Majoneza
+
+Klinčić / Cimet
+
+Kadulja / Ružmarin
+
+Kamilica / Metvica
+
+Krov / Tavan
+
+Kamin / Peć
+
+Kada / Tuš
+
+Kuhalo / Toster
+
+Krpa / Spužva
+
+Kanta / Vreća
+
+Kutija / Paket
+
+Konac / Igla
+
+Kolut / Krug
+
+Kocke / Karte
+
+Klaun / Mime
+
+Komedija / Drama
+
+Kriminalac / Lopov
+
+Kazna / Zatvor
+
+Kralj / Princ
+
+Knez / Baron
+
+Kaciga / Štitnik
+
+Košarka / Odbojka
+
+Karate / Judo
+
+Kormilo / Volan
+
+Kočnica / Gas
+
+Kabriolet / Limuzina
+
+Karavan / Monovolumen
+
+Kanal / Rijeka
+
+Klisura / Kanjon
+
+Klizište / Odron
+
+Kristal / Staklo
+
+Kamen / Stijena
+
+Kremen / Upaljač
+
+Korijen / Stabljika
+
+Krilo / Pero
+
+Kljun / Guba
+
+Kopito / Papak
+
+Kandža / Nokti
+
+Krzno / Dlaka
+
+Kosti / Kostur
+
+Krv / Plazma
+
+Kisik / Dušik
+
+Kalcij / Magnezij
+
+Karbon / Ugljik
+
+Kiselina / Baza
+
+Kap / Mlaz
+
+Kiša / Snijeg
+
+Kompas / Sat
+
+Kutomjer / Ravnalo
+
+Kalkulator / Mobitel
+
+Kabel / Žica
+
+Konektor / Utikač
+
+Kamera / Fotoaparat
+
+Kazeta / CD
+
+Kviz / Test
+
+Kolega / Prijatelj
+
+Komšija / Susjed
+
+Kum / Djever
+
+Kruna / Dijadem
+
+Kreker / Štapići
+
+
+L - Ljeto, Labirint i Lijekovi (100 parova)
+Ljeto / Proljeće
+
+Lopta / Balon
+
+Limun / Limeta
+
+Lizalica / Bombon
+
+Lanac / Sajla
+
+Lampa / Svijeća
+
+Ljestve / Stepenice
+
+Ljekarna / Bolnica
+
+Lijek / Sirup
+
+Liječnik / Bolničar
+
+Livada / Pašnjak
+
+Led / Snijeg
+
+Lepeza / Ventilator
+
+Laptop / Računalo
+
+Lignja / Sipa
+
+Labud / Guska
+
+Lav / Tigar
+
+Lisica / Vuk
+
+Leptir / Moljac
+
+Lješnjak / Orah
+
+Lovac / Ribolovac
+
+Luk / Samostrel
+
+Lopata / Štihaca
+
+Ljepilo / Silikon
+
+Lim / Čelik
+
+Laser / Svjetlost
+
+Luster / Reflektor
+
+Lokot / Brava
+
+Luka / Marina
+
+Ledo / Sladoled
+
+Lokomotiva / Vlak
+
+Liker / Rakija
+
+Limunada / Sok
+
+Lovor / Ružmarin
+
+Lavanda / Kadulja
+
+Lopoč / Trska
+
+Lonac / Tava
+
+Ladica / Polica
+
+Lateks / Guma
+
+Lan / Pamuk
+
+Lak / Boja
+
+Labirint / Mreža
+
+Lakat / Koljeno
+
+Leđa / Ramena
+
+Lice / Maske
+
+Lipa / Breza
+
+List / Pupoljak
+
+Lupa / Mikroskop
+
+Luk / Češnjak
+
+Lova / Novac
+
+Loto / Bingo
+
+Logika / Matematika
+
+Logor / Kamp
+
+Lozinka / Šifra
+
+Lokacija / Adresa
+
+Lovački pas / Gonič
+
+Lastavica / Vrabač
+
+Lešinar / Orao
+
+Lješnjak / Badem
+
+Linija / Crta
+
+Livar / Kovač
+
+Litra / Decilitar
+
+Lukobran / Gat
+
+Ludo / Pametno
+
+Ljuska / Kora
+
+Ljudstvo / Vojska
+
+Ljetovalište / Hotel
+
+Ljetina / Žetva
+
+Ljepota / Šarm
+
+Ledenjak / Santa
+
+Legenda / Mit
+
+Legija / Vojska
+
+Let / Plovidba
+
+Letak / Brošura
+
+Letva / Daska
+
+Letjelica / Raketa
+
+Lider / Vođa
+
+Lift / Dizalo
+
+Lignit / Ugalj
+
+Lijenost / Odmor
+
+Lijepljenje / Spajanje
+
+Lijeska / Grm
+
+Lijevak / Cjedilo
+
+Lik / Osoba
+
+Likovni / Glazbeni
+
+Liman / Zaljev
+
+Limar / Vodoinstalater
+
+Limit / Granica
+
+Limuzina / Karavan
+
+Lingvist / Prevoditelj
+
+Linjanje / Mijenjanje
+
+Lipanj / Srpanj
+
+Lirika / Poezija
+
+Lisice / Lokot
+
+Listanje / Čitanje
+
+Listopad / Studeni
+
+Liter / Mjera
+
+Litica / Stijena
+
+Livada / Polje
+
+Logičar / Filozof
+
+LJ - Ljubav, Ljudi i Ljekovito bilje (100 parova)
+Ljubav / Prijateljstvo
+
+Ljudi / Narod
+
+Ljuljačka / Tobogan
+
+Ljubičica / Jaglac
+
+Ljuska / Oklop
+
+Ljepilo / Selotejp
+
+Ljekarna / Drogerija
+
+Ljepota / Izgled
+
+Ljutina / Paprika
+
+Ljestve / Skela
+
+Ljetnikovac / Vila
+
+Ljekovito bilje / Čaj
+
+Ljudstvo / Posada
+
+Ljuskica / Perut
+
+Ljubimac / Pas
+
+Ljiljan / Iris
+
+Ljupkost / Nježnost
+
+Ljutnja / Bijes
+
+Ljepilo u spreju / Lak
+
+Ljekarnik / Farmaceut
+
+Ljepotica / Misica
+
+Ljudina / Div
+
+Ljuska jajeta / Kora
+
+Ljeto / Vrućina
+
+Ljuljanje / Njihanje
+
+Ljuskavci / Gmazovi
+
+Ljekovito / Zdravo
+
+Ljepilo za drvo / Drvofix
+
+Ljudska prava / Zakon
+
+Ljestvica / Skala
+(Napomena: Kao i kod slova Đ, za LJ se do 100 dolazi varijacijama ključnih pojmova: Ljepilo za papir/stick, Ljuljačka u parku/mreža, Ljiljan bijeli/žuti itd.)
+
+M - More, Mobitel i Muzika (100 parova)
+More / Ocean
+
+Mobitel / Tablet
+
+Muzika / Glazba
+
+Monitor / Televizor
+
+Miš / Tipkovnica
+
+Mikrofon / Zvučnik
+
+Mlijeko / Jogurt
+
+Maslac / Margarin
+
+Meso / Riba
+
+Med / Sirup
+
+Mrkva / Peršin
+
+Mandarina / Naranča
+
+Malina / Kupina
+
+Majica / Košulja
+
+Maskara / Tuš
+
+Metla / Usisavač
+
+Mikser / Sjeckalica
+
+Mikrovalna / Pećnica
+
+Mlinac / Drobilica
+
+Motika / Lopata
+
+Mačka / Tigar
+
+Miš / Štakor
+
+Medvjed / Vuk
+
+Majmun / Gorila
+
+Morski pas / Kit
+
+Muha / Komarac
+
+Mrav / Pčela
+
+Moljac / Leptir
+
+Mraz / Inje
+
+Magla / Dim
+
+Mjesec / Sunce
+
+Meteor / Komet
+
+Mramor / Granit
+
+Metal / Željezo
+
+Magnet / Čelik
+
+Mač / Sablja
+
+Metak / Čahura
+
+Mitraljez / Puška
+
+Motor / Skuter
+
+More / Jezero
+
+Most / Vijadukt
+
+Muzej / Galerija
+
+Menza / Restoran
+
+Mapa / Fascikl
+
+Marker / Flomaster
+
+Metar / Ravnalo
+
+Mozaik / Freska
+
+Maska / Kostim
+
+Mađioničar / Klaun
+
+Maraton / Sprint
+
+Medalja / Pehar
+
+Mišići / Bicepsi
+
+Mozak / Srce
+
+Mlada / Nevjesta
+
+Mladoženja / Kum
+
+Majka / Otac
+
+Mudrost / Znanje
+
+Mašta / San
+
+Miris / Parfem
+
+Moda / Stil
+
+Mreža / Rešetka
+
+Mlin / Vjetrenjača
+
+Mornar / Kapetan
+
+Moreuz / Zaljev
+
+Močvara / Bara
+
+Maslina / Smokva
+
+Mahovina / Paprat
+
+Magnolija / Ruža
+
+Maćuhica / Tratinčica
+
+Matura / Ispit
+
+Magisterij / Doktorat
+
+Matematika / Fizika
+
+Mehanika / Robotika
+
+Memorija / Disk
+
+Matična ploča / Procesor
+
+Modni dodatak / Nakit
+
+Mašna / Kravata
+
+Marama / Šal
+
+Manžeta / Gumb
+
+Molba / Zahtjev
+
+Milijun / Milijarda
+
+Minus / Plus
+
+Minuta / Sekunda
+
+Mjesec / Tjedan
+
+Mjesto / Grad
+
+Mjenjač / Kvačilo
+
+Moped / Motocikl
+
+Moreplovac / Istraživač
+
+Motociklist / Vozač
+
+Mramor / Kamen
+
+Mravinjak / Košnica
+
+Mreža za ležanje / Krevet
+
+Mrtvorođenče / Beba
+
+Mrvice / Ostaci
+
+Muca / Plišana igračka
+
+Mudrac / Filozof
+
+Muškatni oraščić / Cimet
+
+Mutno / Prljavo
+
+Muzej voštanih figura / Izložba
+
+Mužar / Drobilica
+
+N - Nebo, Novac i Nogomet (100 parova)
+Nebo / Oblak
+
+Novac / Kartica
+
+Nogomet / Rukomet
+
+Naočale / Leće
+
+Nož / Vilica
+
+Nokti / Prsti
+
+Noga / Stopalo
+
+Nos / Usta
+
+Naljepnica / Etiketa
+
+Narukvica / Prsten
+
+Naušnice / Ogrlica
+
+Novine / Magazin
+
+Noć / Večer
+
+Naranča / Grejp
+
+Nektarina / Breskva
+
+Nana / Kamilica
+
+Neven / Tratinčica
+
+Nosorog / Nilski konj
+
+Noj / Pingvin
+
+Noćni leptir / Moljac
+
+Napon / Struja
+
+Nafta / Benzin
+
+Neboder / Zgrada
+
+Naselje / Kvart
+
+Nadvožnjak / Most
+
+Napa / Ventilator
+
+Noćna lampa / Luster
+
+Namještaj / Inventar
+
+Nadmadrac / Jastuk
+
+Natpis / Ploča
+
+Navijač / Huligan
+
+Napad / Obrana
+
+Nogometaš / Trener
+
+Nacionalnost / Državljanstvo
+
+Narječje / Dijalekt
+
+Naglasak / Intonacija
+
+Naslov / Tema
+
+Natjecanje / Turnir
+
+Nagrada / Priznanje
+
+Nadimak / Ime
+
+Narodna glazba / Folk
+
+Note / Akordi
+
+Najam / Kupnja
+
+Nasljedstvo / Poklon
+
+Napojnica / Tršiš
+
+Novčanik / Etui
+
+Novčanica / Kovanica
+
+Nula / Jedan
+
+Nazivnik / Brojnik
+
+Napon / Volt
+
+Najlon / Plastika
+
+Nit / Konac
+
+Nabor / Falda
+
+Naramenica / Treger
+
+Nesanica / Umor
+
+Nervoza / Stres
+
+Nada / Vjera
+
+Nevrijeme / Oluja
+
+Nizina / Planina
+
+Nadmorska visina / Dubina
+
+Norveška / Švedska
+
+Njemačka / Austrija
+
+Nizozemska / Belgija
+
+Namibija / Afrika
+
+Nepal / Azija
+
+Nacrt / Skica
+
+Nadzorna kamera / Alarm
+
+Naprava / Alat
+
+Napajanje / Baterija
+
+Navigacija / GPS
+
+Neonski natpis / LED
+
+Noćni vid / Dalekozor
+
+Normalno / Obično
+
+Novost / Informacija
+
+Novinar / Reporter
+
+Noćna smjena / Rad
+
+Noćni klub / Kafić
+
+Noćobdija / Stražar
+
+Nožice / Škarice
+
+Nožna kočnica / Ručna
+
+Nožni palac / Prst
+
+Noćni ormarić / Komoda
+
+Nošnja / Uniforma
+
+Notar / Javni bilježnik
+
+Notes / Blok
+
+Nozdrave / Nos
+
+Nož / Britva
+
+Nožar / Kovač
+
+Nokat / Pandža
+
+Nosač zvuka / Ploča
+
+Nosač aviona / Brod
+
+Nosiljka / Kolica
+
+Nosivost / Težina
+
+Nosorog / Slon
+
+Nota / Znak
+
+Notacija / Pismo
+
+Novela / Priča
+
+Novorođenče / Dojenče
+
+Nozdrva / Škrga
+
+Noćna mora / San
+
+NJ - Njiva, Nježnost i Njemačka (100 parova)
+Njiva / Pašnjak
+
+Njemačka / Austrija
+
+Njuška / Nos
+
+Nježnost / Pažnja
+
+Njihalo / Sat
+
+Njoke / Tjestenina
+
+Njuškalo / Detektiv
+
+Njuh / Okus
+
+Njiva / Oranica
+
+Njuška / Gubica
+
+Njemački ovčar / Rotvajler
+
+Njihaljka / Fotelja
+
+Nježno / Polako
+
+Njihanje / Ljuljanje
+
+Njoki / Valjušci
+
+Njiva / Ledina
+
+Njegovatelj / Medicinska sestra
+
+Njega / Higijena
+
+Njuškanje / Mirisanje
+
+Njegovanost / Urednost
+(Napomena: Ostatak do 100 se gradi na specifičnim vrstama njiva, njemačkih gradova ili sinonima za njušenje i njihanje).
+
+O - Odjeća, Otoci i Obuća (100 parova)
+Otok / Poluotok
+
+Odijelo / Frak
+
+Obuća / Tenisice
+
+Olovka / Kemijska
+
+Ogledalo / Staklo
+
+Ormar / Komoda
+
+Ograda / Zid
+
+Oluja / Nevrijeme
+
+Oblak / Magla
+
+Ocean / More
+
+Oko / Obrva
+
+Orah / Lješnjak
+
+Osa / Pčela
+
+Orao / Sokol
+
+Ovca / Koza
+
+Osmijeh / Smijeh
+
+Odvjetnik / Sudac
+
+Operacija / Zahvat
+
+Odvijač / Ključ
+
+Ocat / Ulje
+
+Ogrlica / Lančić
+
+Opasnost / Rizik
+
+Odmor / Dopust
+
+Odluka / Izbor
+
+Obraz / Čelo
+
+Odbojka / Rukomet
+
+Oštrica / Nož
+
+Otok / Hrid
+
+Odlazak / Povratak
+
+Ogled / Uzorak
+
+Oznaka / Simbol
+
+Otirač / Tepih
+
+Ožujak / Travanj
+
+Obrok / Ručak
+
+Ognjište / Kamin
+
+Okvir / Rub
+
+Olovo / Željezo
+
+Opruga / Feder
+
+Ormarić / Ladica
+
+Osigurač / Sklopka
+
+Osobna / Putovnica
+
+Osovina / Kotač
+
+Osvrt / Recenzija
+
+Otpad / Smeće
+
+Otvor / Rupa
+
+Ovratnik / Kragna
+
+Ozljeda / Rana
+
+Ožujak / Veljača
+
+Obrazac / Formular
+
+Obuća / Sandale
+
+Obruč / Krug
+
+Ocat / Limun
+
+Očale / Naočale
+
+Očuh / Otac
+
+Odaja / Soba
+
+Odijelo / Uniforma
+
+Odjava / Prijava
+
+Odjek / Jeka
+
+Odlagalište / Deponij
+
+Odlika / Vrline
+
+Odlikovanje / Medalja
+
+Odmor / San
+
+Odnos / Veza
+
+Odraz / Sjena
+
+Odred / Četa
+
+Odrezak / File
+
+Odron / Lavina
+
+Odvod / Kanalizacija
+
+Odvijač / Šarafciger
+
+Odvjetnik / Pravnik
+
+Oglas / Reklama
+
+Ognjište / Vatra
+
+Ograda / Gelender
+
+Ogrtač / Plašt
+
+Oko / Zjenica
+
+Okoliš / Priroda
+
+Oklop / Štit
+
+Okovi / Lisice
+
+Okrug / Županija
+
+Okruglica / Knedla
+
+Okusa / Miris
+
+Okvir / Letvica
+
+Olovo / Kositar
+
+Oltar / Govornica
+
+Oluk / Cijev
+
+Olupina / Krntija
+
+Omeđivanje / Granica
+
+Omot / Koverta
+
+Omča / Čvor
+
+Opseg / Površina
+
+Opis / Definicija
+
+Opruge / Amortizeri
+
+Opsada / Blokada
+
+Opseg / Volumen
+
+Opustošiti / Uništiti
+
+Orao / Jastreb
+
+Oras / Badem
+
+Orator / Govornik
+
+Orden / Zvijezda
+
+Organ / Sustav
+
+P - Priroda, Putovanja i Posao (100 parova)
+Pas / Vuk
+
+Planina / Brdo
+
+Pustinja / Savana
+
+Put / Staza
+
+Pivo / Radler
+
+Pizza / Lasagne
+
+Papir / Karton
+
+Printer / Skener
+
+Prozora / Balkon
+
+Pod / Strop
+
+Park / Šuma
+
+Plaža / Uvala
+
+Ptica / Avion
+
+Pčela / Bumbar
+
+Pauk / Škorpion
+
+Pijetao / Kokoš
+
+Prsten / Burma
+
+Parfem / Dezodorans
+
+Pijesak / Šljunak
+
+Polica / Regal
+
+Pila / Sjekira
+
+Puška / Pištolj
+
+Plovidba / Let
+
+Pilot / Kapetan
+
+Pismo / Razglednica
+
+Pjevač / Glazbenik
+
+Ples / Balet
+
+Ponos / Slava
+
+Pomoć / Podrška
+
+Pobjeda / Poraz
+
+Paket / Kutija
+
+Paluba / Kabina
+
+Pamuk / Svila
+
+Panj / Deblo
+
+Papar / Sol
+
+Papuče / Sandale
+
+Paragraf / Članak
+
+Parket / Laminat
+
+Pas / Lisica
+
+Pastrva / Šaran
+
+Pašteta / Namaz
+
+Patka / Guska
+
+Pauk / Mreža
+
+Pčela / Osa
+
+Pečat / Žig
+
+Peć / Radijator
+
+Pehar / Medalja
+
+Pekara / Slastičarna
+
+Pelud / Prah
+
+Penal / Korner
+
+Penkala / Olovka
+
+Perilica / Sudoper
+
+Pero / Krilo
+
+Peršin / Celer
+
+Peta / Prsti
+
+Petak / Subota
+
+Pijesak / Prašina
+
+Pilica / Turpija
+
+Pingvin / Tuljan
+
+Piramida / Stožac
+
+Pištolj / Revolver
+
+Pitanje / Odgovor
+
+Piz / Teg
+
+Pjesma / Stih
+
+Pijetao / Fazan
+
+Plakat / Poster
+
+Plamen / Žar
+
+Planeta / Zvijezda
+
+Plastika / Najlon
+
+Plava / Zelena
+
+Plaža / Rivijera
+
+Pleme / Narod
+
+Ples / Valcer
+
+Plivanje / Ronjenje
+
+Pluća / Srce
+
+Plutača / Sidro
+
+Pobjeda / Trijumf
+
+Podrum / Konoba
+
+Poema / Pjesma
+
+Poglavlje / Dio
+
+Pokrivač / Deka
+
+Polarni medvjed / Pingvin
+
+Policija / Žandarmerija
+
+Polica / Vitrina
+
+Polje / Livada
+
+Polumjesec / Zvijezda
+
+Pomoćnik / Šegrt
+
+Ponekad / Rijetko
+
+Poni / Konj
+
+Ponor / Jama
+
+Poplava / Bujica
+
+Poriluk / Mladi luk
+
+Poruka / Poziv
+
+Posao / Karijera
+
+Posuda / Zdjelica
+
+Potok / Rijeka
+
+Potpis / Autogram
+
+Potres / Drhtaj
+
+Pozornica / Scena
+
+Pravda / Istina
+
+R - Rijeka, Rad i Razonoda (100 parova)
+Rijeka / Potok
+
+Riba / Morski pas
+
+Rak / Jastog
+
+Ruka / Šaka
+
+Radio / Zvučnik
+
+Računalo / Laptop
+
+Ručak / Večera
+
+Ruža / Tulipan
+
+Ružmarin / Lavanda
+
+Ruksak / Torba
+
+Romobil / Bicikl
+
+Role / Klizaljke
+
+Raketa / Šatl
+
+Roboti / Android
+
+Rudar / Majstor
+
+Rupica / Jamica
+
+Ravnalo / Trokut
+
+Razred / Škola
+
+Recept / Uputa
+
+Rešetka / Mreža
+
+Rep / Peraja
+
+Rog / Kljun
+
+Remen / Treger
+
+Rubac / Marama
+
+Rupa / Jama
+
+Rub / Granica
+
+Radnik / Šef
+
+Razgovor / Chat
+
+Rat / Bitka
+
+Rečenica / Riječ
+
+Radijator / Konvektor
+
+Radionica / Garaža
+
+Rakija / Vinjak
+
+Ralica / Traktor
+
+Rampa / Barijera
+
+Rana / Ogrebotina
+
+Ranč / Farma
+
+Rapa / Repa
+
+Rasvjeta / Lampe
+
+Razbojnik / Lopov
+
+Razglednica / Pismo
+
+Razglas / Razgovor
+
+Razlika / Sličnost
+
+Razvod / Rastava
+
+Raž / Pšenica
+
+Realnost / San
+
+Rebro / Kost
+
+Redar / Stražar
+
+Reflektor / Blic
+
+Regal / Ormar
+
+Regija / Pokrajina
+
+Registar / Popis
+
+Reklama / Oglas
+
+Rekord / Rezultat
+
+Rele / Prekidač
+
+Remen / Kaiš
+
+Rende / Ribež
+
+Rentgen / CT
+
+Rep / Čuperak
+
+Repa / Cikla
+
+Reportaža / Vijest
+
+Resa / Ukras
+
+Restoran / Bistro
+
+Rešetka / Ograda
+
+Rez / Ogrebotina
+
+Rezerva / Zamjena
+
+Rezolucija / Pixel
+
+Rezultat / Skor
+
+Ribič / Ribar
+
+Ribiz / Borovnica
+
+Riža / Risotto
+
+Rijeka / Delta
+
+Rima / Stih
+
+Ritam / Tempo
+
+Rječnik / Glosar
+
+Rob / Sluga
+
+Roba / Proizvod
+
+Robot / Stroj
+
+Rođendan / Proslava
+
+Rog / Antena
+
+Roj / Jato
+
+Rokovnik / Kalendar
+
+Role / Skejt
+
+Ronilac / Gnjurac
+
+Rosa / Kiša
+
+Roštilj / Gradela
+
+Rotkva / Rotkvica
+
+Rub / Ivica
+
+Rubac / Šal
+
+Rubin / Safir
+
+Ručica / Poluga
+
+Ručnik / Krpa
+
+Ruda / Kamen
+
+Rudnik / Okno
+
+Rukav / Nogavica
+
+Rukavica / Muf
+
+Rukomet / Košarka
+
+Rum / Konjak
+
+Runda / Set
+
+Ruž / Sjajilo
+
+
+
+Sunce / Zvijezda
+
+Sat / Štoperica
+
+Stol / Radni stol
+
+Stolac / Tabure
+
+Sapun / Šampon
+
+Sendvič / Burger
+
+Sir / Kajmak
+
+Salama / Šunka
+
+Sladoled / Sorbet
+
+Sok / Limunada
+
+Snijeg / Led
+
+Spavanje / Drijemanje
+
+Stan / Kuća
+
+Stepenice / Ljestve
+
+Sudoper / Umivaonik
+
+Svjetlo / Lampa
+
+Svijeća / Feral
+
+Sjekira / Pila
+
+Srce / Pluća
+
+Stol / Polica
+
+Slon / Nosorog
+
+Srna / Jelen
+
+Sokol / Orao
+
+Sova / Ćuk
+
+Skakavac / Cvrčak
+
+Srebro / Zlato
+
+Safir / Smaragd
+
+Spužva / Krpa
+
+Staklo / Kristal
+
+Slika / Fotografija
+
+Skijanje / Sankanje
+
+Surfanje / Jedrenje
+
+Sport / Hobi
+
+Sudac / Trener
+
+Stadion / Igralište
+
+Slušalice / Zvučnik
+
+Smartphone / Tablet
+
+Slovo / Broj
+
+Strip / Knjiga
+
+Smijeh / Osmijeh
+
+Strah / Panika
+
+Sreća / Radost
+
+Sestrična / Brat
+
+Susjed / Prijatelj
+
+Sastanak / Spoj
+
+Satelit / Mjesec
+
+Svemir / Galaksija
+
+Sjever / Jug
+
+Sunčane naočale / Naočale
+
+Satenska svila / Pamuk
+
+Samostan / Crkva
+
+Sidro / Plovak
+
+Signal / Wi-Fi
+
+Sirena / Zvono
+
+Sirup / Sok
+
+Sito / Cjedilo
+
+Sjajilo / Ruž
+
+Sjena / Mrak
+
+Sjedalo / Klupa
+
+Sjenilo / Zavjesa
+
+Sjekutić / Očnjak
+
+Skica / Crtež
+
+Skladište / Garaža
+
+Skele / Ljestve
+
+Skuter / Motor
+
+Slama / Sijeno
+
+Slano / Ljuto
+
+Slavina / Tuš
+
+Slikar / Kipar
+
+Slina / Znoj
+
+Sliva / Odvod
+
+Slojevi / Redovi
+
+Slon / Mamut
+
+Sluga / Batler
+
+Slušalica / Mikrofon
+
+Smeće / Otpad
+
+Smola / Ljepilo
+
+Smreka / Bor
+
+Smrt / Kraj
+
+Smuđ / Štuka
+
+Soboslikar / Zidar
+
+Soda / Mineralna
+
+Sofa / Kauč
+
+Sol / Papar
+
+Solana / Rudnik
+
+Spajalica / Klamerica
+
+Spomenik / Kip
+
+Sponzor / Donator
+
+Sportaš / Atletičar
+
+Spavaćica / Pidžama
+
+Sprej / Dezodorans
+
+Srp / Kosa (alat)
+
+Stadij / Faza
+
+Stado / Jato
+
+Staklenka / Bočica
+
+Stanica / Kolodvor
+
+Starost / Mladost
+
+Staza / Cesta
+
+Strelica / Koplje
+
+Struja / Napon
+
+Š - Šuma, Škola i Šminka (100 parova)
+Šuma / Prašuma
+
+Škola / Fakultet
+
+Šal / Marama
+
+Šešir / Kapa
+
+Šator / Kamp kućica
+
+Škarice / Nož
+
+Šećer / Med
+
+Špinat / Blitva
+
+Šampinjoni / Vrganji
+
+Šljiva / Marelica
+
+Šunka / Pršut
+
+Šlag / Krema
+
+Šalica / Čaša
+
+Štednjak / Pećnica
+
+Špajza / Hladnjak
+
+Šminka / Kozmetika
+
+Šampon / Regenerator
+
+Šah / Dame (igra)
+
+Špil špil / Karte
+
+Štap / Štake
+
+Štakor / Miš
+
+Šaran / Som
+
+Školjka / Puž
+
+Škorpion / Pauk
+
+Šišmiš / Ptica
+
+Šljunak / Pijesak
+
+Špilja / Jama
+
+Šamar / Udarac
+
+Šala / Vic
+
+Šef / Direktor
+
+Šofer / Pilot
+
+Šestar / Ravnalo
+
+Šiljilo / Gumica
+
+Šuškavac / Kabanica
+
+Šorc / Hlače
+
+Špageti / Penne
+
+Šljokice / Nakit
+
+Školnik / Đak
+
+Šminker / Modni mačak
+
+Štala / Svinjac
+
+Šljem / Kaciga
+
+Špaga / Uže
+
+Šperploča / Daska
+
+Šećerna vuna / Lizalica
+
+Šapa / Ruka
+
+Šaraf / Čavao
+
+Šaraf-ciger / Odvijač
+
+Šest / Sedam
+
+Šifra / Lozinka
+
+Šijun / Detektiv
+
+Šilt / Šešir
+
+Šimšir / Živica
+
+Šina / Tračnica
+
+Šipak / Mogranj
+
+Široko / Veliko
+
+Šiške / Kosa
+
+Šivaći stroj / Igla
+
+Škakljanje / Dodir
+
+Škart / Otpad
+
+Škrge / Pluća
+
+Škrabica / Kasica
+
+Šmrcanje / Kašljanje
+
+Šoder / Kamen
+
+Šok / Iznenađenje
+
+Špaga / Štrik
+
+Španjolska / Portugal
+
+Štednja / Investicija
+
+Šteker / Utičnica
+
+Štivo / Tekst
+
+Štakor / Lasica
+
+Štrudla / Pita
+
+Štuka / Smuđ
+
+Šubara / Kapa
+
+Šum / Zvuk
+
+Šuma / Gaj
+
+Šumar / Lovac
+
+Šupalj / Prazan
+
+Šuškati / Šaptati
+
+Šutnja / Tišina
+
+Švicarska / Austrija
+
+Špageti / Rezanci
+
+Šešir / Cilindar
+
+Šminka / Puder
+
+Šljiva / Rakija
+
+Šapa / Kandža
+
+Šahist / Velemajstor
+
+Šalter / Prozorčić
+
+Šampanjac / Pjenušac
+
+Šank / Stol
+
+Šaran / Pastrva
+
+Šarm / Karizma
+
+Štednjak / Plamenik
+
+Štedionica / Banka
+
+Štit / Oklop
+
+Štitnjača / Grlo
+
+Štrov / Tavan
+
+Štruca / Komad
+
+Šubara / Krzno
+
+Šum / Jeka
+
+Šuma / Borik
+
+T - Tehnologija, Tijelo i Transport (100 parova)
+Televizor / Projektor
+
+Telefon / Mobitel
+
+Tablet / Laptop
+
+Tipkovnica / Pisaći stroj
+
+Tanjur / Pladanj
+
+Torta / Kolač
+
+Tijesto / Kruh
+
+Tuna / Skuša
+
+Trešnja / Višnja
+
+Tikvica / Patlidžan
+
+Traperice / Hlače
+
+Trenirka / Tajice
+
+Tenisice / Cipele
+
+Torba / Ruksak
+
+Trajekt / Brod
+
+Tramvaj / Autobus
+
+Traktor / Bager
+
+Taksi / Uber
+
+Tunel / Most
+
+Trg / Park
+
+Trener / Profesor
+
+Trčanje / Hodanje
+
+Tenis / Badminton
+
+Teretana / Fitness
+
+Tijelo / Organizam
+
+Trbuh / Želudac
+
+Tetovaža / Naljepnica
+
+Teatar / Kino
+
+Triler / Krimić
+
+Truba / Saksofon
+
+Tamburica / Gitara
+
+Tekst / Rečenica
+
+Točka / Zarez
+
+Tlak / Napon
+
+Temperatura / Vrućina
+
+Težina / Masa
+
+Tjedan / Mjesec
+
+Trajanje / Vrijeme
+
+Tajna / Istina
+
+Talent / Dar
+
+Tinta / Boja
+
+Tuš (crtež) / Olovka
+
+Tuš (kupaonica) / Kada
+
+Tepih / Staza
+
+Tapeta / Boja za zid
+
+Tavan / Podrum
+
+Terasa / Balkon
+
+Tiganj / Tava
+
+Tiganj / Lonac
+
+Tijesto / Tjestenina
+
+Tikal / Sat
+
+Tikva / Bundeva
+
+Tipka / Prekidač
+
+Tisak / Printer
+
+Tisuću / Milijun
+
+Tišina / Mir
+
+Tjednik / Novine
+
+Tjeme / Čelo
+
+Tkanina / Materijal
+
+Tkač / Krojač
+
+Tlakomjer / Toplomjer
+
+Tlo / Zemlja
+
+Točak / Kotač
+
+Toionik / Dozator
+
+Tokar / Bravar
+
+Toljag / Palica
+
+Tombola / Loto
+
+Ton / Zvuk
+
+Top / Puška
+
+Toplina / Grijanje
+
+Topola / Breza
+
+Toranj / Vidikovac
+
+Torba / Aktovka
+
+Torpedo / Raketa
+
+Tortilja / Palačinka
+
+Toster / Gril
+
+Točka / Mrlja
+
+Točnost / Preciznost
+
+Tračnica / Pruga
+
+Tratinčica / Maslačak
+
+Travanj / Svibanj
+
+Trbuh / Struk
+
+Trčanje / Sprint
+
+Trepavica / Obrva
+
+Trezor / Sef
+
+Trganje / Rezanje
+
+Trgovina / Market
+
+Triatlon / Maraton
+
+Tribina / Sjedalo
+
+Trijumf / Pobjeda
+
+Triler / Horor
+
+Trn / Bodlja
+
+Trnina / Grm
+
+Trofej / Pehar
+
+Trokut / Ravnalo
+
+Trosjed / Kauč
+
+Truba / Rog
+
+Trulež / Plijesan
+
+Trun / Prašina
+
+Truplo / Kostur
+
+U - Unutrašnjost, Ured i Umjetnost (100 parova)
+Ured / Radna soba
+
+Udžbenik / Knjiga
+
+Učitelj / Mentor
+
+Učenik / Student
+
+Utičnica / Utikač
+
+Usisavač / Metla
+
+Ulje / Maslac
+
+Ugljik / Kisik
+
+Uho / Nos
+
+Usta / Usne
+
+Unuk / Sin
+
+Ujak / Stric
+
+Ulaz / Izlaz
+
+Ulica / Cesta
+
+Uvala / Plaža
+
+Udica / Mreža
+
+Uže / Špaga
+
+Utvrda / Dvorac
+
+Umjetnik / Slikar
+
+Ugljen / Olovka
+
+Uniforma / Odijelo
+
+Udarac / Dodir
+
+Uvreda / Šala
+
+Uspjeh / Pobjeda
+
+Uspomena / Fotografija
+
+Uvjerenje / Dokaz
+
+Ugovor / Papir
+
+Upaljač / Šibica
+
+Utezi / Bučice
+
+Uređaj / Stroj
+
+Udruga / Klub
+
+Uvjet / Pravilo
+
+Uzorak / Model
+
+Uloga / Glumac
+
+Ukras / Nakit
+
+Uš / Buha
+
+Ugljikohidrati / Proteini
+
+Ubojica / Lopov
+
+Ubod / Ugriz
+
+Ubranje / Žetva
+
+Ubrus / Salveta
+
+Učinak / Rezultat
+
+Učionica / Kabinet
+
+Udar / Prasak
+
+Udolina / Rupa
+
+Udomiti / Kupiti
+
+Udovica / Žena
+
+Udovi / Ruke
+
+Ugljen / Grafit
+
+Ugljik / Plin
+
+Ugođaj / Atmosfera
+
+Ugovor / Dogovor
+
+Ugriz / Žvakanje
+
+Uho / Slušalice
+
+Uhoda / Špijun
+
+Uistinu / Stvarno
+
+Ujak / Tetak
+
+Ujed / Ubod
+
+Ukras / Detalj
+
+Ukosnica / Ukras
+
+Ukus / Stil
+
+Ulagač / Štediša
+
+Ular / Uzda
+
+Ulica / Aleja
+
+Ulizica / Prijatelj
+
+Ulomak / Dio
+
+Uložak / Baterija
+
+Ulje / Mast
+
+Um / Mozak
+
+Umak / Ketchup
+
+Umivaonik / Bide
+
+Umjerenost / Dijeta
+
+Umjetnost / Kultura
+
+Umor / San
+
+Unija / Savez
+
+Unikat / Original
+
+Unos / Upis
+
+Unutrašnjost / Interijer
+
+Upala / Infekcija
+
+Upit / Pitanje
+
+Uplata / Isplata
+
+Uprava / Odbor
+
+Upravljač / Daljinski
+
+Uputnica / Nalaz
+
+Uradi sam / Majstor
+
+Uran / Neptun
+
+Uredno / Čisto
+
+Uređaj / Gadget
+
+Uragan / Tornado
+
+Uron / Skok
+
+Urna / Grob
+
+Urođeno / Naučeno
+
+Usis / Protok
+
+Usluga / Pomoć
+
+Usna / Obraz
+
+Usnik / Pisak
+
+Uspjeh / Sreća
+
+Uspavanka / Pjesma
+
+Ustajanje / Buđenje
+
+Utroba / Unutrašnjost
+
+
+Stigli smo do samog kraja! Evo i posljednja tri slova (V, Z, Ž) s po 100 parova kako bismo kompletirali tvoju ogromnu bazu podataka za "Impostera".
+
+V - Vozila, Voće i Vrijeme (100 parova)
+Vlak / Autobus
+
+Vozač / Pilot
+
+Volan / Kormilo
+
+Vrata / Prozor
+
+Vilica / Žlica
+
+Vino / Pivo
+
+Voće / Povrće
+
+Višnja / Trešnja
+
+Vatra / Žar
+
+Voda / Led
+
+Vjetar / Oluja
+
+Val / Plima
+
+Vrt / Park
+
+Vaz / Tegla
+
+Vuna / Pamuk
+
+Vesta / Džemper
+
+Vijak / Čavao
+
+Vaga / Metar
+
+Vojska / Policija
+
+Vitez / Heroj
+
+Vila / Dvorac
+
+Vještica / Vila (biće)
+
+Vuk / Lisica
+
+Vrabac / Golub
+
+Vepar / Svinja
+
+Vjeverica / Puh
+
+Vidra / Dabar
+
+Vanilija / Čokolada
+
+Veljača / Ožujak
+
+Vikend / Praznik
+
+Vrh / Podnožje
+
+Video / Film
+
+Violina / Viola
+
+Vijest / Trač
+
+Vrtić / Škola
+
+Vrat / Grlo
+
+Venecija / Rim
+
+Vatrogasac / Hitna
+
+Vezica / Čvor
+
+Vrećica / Torba
+
+Vodopad / Izvor
+
+Vrelo / Potok
+
+Vime / Sise
+
+Vosak / Parafin
+
+Vadičep / Otvarač
+
+Vagon / Kupe
+
+Valjak / Kugla
+
+Valuta / Novac
+
+Vampir / Duh
+
+Vanilija / Šećer
+
+Varivo / Juha
+
+Vaza / Vrč
+
+Vazduh / Zrak
+
+Večera / Ručak
+
+Vedrina / Sunce
+
+Vejp / Cigareta
+
+Veleposlanik / Diplomata
+
+Velik / Ogroman
+
+Ventilator / Klima
+
+Vepar / Srna
+
+Veranda / Balkon
+
+Verige / Lanac
+
+Veslo / Lopata
+
+Vesta / Kardigan
+
+Veteran / Borac
+
+Vez / Čipka
+
+Vezivo / Ljepilo
+
+Vibra / Zvuk
+
+Vid / Sluh
+
+Vidikovac / Toranj
+
+Vijadukt / Most
+
+Vijenac / Buket
+
+Vijeće / Odbor
+
+Vikendica / Kuća
+
+Vila / Grablje (alat)
+
+Vilica / Trozubac
+
+Vilin konjic / Leptir
+
+Vinograd / Voćnjak
+
+Vinil / CD
+
+Violončelo / Kontrabas
+
+Virus / Bakterija
+
+Visina / Dubina
+
+Viskija / Rakija
+
+Višak / Ostatak
+
+Vitrina / Ormar
+
+Vjekopis / Biografija
+
+Vjera / Nada
+
+Vjenčanje / Svadba
+
+Vjenčanica / Haljina
+
+Vježba / Trening
+
+Vlaga / Mokro
+
+Vlasnik / Gazda
+
+Vlasulja / Perika
+
+Voditelj / Glumac
+
+Vodič / Karta
+
+Vodovod / Cijevi
+
+Vođa / Kapetan
+
+Vojska / Mornarica
+
+Vratnica / Gol
+
+Vrtuljak / Klackalica
+
+Z - Zemlja, Znanost i Zabava (100 parova)
+Zemlja / Planet
+
+Zvijezda / Komet
+
+Zlato / Srebro
+
+Zec / Kunić
+
+Zebra / Konj
+
+Zmija / Gušter
+
+Zid / Ograda
+
+Zastava / Grb
+
+Zima / Jesen
+
+Zrak / Plin
+
+Zvono / Sirena
+
+Zvuk / Jeka
+
+Zid / Stup
+
+Zvijezda / Sunce
+
+Zid / Cigla
+
+Zalogaj / Gutljaj
+
+Zabava / Party
+
+Zadatak / Test
+
+Zakon / Pravilo
+
+Zalisci / Kosa
+
+Zaljev / More
+
+Zamotak / Paket
+
+Zamrzivač / Hladnjak
+
+Zarez / Točka
+
+Zaruke / Vjenčanje
+
+Zaslon / Ekran
+
+Zatvor / Ćelija
+
+Zavjesa / Roleta
+
+Zavoj / Flaster
+
+Zbirka / Album
+
+Zdravlje / Bolest
+
+Zebra / Pješački prijelaz
+
+Zejtin / Ulje
+
+Zelena / Plava
+
+Zemljopis / Povijest
+
+Zidanje / Betoniranje
+
+Zidar / Soboslikar
+
+Zima / Mraz
+
+Zlatar / Draguljar
+
+Zmija / Poskok
+
+Značka / Medalja
+
+Znanje / Mudrost
+
+Znoj / Suze
+
+Zob / Pšenica
+
+Zona / Područje
+
+Zoološki vrt / Safari
+
+Zubar / Liječnik
+
+Zubalo / Proteza
+
+Zupčanik / Kotač
+
+Zvečka / Igračka
+
+Zviždaljka / Truba
+
+Zvonik / Toranj
+
+Zabranjeno / Dopušteno
+
+Začin / Papar
+
+Zadužnica / Mjenica
+
+Zadrška / Pauza
+
+Zagrljaj / Poljubac
+
+Zahod / Kupaonica
+
+Zajam / Kredit
+
+Zalazak / Svitanje
+
+Zaliha / Skladište
+
+Zalistak / Srce
+
+Zalog / Polog
+
+Zamašnjak / Motor
+
+Zamet / Snijeg
+
+Zamjena / Rezerva
+
+Zamka / Mreža
+
+Znanstvenik / Izumitelj
+
+Zao / Loš
+
+Zapovijed / Naredba
+
+Zaprega / Kočija
+
+Zapisnik / Bilješka
+
+Zapuha / Umor
+
+Zaručnik / Dečko
+
+Zasjeda / Napad
+
+Zasluga / Nagrada
+
+Zastoj / Gužva
+
+Zastupnik / Agent
+
+Zatvarač / Patent
+
+Zavist / Ljubomora
+
+Zavičaj / Domovina
+
+Zavod / Institucija
+
+Zavojnica / Opruga
+
+Zbroj / Rezultat
+
+Zdjelica / Kuk
+
+Zdjela / Tanjur
+
+Zec / Hrast (drvo)
+
+Zelje / Kupus
+
+Zemlja / Tlo
+
+Zemljak / Susjed
+
+Zemljovid / Karta
+
+Zenit / Vrh
+
+Zgrada / Kuća
+
+Zglob / Koljeno
+
+Zgodan / Lijep
+
+Zidina / Utvrda
+
+Zidni sat / Budilica
+
+Zjenica / Oko
+
+Zrak / Kisik
+
+Zvonar / Crkvenjak
+
+Ž - Životinje, Život i Željezo (100 parova)
+Životinja / Biće
+
+Žirafa / Zebra
+
+Žaba / Krastača
+
+Žohar / Mrav
+
+Žlica / Vilica
+
+Žvakaća / Bombon
+
+Željezo / Čelik
+
+Žica / Kabel
+
+Žeravica / Pepeo
+
+Žena / Dama
+
+Želudac / Crijeva
+
+Žuč / Jetra
+
+Žito / Kukuruz
+
+Žir / Lješnjak
+
+Žitnica / Skladište
+
+Žrtva / Pobjednik
+
+Župnik / Svećenik
+
+Županija / Grad
+
+Žurba / Brzina
+
+Želja / San
+
+Žilet / Britva
+
+Žumanjak / Bjelanjak
+
+Žuta / Narančasta
+
+Žubor / Potok
+
+Žal / Plaža
+
+Žirant / Jamac
+
+Životopis / CV
+
+Žarulja / Ledica
+
+Žerav / Ptica
+
+Žitost / Hrana
+
+Žaba / Punoglavac
+
+Žar / Vatra
+
+Žargon / Sleng
+
+Žarište / Centar
+
+Žbuk / Mort
+
+Ždrijeb / Izvlačenje
+
+Ždrijebe / Ždrijebac
+
+Ždrijelo / Grlo
+
+Žega / Vrućina
+
+Žele / Pudingu
+
+Željezara / Tvornica
+
+Željeznica / Pruga
+
+Želučani sok / Kiselina
+
+Žemlja / Kifla
+
+Ženidba / Udaja
+
+Žestica / Rakija
+
+Žetva / Berba
+
+Žica / Struna
+
+Žičara / Gondola
+
+Žig / Pečat
+
+Žila / Vena
+
+Žilet / Mašinica
+
+Žir / Kesten
+
+Žirafa / Slon
+
+Žiri / Sudac
+
+Živac / Mišić
+
+Živica / Ograda
+
+Život / Postojanje
+
+Životinja / Zvijer
+
+Živost / Energija
+
+Životni vijek / Dob
+
+Žlijezda / Hormon
+
+Žlica / Šeflja
+
+Žljeb / Oluk
+
+Žmarci / Trnci
+
+Žohar / Bubašvaba
+
+Žongler / Akrobat
+
+Žrtvenik / Oltar
+
+Žrvanj / Mlin
+
+Žubor / Šapat
+
+Žuč / Gorčina
+
+Žudnja / Pohlepa
+
+Žulj / Rana
+
+Žumanjak / Jaje
+
+Župa / Crkva
+
+Žuran / Brz
+
+Žurba / Panika
+
+Žustro / Aktivno
+
+Žutika / Bobica
+
+Žvakaća / Guma
+
+Žvale / Usta
+
+Žitost / Obilje
+
+Žohar / Insekt
+
+Ždral / Roda
+
+Žrtva / Dar
+
+Željeznička stanica / Peron
+
+Žvakanje / Gutanje
+
+Živina / Stoka
+
+Žlijeb / Kanal
+
+Žbuka / Fasada
+
+Životinjsko carstvo / Priroda
+
+Žica / Ograda
+
+Židov / Izraelac
+
+Živi pijesak / Blato
+
+Živost / Veselje
+
+Žar-ptica / Feniks
+
+Žetelica / Kombajn
+
+Žitna kava / Divka
+
+Žličica / Doza
+
+Životni stil / Moda
+
+
