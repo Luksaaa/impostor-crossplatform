@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.example.impostergame.ui.components.QRCodeImage
 import com.example.impostergame.ui.theme.*
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,9 +54,8 @@ fun LobbyScreen(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(roomCode) {
-        // Slušamo promjene preko flow-a (GitLive standard)
         FirebaseManager.roomsRef.child(roomCode).valueEvents.collectLatest { snapshot ->
-            if (!snapshot.exists) return@collectLatest
+            if (snapshot.value == null) return@collectLatest
             
             status = snapshot.child("status").getValueSafe<String?>() ?: "waiting"
             currentAdmin = snapshot.child("admin").getValueSafe<String?>() ?: ""
@@ -67,7 +67,10 @@ fun LobbyScreen(
                 it.getValueSafe<String?>()?.let { msg -> msgList.add(msg) }
             }
             messages = msgList.reversed()
-            playerCount = snapshot.child("players").children.count()
+            
+            var count = 0
+            snapshot.child("players").children.forEach { _ -> count++ }
+            playerCount = count
         }
     }
 
@@ -180,12 +183,17 @@ fun LobbyScreen(
                             val (mainWord, imposterWord) = WordManager.getNextWords()
                             scope.launch {
                                 try {
-                                    val database = FirebaseManager.roomsRef.child(roomCode)
-                                    val snapshot = database.get()
-                                    val playersList = snapshot.child("players").children.mapNotNull { it.key }.toList().shuffled()
-                                    if (playersList.size >= 2) {
-                                        val imposterId = playersList[0]
-                                        val mrWhiteId = if (playersList.size >= 3 && (1..100).random() <= 20) playersList[1] else ""
+                                    val dbRef = FirebaseManager.roomsRef.child(roomCode)
+                                    val snap = dbRef.valueEvents.first()
+                                    val playersList = mutableListOf<String>()
+                                    snap.child("players").children.forEach { childSnap ->
+                                        childSnap.key?.let { playersList.add(it) }
+                                    }
+                                    val shuffled = playersList.shuffled()
+                                    
+                                    if (shuffled.size >= 2) {
+                                        val imposterId = shuffled[0]
+                                        val mrWhiteId = if (shuffled.size >= 3 && (1..100).random() <= 20) shuffled[1] else ""
                                         
                                         val updates = mapOf(
                                             "mainWord" to mainWord,
@@ -194,7 +202,7 @@ fun LobbyScreen(
                                             "mrWhiteId" to mrWhiteId,
                                             "status" to "started"
                                         )
-                                        database.updateChildren(updates)
+                                        dbRef.updateChildren(updates)
                                     }
                                 } catch (e: Exception) {}
                             }

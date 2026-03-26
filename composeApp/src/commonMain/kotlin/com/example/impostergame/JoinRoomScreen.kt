@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.impostergame.ui.theme.*
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
@@ -107,12 +108,13 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                             if (inputCode.length == 6) {
                                 scope.launch {
                                     try {
-                                        // U GitLive Firebase koristimo suspend .get()
-                                        val snapshot = FirebaseManager.roomsRef.child(inputCode).get()
-                                        if (snapshot.exists) {
+                                        val snapshot = FirebaseManager.roomsRef.child(inputCode).valueEvents.first()
+                                        if (snapshot.value != null) {
                                             val players = snapshot.child("players")
-                                            // players.children je Iterable, koristimo count()
-                                            if (players.children.count() < 16) {
+                                            var count = 0
+                                            players.children.forEach { _ -> count++ }
+                                            
+                                            if (count < 16) {
                                                 val playerRef = FirebaseManager.roomsRef.child(inputCode).child("players").child(username)
                                                 playerRef.setValue(mapOf("name" to username, "isReady" to false))
                                                 val msgRef = FirebaseManager.roomsRef.child(inputCode).child("messages").child("join_${username}")

@@ -7,12 +7,23 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinx.serialization)
+    id("com.google.gms.google-services")
 }
 
 kotlin {
-    androidTarget()
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
 
-    jvm("desktop")
+    jvm("desktop") {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
 
     listOf(
         iosX64(),
@@ -60,18 +71,18 @@ kotlin {
 
 android {
     namespace = "com.example.impostergame"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.impostergame"
         minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
     }
     
     compileOptions {
-        sourceCompatibility = org.gradle.api.JavaVersion.VERSION_11
-        targetCompatibility = org.gradle.api.JavaVersion.VERSION_11
+        sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17
+        targetCompatibility = org.gradle.api.JavaVersion.VERSION_17
     }
 }

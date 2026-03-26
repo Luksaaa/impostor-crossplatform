@@ -5,6 +5,7 @@ import dev.gitlive.firebase.database.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -18,8 +19,9 @@ object FirebaseManager {
         scope.launch {
             val code = generateRandomCode()
             try {
-                val snapshot = roomsRef.child(code).get()
-                if (snapshot.exists) {
+                // Using valueEvents.first() as a more reliable way to get a snapshot if get() is failing to resolve
+                val snapshot = roomsRef.child(code).valueEvents.first()
+                if (snapshot.value != null) {
                     generateRoom(username, onComplete)
                 } else {
                     val roomData = mapOf(
@@ -46,14 +48,16 @@ object FirebaseManager {
     suspend fun joinRoom(roomCode: String, username: String): Result<Unit> {
         return try {
             val roomRef = roomsRef.child(roomCode)
-            val snapshot = roomRef.get()
-            if (!snapshot.exists) {
+            val snapshot = roomRef.valueEvents.first()
+            if (snapshot.value == null) {
                 return Result.failure(Exception("Soba ne postoji"))
             }
             
             val players = snapshot.child("players")
-            val playersList = players.children.toList()
-            if (playersList.size >= 16) {
+            var count = 0
+            players.children.forEach { _ -> count++ }
+            
+            if (count >= 16) {
                 return Result.failure(Exception("Soba je puna"))
             }
             
@@ -71,14 +75,15 @@ object FirebaseManager {
         scope.launch {
             try {
                 val roomRef = roomsRef.child(roomCode)
-                val snapshot = roomRef.get()
-                if (!snapshot.exists) {
+                val snapshot = roomRef.valueEvents.first()
+                if (snapshot.value == null) {
                     onComplete()
                     return@launch
                 }
                 
                 val currentAdmin = snapshot.child("admin").getValueSafe<String?>()
-                val playersSnapshots = snapshot.child("players").children.toList()
+                val playersSnapshots = mutableListOf<DataSnapshot>()
+                snapshot.child("players").children.forEach { playersSnapshots.add(it) }
                 
                 val timestamp = Clock.System.now().toEpochMilliseconds()
                 
