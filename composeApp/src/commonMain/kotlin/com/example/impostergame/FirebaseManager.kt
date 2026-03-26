@@ -4,36 +4,46 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.database.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 
 object FirebaseManager {
     private val database: FirebaseDatabase get() = Firebase.database
     val roomsRef: DatabaseReference get() = database.reference("rooms")
+    
+    private val firebaseScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     fun generateRoom(username: String, onComplete: (String) -> Unit) {
-        val scope = CoroutineScope(Dispatchers.Default)
-        scope.launch {
-            val code = generateRandomCode()
+        firebaseScope.launch {
             try {
-                // Using valueEvents.first() as a more reliable way to get a snapshot if get() is failing to resolve
+                val code = generateRandomCode()
+                val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Igrac" }
+                
+                // Using valueEvents.first() as it seems to be the most compatible way in this project's setup
                 val snapshot = roomsRef.child(code).valueEvents.first()
+                
                 if (snapshot.value != null) {
                     generateRoom(username, onComplete)
                 } else {
                     val roomData = mapOf(
-                        "admin" to username,
+                        "admin" to sanitizedName,
                         "status" to "waiting",
-                        "players" to mapOf(username to mapOf("name" to username, "isReady" to false)),
-                        "messages" to mapOf("init" to "$username je napravio sobu")
+                        "players" to mapOf(sanitizedName to mapOf("name" to sanitizedName, "isReady" to false)),
+                        "messages" to mapOf("init" to "$sanitizedName je napravio sobu")
                     )
                     roomsRef.child(code).setValue(roomData)
-                    onComplete(code)
+                    
+                    withContext(Dispatchers.Main) {
+                        onComplete(code)
+                    }
                 }
             } catch (e: Exception) {
+                println("Firebase Error: ${e.message}")
             }
         }
     }
@@ -47,8 +57,10 @@ object FirebaseManager {
 
     suspend fun joinRoom(roomCode: String, username: String): Result<Unit> {
         return try {
+            val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Gost" }
             val roomRef = roomsRef.child(roomCode)
             val snapshot = roomRef.valueEvents.first()
+            
             if (snapshot.value == null) {
                 return Result.failure(Exception("Soba ne postoji"))
             }
@@ -61,9 +73,9 @@ object FirebaseManager {
                 return Result.failure(Exception("Soba je puna"))
             }
             
-            roomRef.child("players").child(username).setValue(mapOf("name" to username, "isReady" to false))
+            roomRef.child("players").child(sanitizedName).setValue(mapOf("name" to sanitizedName, "isReady" to false))
             val timestamp = Clock.System.now().toEpochMilliseconds()
-            roomRef.child("messages").child("join_$timestamp").setValue("$username je ušao")
+            roomRef.child("messages").child("join_$timestamp").setValue("$sanitizedName je ušao")
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -71,13 +83,14 @@ object FirebaseManager {
     }
 
     fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit) {
-        val scope = CoroutineScope(Dispatchers.Default)
-        scope.launch {
+        firebaseScope.launch {
             try {
+                val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
                 val roomRef = roomsRef.child(roomCode)
                 val snapshot = roomRef.valueEvents.first()
+                
                 if (snapshot.value == null) {
-                    onComplete()
+                    withContext(Dispatchers.Main) { onComplete() }
                     return@launch
                 }
                 
@@ -87,24 +100,27 @@ object FirebaseManager {
                 
                 val timestamp = Clock.System.now().toEpochMilliseconds()
                 
-                if (currentAdmin == username) {
-                    val nextAdmin = playersSnapshots.firstOrNull { it.key != username }?.key
+                if (currentAdmin == sanitizedName) {
+                    val nextAdmin = playersSnapshots.firstOrNull { it.key != sanitizedName }?.key
                     if (nextAdmin != null) {
                         roomRef.updateChildren(mapOf(
                             "admin" to nextAdmin,
-                            "players/$username" to null,
-                            "messages/exit_$timestamp" to "$username je izašao, novi admin je $nextAdmin"
+                            "players/$sanitizedName" to null,
+                            "messages/exit_$timestamp" to "$sanitizedName je izašao, novi admin je $nextAdmin"
                         ))
                     } else {
                         roomRef.removeValue()
                     }
                 } else {
-                    roomRef.child("players").child(username).removeValue()
-                    roomRef.child("messages").child("exit_$timestamp").setValue("$username je izašao")
+                    roomRef.child("players").child(sanitizedName).removeValue()
+                    roomRef.child("messages").child("exit_$timestamp").setValue("$sanitizedName je izašao")
                 }
-                onComplete()
+                
+                withContext(Dispatchers.Main) {
+                    onComplete()
+                }
             } catch (e: Exception) {
-                onComplete()
+                withContext(Dispatchers.Main) { onComplete() }
             }
         }
     }
@@ -114,17 +130,16 @@ object FirebaseManager {
     }
 
     fun toggleReady(roomCode: String, username: String, isReady: Boolean) {
-        val scope = CoroutineScope(Dispatchers.Default)
-        scope.launch {
+        firebaseScope.launch {
             try {
-                roomsRef.child(roomCode).child("players").child(username).child("isReady").setValue(isReady)
+                val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
+                roomsRef.child(roomCode).child("players").child(sanitizedName).child("isReady").setValue(isReady)
             } catch (e: Exception) {}
         }
     }
 
     fun startGame(roomCode: String, playersList: List<String>) {
-        val scope = CoroutineScope(Dispatchers.Default)
-        scope.launch {
+        firebaseScope.launch {
             try {
                 val (mainWord, imposterWord) = WordManager.getNextWords()
                 val shuffled = playersList.shuffled()
@@ -148,18 +163,17 @@ object FirebaseManager {
     }
 
     fun sendMessage(roomCode: String, username: String, message: String) {
-        val scope = CoroutineScope(Dispatchers.Default)
-        scope.launch {
+        firebaseScope.launch {
             try {
-                val chatMsg = ChatMessage(username, message.trim(), Clock.System.now().toEpochMilliseconds())
+                val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
+                val chatMsg = ChatMessage(sanitizedName, message.trim(), Clock.System.now().toEpochMilliseconds())
                 roomsRef.child(roomCode).child("chatMessages").push().setValue(chatMsg)
             } catch (e: Exception) {}
         }
     }
 
     fun startDiscussion(roomCode: String, seconds: Int) {
-        val scope = CoroutineScope(Dispatchers.Default)
-        scope.launch {
+        firebaseScope.launch {
             try {
                 val endTime = Clock.System.now().toEpochMilliseconds() + (seconds * 1000L)
                 roomsRef.child(roomCode).updateChildren(mapOf(
@@ -171,8 +185,7 @@ object FirebaseManager {
     }
 
     fun endRound(roomCode: String, resultMessage: String) {
-        val scope = CoroutineScope(Dispatchers.Default)
-        scope.launch {
+        firebaseScope.launch {
             try {
                 roomsRef.child(roomCode).updateChildren(mapOf(
                     "status" to "finished",
@@ -184,8 +197,7 @@ object FirebaseManager {
     }
 
     fun resetToLobby(roomCode: String) {
-        val scope = CoroutineScope(Dispatchers.Default)
-        scope.launch {
+        firebaseScope.launch {
             try {
                 roomsRef.child(roomCode).updateChildren(mapOf(
                     "status" to "waiting",

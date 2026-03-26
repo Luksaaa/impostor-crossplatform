@@ -71,12 +71,12 @@ kotlin {
 
 android {
     namespace = "com.example.impostergame"
-    compileSdk = 36
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.example.impostergame"
         minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = 36
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
     }

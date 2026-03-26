@@ -134,7 +134,7 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                             when {
                                 name.isBlank() -> errorMessage = "Ime ne smije biti prazno"
                                 name.length > 8 -> errorMessage = "Ime ne smije biti duže od 8 znakova"
-                                name.all { it.isDigit() } -> errorMessage = "Ime ne smije sadržavati samo brojeve"
+                                !name.all { it.isLetterOrDigit() || it == '_' } -> errorMessage = "Samo slova, brojke i _"
                                 else -> onNameEntered(name, rememberMe)
                             }
                         },
