@@ -66,6 +66,9 @@ kotlin {
             implementation(libs.androidx.camera.lifecycle)
             implementation(libs.androidx.camera.view)
             implementation(libs.mlkit.barcode.scanning)
+
+            // Fix for Android Studio Preview
+            implementation(libs.androidx.compose.ui.tooling)
         }
 
         val desktopMain by getting {
@@ -94,4 +97,9 @@ android {
         sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17
         targetCompatibility = org.gradle.api.JavaVersion.VERSION_17
     }
+}
+
+dependencies {
+    // This is required for Android Studio Preview to find the Compose View Adapter
+    debugImplementation(libs.androidx.compose.ui.tooling)
 }
