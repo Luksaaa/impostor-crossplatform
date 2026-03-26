@@ -44,7 +44,8 @@ ktor-serverTestHost = { module = "io.ktor:ktor-server-test-host-jvm", version.re
 # Multiplatform Libraries
 firebase-database = { module = "dev.gitlive:firebase-database", version.ref = "firebase-database" }
 firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebase-common" }
-multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }

@@ -50,6 +50,7 @@ kotlin {
             implementation(libs.firebase.database)
             implementation(libs.firebase.common)
             implementation(libs.multiplatform.settings)
+            implementation(libs.multiplatform.settings.no.arg) // Added for Settings()
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
             implementation(libs.androidx.lifecycle.viewmodelCompose)

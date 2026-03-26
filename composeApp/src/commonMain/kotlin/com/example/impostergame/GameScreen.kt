@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
     roomCode: String, 
