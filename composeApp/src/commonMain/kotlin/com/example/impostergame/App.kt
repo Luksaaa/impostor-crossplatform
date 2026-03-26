@@ -5,18 +5,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalInspectionMode
 import com.example.impostergame.ui.components.AnimatedBackground
 import com.example.impostergame.ui.theme.ImposterGameTheme
 import com.russhwolf.settings.Settings
-import org.jetbrains.compose.ui.tooling.preview.Preview
+
 
 /**
- * Jednostavna implementacija Settings za korištenje u Preview modu.
- * Ovo izbjegava NullPointerException jer defaultni Settings() na Androidu zahtijeva Context
- * koji nije dostupan u Preview okruženju.
+ * Minimalna implementacija Settings za Preview okruženje
  */
-class PreviewSettings : Settings {
+private class MockSettings : Settings {
     private val data = mutableMapOf<String, Any?>()
     override val keys: Set<String> get() = data.keys
     override val size: Int get() = data.size
@@ -44,13 +41,16 @@ class PreviewSettings : Settings {
 }
 
 @Composable
-@Preview
-fun App(providedSettings: Settings? = null) {
-    val isPreview = LocalInspectionMode.current
-    // Inicijaliziramo settings samo ako nisu proslijeđeni.
-    // U Preview modu OBAVEZNO koristimo PreviewSettings() kako bismo izbjegli NPE.
-    val settings: Settings = remember(providedSettings) {
-        providedSettings ?: if (isPreview) PreviewSettings() else Settings()
+
+fun App() {
+    // Koristimo remember kako bismo izbjegli ponovno kreiranje Settings objekta na svakoj rekompoziciji.
+    // Također koristimo try-catch kako bismo spriječili pucanje u Preview modu.
+    val settings: Settings = remember {
+        try {
+            Settings()
+        } catch (_: Throwable) {
+            MockSettings()
+        }
     }
     
     // Učitaj spremljeno stanje

@@ -205,7 +205,7 @@ fun LobbyScreen(
                                         )
                                         dbRef.updateChildren(updates)
                                     }
-                                } catch (e: Exception) {}
+                                } catch (_: Exception) {}
                             }
                         },
                         modifier = Modifier.fillMaxWidth().height(60.dp),
