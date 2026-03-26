@@ -39,9 +39,9 @@ fun LobbyScreen(
     val primaryBtnBg = if (isDarkTheme) DarkEarthy else SoftCream
     val primaryBtnText = if (isDarkTheme) SoftCream else DeepCharcoal
 
-    // Silence unused parameter warning if it isn't utilized directly
+    // Micanje neiskorištenog warninga
     val dummy = isAdmin
-    println(dummy) // Minimalna operacija da bi dummy bio "korišten"
+    println(dummy)
 
     if (roomCode.isBlank()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -50,15 +50,18 @@ fun LobbyScreen(
         return
     }
 
+    // Sanitizirano ime koje se sigurno podudara sa bazom
+    val sanitizedName = remember(username) { username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Gost" } }
+
     var messages by remember { mutableStateOf(listOf<String>()) }
     var playerCount by remember { mutableStateOf(0) }
     var status by remember { mutableStateOf("waiting") }
     var currentAdmin by remember { mutableStateOf("") }
-    val isUserAdmin = currentAdmin == username
+    val isUserAdmin = currentAdmin == sanitizedName
     
+    // U starom Compose-u ovo je de facto način za Clipboard tekst iako je deprecated za ClipEntry
     @Suppress("DEPRECATION")
     val clipboardManager = LocalClipboardManager.current
-    
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(roomCode) {
@@ -68,17 +71,32 @@ fun LobbyScreen(
             status = snapshot.child("status").getValueSafe<String?>() ?: "waiting"
             currentAdmin = snapshot.child("admin").getValueSafe<String?>() ?: ""
             
-            if (status == "started") onGameStarted()
+            var isInGame = false
+            var count = 0
+            val playersSnap = snapshot.child("players")
+            playersSnap.children.forEach { child ->
+                count++
+                if (child.key == sanitizedName) isInGame = true
+            }
+            playerCount = count
+            
+            // Igrač ide u igru samo ako je igra "started" i on NIJE izbačen
+            if (status == "started" && isInGame) {
+                onGameStarted()
+            }
+
+            // Ako je igra završila ili je admin resetirao i vratili smo se u "waiting" status
+            // a igrač nije u igračima (jer je npr. izbačen ranije), tada automatski vraća igrača u sobu
+            if (status == "waiting" && !isInGame) {
+                FirebaseManager.roomsRef.child(roomCode).child("players").child(sanitizedName)
+                    .setValue(mapOf("name" to username, "isReady" to false))
+            }
 
             val msgList = mutableListOf<String>()
             snapshot.child("messages").children.forEach {
                 it.getValueSafe<String?>()?.let { msg -> msgList.add(msg) }
             }
             messages = msgList.reversed()
-            
-            var count = 0
-            snapshot.child("players").children.forEach { _ -> count++ }
-            playerCount = count
         }
     }
 

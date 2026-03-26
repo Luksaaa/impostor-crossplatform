@@ -49,10 +49,6 @@ fun GameScreen(
     onNewGame: () -> Unit
 ) {
     if (roomCode.isBlank()) return
-    
-    // Silence unused parameter warning
-    val unusedAdmin = isAdmin 
-    println(unusedAdmin)
 
     val database = remember(roomCode) { 
         FirebaseManager.roomsRef.child(roomCode)
@@ -68,9 +64,6 @@ fun GameScreen(
     var players by remember { mutableStateOf<Map<String, PlayerInfo>>(emptyMap()) }
     
     var gameStatus by remember { mutableStateOf("started") }
-    var resultMessage by remember { mutableStateOf("") }
-    var imposterId by remember { mutableStateOf("") }
-    var mrWhiteId by remember { mutableStateOf("") }
     var showVoteDialog by remember { mutableStateOf(false) }
     
     var isDiscussionActive by remember { mutableStateOf(false) }
@@ -96,9 +89,8 @@ fun GameScreen(
             if (snapshot.value == null) return@collectLatest
             currentAdmin = snapshot.child("admin").getValueSafe<String?>() ?: ""
             gameStatus = snapshot.child("status").getValueSafe<String?>() ?: "started"
-            resultMessage = snapshot.child("resultMessage").getValueSafe<String?>() ?: ""
-            imposterId = snapshot.child("imposterId").getValueSafe<String?>() ?: ""
-            mrWhiteId = snapshot.child("mrWhiteId").getValueSafe<String?>() ?: ""
+            val imposterId = snapshot.child("imposterId").getValueSafe<String?>() ?: ""
+            val mrWhiteId = snapshot.child("mrWhiteId").getValueSafe<String?>() ?: ""
             
             // Ako admin promijeni status u "waiting", svi se vraćaju u lobby
             if (gameStatus == "waiting") {
@@ -130,6 +122,13 @@ fun GameScreen(
         }
     }
 
+    LaunchedEffect(players) {
+        // Ako je igra u tijeku, ali korisnika više nema u listi igrača (izbačen je)
+        if (gameStatus == "started" && players.isNotEmpty() && !players.containsKey(username)) {
+            onRepeat() // Vraća u lobby
+        }
+    }
+
     LaunchedEffect(isDiscussionActive, discussionEndTime) {
         if (isDiscussionActive && discussionEndTime > 0L) {
             while (true) {
@@ -150,39 +149,6 @@ fun GameScreen(
         if (chatMessages.isNotEmpty()) listState.animateScrollToItem(chatMessages.size - 1)
     }
 
-    if (gameStatus == "finished") {
-        Dialog(onDismissRequest = {}) {
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = containerColor),
-                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
-            ) {
-                Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    val resColor = if (resultMessage.contains("🏆")) accentColor else MutedRose
-                    Text("KRAJ RUNDE", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = resColor)
-                    Spacer(Modifier.height(16.dp))
-                    Text(resultMessage, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = textColor, lineHeight = 28.sp)
-                    Spacer(Modifier.height(24.dp))
-                    if (isUserAdmin) {
-                        Button(
-                            onClick = { 
-                                scope.launch {
-                                    database.updateChildren(mapOf("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false, "discussionEndTime" to 0L, "resultMessage" to ""))
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = accentColor)
-                        ) { Text("POVRATAK U SOBU", fontWeight = FontWeight.ExtraBold) }
-                    } else {
-                        Text("Čekamo admina...", fontSize = 13.sp, color = textColor.copy(alpha = 0.5f), fontWeight = FontWeight.Medium)
-                    }
-                }
-            }
-        }
-    }
-
     if (showVoteDialog) {
         Dialog(onDismissRequest = { showVoteDialog = false }) {
             Card(
@@ -200,23 +166,17 @@ fun GameScreen(
                             val playerName = players[pId]?.name ?: pId
                             Surface(
                                 onClick = {
-                                    val isImposter = pId == imposterId
-                                    val isMrWhite = pId == mrWhiteId
-                                    
-                                    val imposterName = players[imposterId]?.name ?: "Imposter"
-                                    val mrWhiteName = players[mrWhiteId]?.name ?: "Mr. White"
-                                    
-                                    val msg = when {
-                                        isImposter -> "Pronašli ste Impostera! $playerName je bio on. Većina pobjeđuje! 🏆"
-                                        isMrWhite -> "Pronašli ste Mr. White-a! $playerName nije imao riječ. Većina pobjeđuje! 🏆"
-                                        else -> {
-                                            val roles = if (mrWhiteId.isNotBlank()) "Imposter je bio $imposterName, a Mr. White $mrWhiteName." else "Imposter je bio $imposterName."
-                                            "Izbacili ste nevinu osobu! Uljezi pobjeđuju! 🎭\n$roles"
-                                        }
-                                    }
-                                    
                                     scope.launch {
-                                        database.updateChildren(mapOf("status" to "finished", "resultMessage" to msg, "isDiscussionActive" to false))
+                                        // Ukloni igrača iz sobe
+                                        database.child("players").child(pId).removeValue()
+                                        
+                                        // Dodaj poruku u chat da je izbačen
+                                        database.child("chatMessages").push().setValue(
+                                            ChatMessage("Sustav", "Korisnik $playerName je izbačen.", Clock.System.now().toEpochMilliseconds())
+                                        )
+                                        
+                                        // Prekini raspravu
+                                        database.child("isDiscussionActive").setValue(false)
                                     }
                                     showVoteDialog = false
                                 },
@@ -269,8 +229,8 @@ fun GameScreen(
                 Box(modifier = Modifier.fillMaxSize().clickable { isRevealed = !isRevealed }, contentAlignment = Alignment.Center) {
                     if (isRevealed) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(if (username == mrWhiteId) "Tvoj status:" else "Tvoja riječ:", color = textColor.copy(alpha = 0.6f), fontSize = 14.sp)
-                            Text(word, color = if (username == mrWhiteId) MutedRose else textColor, fontSize = if (username == mrWhiteId) 32.sp else 42.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                            Text(if (username == isAdmin.toString() || username.isNotEmpty()) "Tvoja riječ:" else "Status:", color = textColor.copy(alpha = 0.6f), fontSize = 14.sp)
+                            Text(word, color = if (word == "TI SI MR. WHITE") MutedRose else textColor, fontSize = if (word == "TI SI MR. WHITE") 32.sp else 42.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
                         }
                     } else {
                         Row(verticalAlignment = Alignment.CenterVertically) {
