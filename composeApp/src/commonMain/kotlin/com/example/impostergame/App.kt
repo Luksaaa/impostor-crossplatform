@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.impostergame.ui.components.AnimatedBackground
 import com.example.impostergame.ui.theme.ImposterGameTheme
 import com.russhwolf.settings.Settings
-
 
 /**
  * Minimalna implementacija Settings za Preview okruženje
@@ -41,7 +41,7 @@ private class MockSettings : Settings {
 }
 
 @Composable
-
+@Preview
 fun App() {
     // Koristimo remember kako bismo izbjegli ponovno kreiranje Settings objekta na svakoj rekompoziciji.
     // Također koristimo try-catch kako bismo spriječili pucanje u Preview modu.
