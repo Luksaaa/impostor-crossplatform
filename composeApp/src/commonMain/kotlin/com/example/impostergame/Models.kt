@@ -24,6 +24,22 @@ data class ChatMessage(
     val timestamp: Long = 0L
 )
 
+@Serializable
+data class Room(
+    val admin: String = "",
+    val status: String = "waiting", // "waiting", "started", "finished"
+    val players: Map<String, PlayerInfo> = emptyMap(),
+    val messages: Map<String, String> = emptyMap(),
+    val chatMessages: Map<String, ChatMessage> = emptyMap(),
+    val mainWord: String = "",
+    val imposterWord: String = "",
+    val imposterId: String = "",
+    val mrWhiteId: String = "",
+    val isDiscussionActive: Boolean = false,
+    val discussionEndTime: Long = 0L,
+    val resultMessage: String = ""
+)
+
 object WordManager {
     private val wordPairs: List<Pair<String, String>> = listOf(
         "Jabuka" to "Kruška",
