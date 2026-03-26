@@ -11,19 +11,35 @@ import com.russhwolf.settings.Settings
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
+fun AppBackHandler(onBack: () -> Unit) {
+    // Platform-specific implementation needed for back button
+}
+
+@Composable
 @Preview
 fun App() {
     val settings: Settings = Settings()
     
-    // Provjeri je li korisnik već upisao ime ranije
+    // Učitaj spremljeno stanje
     val savedUsername = remember { settings.getString("username", "") }
+    val savedScreenOrdinal = remember { settings.getInt("currentScreen", Screen.ENTER_NAME.ordinal) }
+    val savedRoomCode = remember { settings.getString("roomCode", "") }
+    val savedIsAdmin = remember { settings.getBoolean("isAdmin", false) }
     
     var username by remember { mutableStateOf(savedUsername) }
-    var currentScreen by remember { mutableStateOf(if (username.isNotBlank()) Screen.HOME else Screen.ENTER_NAME) }
-    var roomCode by remember { mutableStateOf("") }
-    var isAdmin by remember { mutableStateOf(false) }
+    var currentScreen by remember { mutableStateOf(Screen.entries[savedScreenOrdinal]) }
+    var roomCode by remember { mutableStateOf(savedRoomCode) }
+    var isAdmin by remember { mutableStateOf(savedIsAdmin) }
 
-    // Logika za animiranu pozadinu koja se vrti kroz cijelu aplikaciju
+    // Funkcija za promjenu ekrana uz spremanje stanja
+    fun navigateTo(screen: Screen) {
+        currentScreen = screen
+        settings.putInt("currentScreen", screen.ordinal)
+        settings.putString("roomCode", roomCode)
+        settings.putBoolean("isAdmin", isAdmin)
+    }
+
+    // Logika za animiranu pozadinu
     val infiniteTransition = rememberInfiniteTransition()
     val xOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -42,6 +58,23 @@ fun App() {
         )
     )
 
+    // Upravljanje natrag gestom
+    CommonBackHandler {
+        when (currentScreen) {
+            Screen.JOIN -> navigateTo(Screen.HOME)
+            Screen.LOBBY -> {
+                FirebaseManager.leaveRoomWithAdminTransfer(roomCode, username) {
+                    navigateTo(Screen.HOME)
+                }
+            }
+            Screen.GAME -> {
+                // Možda potvrda izlaska? Za sada samo u Home
+                navigateTo(Screen.HOME)
+            }
+            else -> {} // Na HOME i ENTER_NAME nek sustav odradi svoje (izlaz)
+        }
+    }
+
     ImposterGameTheme {
         AnimatedBackground(xOffset = xOffset, yOffset = yOffset) {
             Surface(modifier = Modifier.fillMaxSize(), color = androidx.compose.ui.graphics.Color.Transparent) {
@@ -54,7 +87,7 @@ fun App() {
                             } else {
                                 settings.remove("username")
                             }
-                            currentScreen = Screen.HOME
+                            navigateTo(Screen.HOME)
                         })
                     }
                     Screen.HOME -> {
@@ -64,11 +97,11 @@ fun App() {
                                 isAdmin = true
                                 FirebaseManager.generateRoom(username) { code ->
                                     roomCode = code
-                                    currentScreen = Screen.LOBBY
+                                    navigateTo(Screen.LOBBY)
                                 }
                             },
                             onJoinRoom = {
-                                currentScreen = Screen.JOIN
+                                navigateTo(Screen.JOIN)
                             }
                         )
                     }
@@ -78,10 +111,10 @@ fun App() {
                             onJoined = { code ->
                                 roomCode = code
                                 isAdmin = false
-                                currentScreen = Screen.LOBBY
+                                navigateTo(Screen.LOBBY)
                             },
                             onBack = {
-                                currentScreen = Screen.HOME
+                                navigateTo(Screen.HOME)
                             }
                         )
                     }
@@ -91,10 +124,10 @@ fun App() {
                             username = username,
                             isAdmin = isAdmin,
                             onLeaveRoom = {
-                                currentScreen = Screen.HOME
+                                navigateTo(Screen.HOME)
                             },
                             onGameStarted = {
-                                currentScreen = Screen.GAME
+                                navigateTo(Screen.GAME)
                             }
                         )
                     }
@@ -104,10 +137,10 @@ fun App() {
                             username = username,
                             isAdmin = isAdmin,
                             onRepeat = {
-                                // Reset logic if needed
+                                navigateTo(Screen.LOBBY)
                             },
                             onNewGame = {
-                                currentScreen = Screen.HOME
+                                navigateTo(Screen.HOME)
                             }
                         )
                     }

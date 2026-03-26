@@ -85,13 +85,17 @@ fun GameScreen(
 
     LaunchedEffect(roomCode) {
         database.valueEvents.collectLatest { snapshot ->
-            if (!snapshot.exists) return@collectLatest
+            if (snapshot.value == null) return@collectLatest
             currentAdmin = snapshot.child("admin").getValueSafe<String?>() ?: ""
             gameStatus = snapshot.child("status").getValueSafe<String?>() ?: "started"
             resultMessage = snapshot.child("resultMessage").getValueSafe<String?>() ?: ""
             imposterId = snapshot.child("imposterId").getValueSafe<String?>() ?: ""
             mrWhiteId = snapshot.child("mrWhiteId").getValueSafe<String?>() ?: ""
-            if (gameStatus == "waiting") onRepeat()
+            
+            // Ako admin promijeni status u "waiting", svi se vraćaju u lobby
+            if (gameStatus == "waiting") {
+                onRepeat()
+            }
             
             word = when (username) {
                 mrWhiteId -> "TI SI MR. WHITE"
@@ -355,6 +359,7 @@ fun GameScreen(
                                         holdProgress = ((Clock.System.now().toEpochMilliseconds() - start) / 1000f).coerceAtMost(2f)
                                         delay(10) 
                                     }
+                                    // Resetiranje cijele sobe na "waiting" status vraća sve igrače u Lobby
                                     database.updateChildren(mapOf("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false, "discussionEndTime" to 0L, "resultMessage" to ""))
                                     holdProgress = 0f
                                 }

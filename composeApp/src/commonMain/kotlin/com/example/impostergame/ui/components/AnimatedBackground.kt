@@ -20,14 +20,14 @@ fun AnimatedBackground(
     content: @Composable () -> Unit
 ) {
     val isDarkTheme = isSystemInDarkTheme()
-    val backgroundColor = if (isDarkTheme) DarkGray else LightGray
+    val backgroundColor = if (isDarkTheme) Color(0xFF121212) else Color(0xFFF5F5F5)
     
-    val blueAlpha = if (isDarkTheme) 0.2f else 0.62f
-    val purpleAlpha = if (isDarkTheme) 0.2f else 0.62f
+    // Povećavamo vidljivost boja
+    val blueAlpha = if (isDarkTheme) 0.3f else 0.5f
+    val purpleAlpha = if (isDarkTheme) 0.3f else 0.5f
 
-    // Smanjujemo radijus krugova za tamni način rada
-    val blueRadius = if (isDarkTheme) 200.dp else 350.dp
-    val purpleRadius = if (isDarkTheme) 180.dp else 300.dp
+    val blueRadius = 400.dp
+    val purpleRadius = 350.dp
 
     Box(
         modifier = Modifier
