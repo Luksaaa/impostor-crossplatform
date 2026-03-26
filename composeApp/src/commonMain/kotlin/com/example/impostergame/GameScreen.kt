@@ -1,4 +1,4 @@
-@file:OptIn(kotlin.time.ExperimentalTime::class)
+@file:OptIn(ExperimentalTime::class)
 
 package com.example.impostergame
 
@@ -119,7 +119,7 @@ fun GameScreen(
 
             val playersMap = mutableMapOf<String, PlayerInfo>()
             snapshot.child("players").children.forEach { playerSnapshot ->
-                val pInfo = playerSnapshot.getValueSafe<PlayerInfo>()
+                val pInfo = playerSnapshot.getValueSafe<PlayerInfo?>()
                 if (pInfo != null) {
                     playerSnapshot.key?.let { playersMap[it] = pInfo }
                 }

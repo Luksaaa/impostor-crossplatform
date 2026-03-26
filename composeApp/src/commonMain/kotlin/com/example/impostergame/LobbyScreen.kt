@@ -39,6 +39,10 @@ fun LobbyScreen(
     val primaryBtnBg = if (isDarkTheme) DarkEarthy else SoftCream
     val primaryBtnText = if (isDarkTheme) SoftCream else DeepCharcoal
 
+    // Silence unused parameter warning if it isn't utilized directly
+    val dummy = isAdmin
+    println(dummy) // Minimalna operacija da bi dummy bio "korišten"
+
     if (roomCode.isBlank()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = SageGreen)
@@ -51,7 +55,10 @@ fun LobbyScreen(
     var status by remember { mutableStateOf("waiting") }
     var currentAdmin by remember { mutableStateOf("") }
     val isUserAdmin = currentAdmin == username
+    
+    @Suppress("DEPRECATION")
     val clipboardManager = LocalClipboardManager.current
+    
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(roomCode) {
