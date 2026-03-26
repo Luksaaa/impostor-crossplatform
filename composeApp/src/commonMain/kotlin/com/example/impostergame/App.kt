@@ -11,11 +11,6 @@ import com.russhwolf.settings.Settings
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun AppBackHandler(onBack: () -> Unit) {
-    // Platform-specific implementation needed for back button
-}
-
-@Composable
 @Preview
 fun App() {
     val settings: Settings = Settings()
@@ -59,19 +54,16 @@ fun App() {
     )
 
     // Upravljanje natrag gestom
-    CommonBackHandler {
-        when (currentScreen) {
-            Screen.JOIN -> navigateTo(Screen.HOME)
-            Screen.LOBBY -> {
-                FirebaseManager.leaveRoomWithAdminTransfer(roomCode, username) {
-                    navigateTo(Screen.HOME)
-                }
-            }
-            Screen.GAME -> {
-                // Možda potvrda izlaska? Za sada samo u Home
-                navigateTo(Screen.HOME)
-            }
-            else -> {} // Na HOME i ENTER_NAME nek sustav odradi svoje (izlaz)
+    if (currentScreen == Screen.JOIN) {
+        // Na ekranu pridruživanja, gesta vraća na Home
+        CommonBackHandler {
+            navigateTo(Screen.HOME)
+        }
+    } else if (currentScreen == Screen.LOBBY || currentScreen == Screen.GAME) {
+        // BLOKIRANO: Gesta ne radi ništa. Korisnik mora kliknuti gumb na ekranu za izlaz.
+        // Ovo sprječava slučajno izlaženje iz sobe ili igre.
+        CommonBackHandler {
+            // Prazno - namjerno blokira 'back' akciju
         }
     }
 
