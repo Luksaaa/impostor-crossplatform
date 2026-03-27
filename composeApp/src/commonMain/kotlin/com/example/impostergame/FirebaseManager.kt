@@ -12,13 +12,46 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 
-object FirebaseManager {
+interface IFirebaseManager {
+    val roomsRef: DatabaseReference
+    fun generateRoom(username: String, onComplete: (String) -> Unit)
+    suspend fun joinRoom(roomCode: String, username: String): Result<Unit>
+    fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit)
+    fun listenToRoom(roomCode: String): Flow<Room?>
+    fun toggleReady(roomCode: String, username: String, isReady: Boolean)
+    fun startGame(roomCode: String, playersList: List<String>)
+    fun sendMessage(roomCode: String, username: String, message: String)
+    fun startDiscussion(roomCode: String, seconds: Int)
+    fun endRound(roomCode: String, resultMessage: String)
+    fun resetToLobby(roomCode: String)
+}
+
+var activeFirebaseManager: IFirebaseManager? = null
+
+object FirebaseManager : IFirebaseManager {
+    private val delegate get() = activeFirebaseManager ?: GitLiveFirebaseManager
+
+    override val roomsRef: DatabaseReference get() = delegate.roomsRef
+
+    override fun generateRoom(username: String, onComplete: (String) -> Unit) = delegate.generateRoom(username, onComplete)
+    override suspend fun joinRoom(roomCode: String, username: String): Result<Unit> = delegate.joinRoom(roomCode, username)
+    override fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit) = delegate.leaveRoomWithAdminTransfer(roomCode, username, onComplete)
+    override fun listenToRoom(roomCode: String): Flow<Room?> = delegate.listenToRoom(roomCode)
+    override fun toggleReady(roomCode: String, username: String, isReady: Boolean) = delegate.toggleReady(roomCode, username, isReady)
+    override fun startGame(roomCode: String, playersList: List<String>) = delegate.startGame(roomCode, playersList)
+    override fun sendMessage(roomCode: String, username: String, message: String) = delegate.sendMessage(roomCode, username, message)
+    override fun startDiscussion(roomCode: String, seconds: Int) = delegate.startDiscussion(roomCode, seconds)
+    override fun endRound(roomCode: String, resultMessage: String) = delegate.endRound(roomCode, resultMessage)
+    override fun resetToLobby(roomCode: String) = delegate.resetToLobby(roomCode)
+}
+
+object GitLiveFirebaseManager : IFirebaseManager {
     private val database: FirebaseDatabase get() = Firebase.database
-    val roomsRef: DatabaseReference get() = database.reference("rooms")
+    override val roomsRef: DatabaseReference get() = database.reference("rooms")
     
     private val firebaseScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-    fun generateRoom(username: String, onComplete: (String) -> Unit) {
+    override fun generateRoom(username: String, onComplete: (String) -> Unit) {
         firebaseScope.launch {
             try {
                 val code = generateRandomCode()
@@ -55,7 +88,7 @@ object FirebaseManager {
                (1..3).map { numbers.random() }.joinToString("")
     }
 
-    suspend fun joinRoom(roomCode: String, username: String): Result<Unit> {
+    override suspend fun joinRoom(roomCode: String, username: String): Result<Unit> {
         return try {
             val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Gost" }
             val roomRef = roomsRef.child(roomCode)
@@ -82,7 +115,7 @@ object FirebaseManager {
         }
     }
 
-    fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit) {
+    override fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit) {
         firebaseScope.launch {
             try {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
@@ -125,11 +158,11 @@ object FirebaseManager {
         }
     }
 
-    fun listenToRoom(roomCode: String): Flow<Room?> {
+    override fun listenToRoom(roomCode: String): Flow<Room?> {
         return roomsRef.child(roomCode).valueEvents.map { it.getValueSafe<Room?>() }
     }
 
-    fun toggleReady(roomCode: String, username: String, isReady: Boolean) {
+    override fun toggleReady(roomCode: String, username: String, isReady: Boolean) {
         firebaseScope.launch {
             try {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
@@ -138,7 +171,7 @@ object FirebaseManager {
         }
     }
 
-    fun startGame(roomCode: String, playersList: List<String>) {
+    override fun startGame(roomCode: String, playersList: List<String>) {
         firebaseScope.launch {
             try {
                 val (mainWord, imposterWord) = WordManager.getNextWords()
@@ -162,7 +195,7 @@ object FirebaseManager {
         }
     }
 
-    fun sendMessage(roomCode: String, username: String, message: String) {
+    override fun sendMessage(roomCode: String, username: String, message: String) {
         firebaseScope.launch {
             try {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
@@ -172,7 +205,7 @@ object FirebaseManager {
         }
     }
 
-    fun startDiscussion(roomCode: String, seconds: Int) {
+    override fun startDiscussion(roomCode: String, seconds: Int) {
         firebaseScope.launch {
             try {
                 val endTime = Clock.System.now().toEpochMilliseconds() + (seconds * 1000L)
@@ -184,7 +217,7 @@ object FirebaseManager {
         }
     }
 
-    fun endRound(roomCode: String, resultMessage: String) {
+    override fun endRound(roomCode: String, resultMessage: String) {
         firebaseScope.launch {
             try {
                 roomsRef.child(roomCode).updateChildren(mapOf(
@@ -196,7 +229,7 @@ object FirebaseManager {
         }
     }
 
-    fun resetToLobby(roomCode: String) {
+    override fun resetToLobby(roomCode: String) {
         firebaseScope.launch {
             try {
                 roomsRef.child(roomCode).updateChildren(mapOf(

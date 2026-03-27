@@ -30,6 +30,7 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
     var inputCode by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var showScanner by remember { mutableStateOf(false) }
+    var isJoining by remember { mutableStateOf(false) }
     
     val isDarkTheme = isSystemInDarkTheme()
     val textColor = if (isDarkTheme) OffWhite else DeepCharcoal
@@ -40,33 +41,20 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
 
     // Funkcija za zajedničku logiku ulaska u sobu
     fun attemptJoin(code: String) {
+        if (isJoining) return
         val upperCode = code.uppercase()
+        isJoining = true
+        errorMessage = ""
+        
         scope.launch {
-            try {
-                val snapshot = FirebaseManager.roomsRef.child(upperCode).valueEvents.first()
-                if (snapshot.value != null) {
-                    val players = snapshot.child("players")
-                    var count = 0
-                    players.children.forEach { _ -> count++ }
-                    
-                    if (count < 16) {
-                        val playerRef = FirebaseManager.roomsRef.child(upperCode).child("players").child(username)
-                        playerRef.setValue(mapOf("name" to username, "isReady" to false))
-                        val msgRef = FirebaseManager.roomsRef.child(upperCode).child("messages").child("join_${username}")
-                        msgRef.setValue("$username je ušao")
-                        onJoined(upperCode)
-                    } else {
-                        errorMessage = "Soba je puna"
-                        showScanner = false // Ugasi skener ako je pun
-                    }
-                } else {
-                    errorMessage = "Soba ne postoji"
-                    showScanner = false // Ugasi skener ako ne postoji
-                }
-            } catch (e: Exception) {
-                errorMessage = "Greška: ${e.message}"
+            val result = FirebaseManager.joinRoom(upperCode, username)
+            if (result.isSuccess) {
+                onJoined(upperCode)
+            } else {
+                errorMessage = result.exceptionOrNull()?.message ?: "Nepoznata greška"
                 showScanner = false
             }
+            isJoining = false
         }
     }
 
@@ -174,7 +162,8 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                                     unfocusedBorderColor = textColor.copy(alpha = 0.2f),
                                     focusedTextColor = textColor,
                                     unfocusedTextColor = textColor
-                                )
+                                ),
+                                enabled = !isJoining
                             )
                         }
                         
@@ -200,11 +189,16 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                             modifier = Modifier.fillMaxWidth().height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (inputCode.length == 6) accentColor else accentColor.copy(alpha = 0.5f),
+                                containerColor = if (inputCode.length == 6 && !isJoining) accentColor else accentColor.copy(alpha = 0.5f),
                                 contentColor = Color.White
-                            )
+                            ),
+                            enabled = !isJoining
                         ) {
-                            Text("PRIDRUŽI SE", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                            if (isJoining) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+                            } else {
+                                Text("PRIDRUŽI SE", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                            }
                         }
                     }
                 }

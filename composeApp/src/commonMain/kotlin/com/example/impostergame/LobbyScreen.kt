@@ -61,18 +61,18 @@ fun LobbyScreen(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(roomCode) {
-        FirebaseManager.roomsRef.child(roomCode).valueEvents.collectLatest { snapshot ->
-            if (snapshot.value == null) return@collectLatest
+        FirebaseManager.listenToRoom(roomCode).collectLatest { room ->
+            if (room == null) return@collectLatest
             
-            status = snapshot.child("status").getValueSafe<String?>() ?: "waiting"
-            currentAdmin = snapshot.child("admin").getValueSafe<String?>() ?: ""
+            status = room.status
+            currentAdmin = room.admin
             
             var isInGame = false
             var count = 0
-            val playersSnap = snapshot.child("players")
-            playersSnap.children.forEach { child ->
+            
+            room.players.forEach { (key, _) ->
                 count++
-                if (child.key == sanitizedName) isInGame = true
+                if (key == sanitizedName) isInGame = true
             }
             playerCount = count
             
@@ -84,13 +84,12 @@ fun LobbyScreen(
             // Ako je igra završila ili je admin resetirao i vratili smo se u "waiting" status
             // a igrač nije u igračima (jer je npr. izbačen ranije), tada automatski vraća igrača u sobu
             if (status == "waiting" && !isInGame) {
-                FirebaseManager.roomsRef.child(roomCode).child("players").child(sanitizedName)
-                    .setValue(mapOf("name" to username, "isReady" to false))
+                FirebaseManager.joinRoom(roomCode, sanitizedName)
             }
 
             val msgList = mutableListOf<String>()
-            snapshot.child("messages").children.forEach {
-                it.getValueSafe<String?>()?.let { msg -> msgList.add(msg) }
+            room.messages.values.forEach { msg ->
+                msgList.add(msg)
             }
             messages = msgList.reversed()
         }
@@ -204,29 +203,12 @@ fun LobbyScreen(
                     if (isUserAdmin) {
                         Button(
                             onClick = {
-                                val (mainWord, imposterWord) = WordManager.getNextWords()
                                 scope.launch {
                                     try {
-                                        val dbRef = FirebaseManager.roomsRef.child(roomCode)
-                                        val snap = dbRef.valueEvents.first()
-                                        val playersList = mutableListOf<String>()
-                                        snap.child("players").children.forEach { childSnap ->
-                                            childSnap.key?.let { playersList.add(it) }
-                                        }
-                                        val shuffled = playersList.shuffled()
-                                        
-                                        if (shuffled.size >= 2) {
-                                            val imposterId = shuffled[0]
-                                            val mrWhiteId = if (shuffled.size >= 3 && (1..100).random() <= 20) shuffled[1] else ""
-                                            
-                                            val updates = mapOf(
-                                                "mainWord" to mainWord,
-                                                "imposterWord" to imposterWord,
-                                                "imposterId" to imposterId,
-                                                "mrWhiteId" to mrWhiteId,
-                                                "status" to "started"
-                                            )
-                                            dbRef.updateChildren(updates)
+                                        val room = FirebaseManager.listenToRoom(roomCode).first()
+                                        if (room != null) {
+                                            val playersList = room.players.keys.toList()
+                                            FirebaseManager.startGame(roomCode, playersList)
                                         }
                                     } catch (_: Exception) {}
                                 }

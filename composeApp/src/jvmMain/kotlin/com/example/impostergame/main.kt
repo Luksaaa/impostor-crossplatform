@@ -11,9 +11,9 @@ import java.io.StringWriter
 
 fun main() {
     try {
-        // Desktop version of gitlive firebase currently does not support initialization directly in main()
-        // We will mock FirebaseManager for desktop or handle it in common code appropriately if needed.
-        println("Starting Desktop App...")
+        // Aktiviraj Desktop (REST) verziju Firebase Managera umjesto Android/iOS verzije
+        activeFirebaseManager = DesktopFirebaseManager
+        println("Starting Desktop App with DesktopFirebaseManager...")
 
         application {
             val windowState = rememberWindowState(width = 1000.dp, height = 800.dp)

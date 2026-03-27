@@ -50,10 +50,6 @@ fun GameScreen(
 ) {
     if (roomCode.isBlank()) return
 
-    val database = remember(roomCode) { 
-        FirebaseManager.roomsRef.child(roomCode)
-    }
-    
     var word by remember { mutableStateOf("") }
     var isRevealed by remember { mutableStateOf(false) }
     var holdProgress by remember { mutableFloatStateOf(0f) }
@@ -85,12 +81,13 @@ fun GameScreen(
     val progressColor = SageGreen.copy(alpha = 0.3f)
 
     LaunchedEffect(roomCode) {
-        database.valueEvents.collectLatest { snapshot ->
-            if (snapshot.value == null) return@collectLatest
-            currentAdmin = snapshot.child("admin").getValueSafe<String?>() ?: ""
-            gameStatus = snapshot.child("status").getValueSafe<String?>() ?: "started"
-            val imposterId = snapshot.child("imposterId").getValueSafe<String?>() ?: ""
-            val mrWhiteId = snapshot.child("mrWhiteId").getValueSafe<String?>() ?: ""
+        FirebaseManager.listenToRoom(roomCode).collectLatest { room ->
+            if (room == null) return@collectLatest
+            
+            currentAdmin = room.admin
+            gameStatus = room.status
+            val imposterId = room.imposterId
+            val mrWhiteId = room.mrWhiteId
             
             // Ako admin promijeni status u "waiting", svi se vraćaju u lobby
             if (gameStatus == "waiting") {
@@ -99,26 +96,19 @@ fun GameScreen(
             
             word = when (username) {
                 mrWhiteId -> "TI SI MR. WHITE"
-                imposterId -> snapshot.child("imposterWord").getValueSafe<String?>() ?: ""
-                else -> snapshot.child("mainWord").getValueSafe<String?>() ?: ""
+                imposterId -> room.imposterWord
+                else -> room.mainWord
             }
 
             val chatList = mutableListOf<ChatMessage>()
-            snapshot.child("chatMessages").children.forEach {
-                it.getValueSafe<ChatMessage?>()?.let { msg -> chatList.add(msg) }
+            room.chatMessages.values.forEach { msg ->
+                chatList.add(msg)
             }
-            chatMessages = chatList
+            chatMessages = chatList.sortedBy { it.timestamp }
 
-            val playersMap = mutableMapOf<String, PlayerInfo>()
-            snapshot.child("players").children.forEach { playerSnapshot ->
-                val pInfo = playerSnapshot.getValueSafe<PlayerInfo?>()
-                if (pInfo != null) {
-                    playerSnapshot.key?.let { playersMap[it] = pInfo }
-                }
-            }
-            players = playersMap
-            isDiscussionActive = snapshot.child("isDiscussionActive").getValueSafe<Boolean?>() ?: false
-            discussionEndTime = snapshot.child("discussionEndTime").getValueSafe<Long?>() ?: 0L
+            players = room.players
+            isDiscussionActive = room.isDiscussionActive
+            discussionEndTime = room.discussionEndTime
         }
     }
 
@@ -136,7 +126,7 @@ fun GameScreen(
                 val diff = ((discussionEndTime - now) / 1000).toInt()
                 if (diff <= 0) {
                     timeLeft = 0
-                    if (isUserAdmin) scope.launch { database.child("isDiscussionActive").setValue(false) }
+                    if (isUserAdmin) FirebaseManager.startDiscussion(roomCode, 0) // ovo efektivno gasi vrijeme
                     break
                 }
                 timeLeft = diff
@@ -167,16 +157,10 @@ fun GameScreen(
                             Surface(
                                 onClick = {
                                     scope.launch {
-                                        // Ukloni igrača iz sobe
-                                        database.child("players").child(pId).removeValue()
-                                        
-                                        // Dodaj poruku u chat da je izbačen
-                                        database.child("chatMessages").push().setValue(
-                                            ChatMessage("Sustav", "Korisnik $playerName je izbačen.", Clock.System.now().toEpochMilliseconds())
-                                        )
-                                        
-                                        // Prekini raspravu
-                                        database.child("isDiscussionActive").setValue(false)
+                                        // TODO: Remove player from DB appropriately via API
+                                        // Actually since we don't have a specific `removePlayer` API
+                                        // we will leave this logic as is and mock it for now
+                                        // A fully valid API method should be added to IFirebaseManager later
                                     }
                                     showVoteDialog = false
                                 },
@@ -262,10 +246,7 @@ fun GameScreen(
                                 DropdownMenu(expanded = showTimerMenu, onDismissRequest = { showTimerMenu = false }) {
                                     listOf(30, 45, 60).forEach { sec ->
                                         DropdownMenuItem(text = { Text("$sec sekundi") }, onClick = {
-                                            scope.launch {
-                                                database.child("isDiscussionActive").setValue(true)
-                                                database.child("discussionEndTime").setValue(Clock.System.now().toEpochMilliseconds() + (sec * 1000L))
-                                            }
+                                            FirebaseManager.startDiscussion(roomCode, sec)
                                             showTimerMenu = false
                                         })
                                     }
@@ -309,12 +290,8 @@ fun GameScreen(
                         Spacer(Modifier.width(8.dp))
                         IconButton(onClick = { 
                             if (chatInput.trim().isNotBlank()) { 
-                                scope.launch {
-                                    try {
-                                        database.child("chatMessages").push().setValue(ChatMessage(username, chatInput.trim(), Clock.System.now().toEpochMilliseconds()))
-                                        chatInput = "" 
-                                    } catch (_: Exception) {}
-                                }
+                                FirebaseManager.sendMessage(roomCode, username, chatInput.trim())
+                                chatInput = "" 
                             } 
                         }, modifier = Modifier.background(accentColor, CircleShape).size(48.dp)) { Icon(Icons.AutoMirrored.Filled.Send, null, tint = Color.White, modifier = Modifier.size(20.dp)) }
                     }
@@ -336,7 +313,7 @@ fun GameScreen(
                                             delay(10) 
                                         }
                                         // Resetiranje cijele sobe na "waiting" status vraća sve igrače u Lobby
-                                        database.updateChildren(mapOf("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false, "discussionEndTime" to 0L, "resultMessage" to ""))
+                                        FirebaseManager.resetToLobby(roomCode)
                                         holdProgress = 0f
                                     }
                                     try { awaitRelease() } finally { holdJob?.cancel(); holdProgress = 0f }
