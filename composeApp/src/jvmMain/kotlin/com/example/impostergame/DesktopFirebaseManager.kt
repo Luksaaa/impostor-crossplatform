@@ -38,7 +38,7 @@ object DesktopFirebaseManager : IFirebaseManager {
         }
     }
     
-    private fun patchData(roomCode: String, updates: JsonObject) {
+    fun patchData(roomCode: String, updates: JsonObject) {
         try {
             val url = URL("$BASE_URL/$roomCode.json")
             val conn = url.openConnection() as HttpURLConnection
@@ -54,7 +54,7 @@ object DesktopFirebaseManager : IFirebaseManager {
         }
     }
 
-    private fun deleteData(path: String) {
+    fun deleteData(path: String) {
         try {
             val url = URL("$BASE_URL/$path.json")
             val conn = url.openConnection() as HttpURLConnection
@@ -205,16 +205,11 @@ object DesktopFirebaseManager : IFirebaseManager {
         scope.launch {
             try {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
-                val chatMsg = ChatMessage(sanitizedName, message.trim(), System.currentTimeMillis())
+                val timestamp = System.currentTimeMillis()
+                val chatMsg = ChatMessage(sanitizedName, message.trim(), timestamp)
                 
-                val url = URL("$BASE_URL/$roomCode/chatMessages.json")
-                val conn = url.openConnection() as HttpURLConnection
-                conn.requestMethod = "POST"
-                conn.doOutput = true
-                conn.setRequestProperty("Content-Type", "application/json")
-                conn.outputStream.write(json.encodeToString(chatMsg).toByteArray())
-                conn.responseCode
-                conn.disconnect()
+                // Put with unique key to simulate push()
+                putData("$roomCode/chatMessages/msg_$timestamp", chatMsg)
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")
             }
@@ -253,6 +248,12 @@ object DesktopFirebaseManager : IFirebaseManager {
                 put("resultMessage", JsonPrimitive(""))
             }
             patchData(roomCode, updates)
+        }
+    }
+    
+    override fun removePlayer(roomCode: String, playerName: String) {
+        scope.launch {
+            deleteData("$roomCode/players/$playerName")
         }
     }
 }

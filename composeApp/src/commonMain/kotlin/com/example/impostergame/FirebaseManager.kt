@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 
 interface IFirebaseManager {
     val roomsRef: DatabaseReference
@@ -24,6 +23,7 @@ interface IFirebaseManager {
     fun startDiscussion(roomCode: String, seconds: Int)
     fun endRound(roomCode: String, resultMessage: String)
     fun resetToLobby(roomCode: String)
+    fun removePlayer(roomCode: String, playerName: String)
 }
 
 var activeFirebaseManager: IFirebaseManager? = null
@@ -43,6 +43,7 @@ object FirebaseManager : IFirebaseManager {
     override fun startDiscussion(roomCode: String, seconds: Int) = delegate.startDiscussion(roomCode, seconds)
     override fun endRound(roomCode: String, resultMessage: String) = delegate.endRound(roomCode, resultMessage)
     override fun resetToLobby(roomCode: String) = delegate.resetToLobby(roomCode)
+    override fun removePlayer(roomCode: String, playerName: String) = delegate.removePlayer(roomCode, playerName)
 }
 
 object GitLiveFirebaseManager : IFirebaseManager {
@@ -107,7 +108,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
             }
             
             roomRef.child("players").child(sanitizedName).setValue(mapOf("name" to sanitizedName, "isReady" to false))
-            val timestamp = Clock.System.now().toEpochMilliseconds()
+            val timestamp = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
             roomRef.child("messages").child("join_$timestamp").setValue("$sanitizedName je ušao")
             Result.success(Unit)
         } catch (e: Exception) {
@@ -131,7 +132,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
                 val playersSnapshots = mutableListOf<DataSnapshot>()
                 snapshot.child("players").children.forEach { playersSnapshots.add(it) }
                 
-                val timestamp = Clock.System.now().toEpochMilliseconds()
+                val timestamp = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
                 
                 if (currentAdmin == sanitizedName) {
                     val nextAdmin = playersSnapshots.firstOrNull { it.key != sanitizedName }?.key
@@ -199,7 +200,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
         firebaseScope.launch {
             try {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
-                val chatMsg = ChatMessage(sanitizedName, message.trim(), Clock.System.now().toEpochMilliseconds())
+                val chatMsg = ChatMessage(sanitizedName, message.trim(), kotlinx.datetime.Clock.System.now().toEpochMilliseconds())
                 roomsRef.child(roomCode).child("chatMessages").push().setValue(chatMsg)
             } catch (e: Exception) {}
         }
@@ -208,7 +209,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
     override fun startDiscussion(roomCode: String, seconds: Int) {
         firebaseScope.launch {
             try {
-                val endTime = Clock.System.now().toEpochMilliseconds() + (seconds * 1000L)
+                val endTime = kotlinx.datetime.Clock.System.now().toEpochMilliseconds() + (seconds * 1000L)
                 roomsRef.child(roomCode).updateChildren(mapOf(
                     "isDiscussionActive" to true,
                     "discussionEndTime" to endTime
@@ -239,6 +240,14 @@ object GitLiveFirebaseManager : IFirebaseManager {
                     "discussionEndTime" to 0L,
                     "resultMessage" to ""
                 ))
+            } catch (e: Exception) {}
+        }
+    }
+    
+    override fun removePlayer(roomCode: String, playerName: String) {
+        firebaseScope.launch {
+            try {
+                roomsRef.child(roomCode).child("players").child(playerName).removeValue()
             } catch (e: Exception) {}
         }
     }

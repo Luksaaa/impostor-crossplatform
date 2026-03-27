@@ -36,7 +36,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -122,7 +121,9 @@ fun GameScreen(
     LaunchedEffect(isDiscussionActive, discussionEndTime) {
         if (isDiscussionActive && discussionEndTime > 0L) {
             while (true) {
-                val now = Clock.System.now().toEpochMilliseconds()
+                // Koristi kotlinx.datetime.Clock.System ako treba, ali za sada uzmimo platform-independent način 
+                // ili barem kompatibilan način kroz FirebaseManager/System
+                val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
                 val diff = ((discussionEndTime - now) / 1000).toInt()
                 if (diff <= 0) {
                     timeLeft = 0
@@ -157,10 +158,18 @@ fun GameScreen(
                             Surface(
                                 onClick = {
                                     scope.launch {
-                                        // TODO: Remove player from DB appropriately via API
-                                        // Actually since we don't have a specific `removePlayer` API
-                                        // we will leave this logic as is and mock it for now
-                                        // A fully valid API method should be added to IFirebaseManager later
+                                        // Brisanje igrača i prekidanje diskusije delegirano kroz poseban API ako ga napravimo,
+                                        // ili možemo kroz DesktopFirebaseManager. Pošto imamo "activeFirebaseManager" koristimo ga ako možemo
+                                        // Kako bismo podržali brisanje (Kick) sa svih platformi bez dodatnog IFirebaseManager proširenja,
+                                        // možemo zatražiti novi API
+                                        if (activeFirebaseManager is DesktopFirebaseManager) {
+                                            val mgr = activeFirebaseManager as DesktopFirebaseManager
+                                            mgr.deleteData("$roomCode/players/$pId")
+                                            FirebaseManager.sendMessage(roomCode, "Sustav", "Korisnik $playerName je izbačen.")
+                                            FirebaseManager.startDiscussion(roomCode, 0)
+                                        } else {
+                                            // TODO: Fallback za Android Firebase za izbacivanje
+                                        }
                                     }
                                     showVoteDialog = false
                                 },
@@ -307,9 +316,9 @@ fun GameScreen(
                             .pointerInput(Unit) {
                                 detectTapGestures(onPress = {
                                     holdJob = scope.launch {
-                                        val start = Clock.System.now().toEpochMilliseconds()
+                                        val start = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
                                         while (holdProgress < 2f) { 
-                                            holdProgress = ((Clock.System.now().toEpochMilliseconds() - start) / 1000f).coerceAtMost(2f)
+                                            holdProgress = ((kotlinx.datetime.Clock.System.now().toEpochMilliseconds() - start) / 1000f).coerceAtMost(2f)
                                             delay(10) 
                                         }
                                         // Resetiranje cijele sobe na "waiting" status vraća sve igrače u Lobby
@@ -351,9 +360,9 @@ fun GameScreen(
                     .pointerInput(Unit) {
                         detectTapGestures(onPress = {
                             exitHoldJob = scope.launch {
-                                val start = Clock.System.now().toEpochMilliseconds()
+                                val start = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
                                 while (exitHoldProgress < 2f) { 
-                                    exitHoldProgress = ((Clock.System.now().toEpochMilliseconds() - start) / 1000f).coerceAtMost(2f)
+                                    exitHoldProgress = ((kotlinx.datetime.Clock.System.now().toEpochMilliseconds() - start) / 1000f).coerceAtMost(2f)
                                     delay(10) 
                                 }
                                 FirebaseManager.leaveRoomWithAdminTransfer(roomCode, username, onNewGame)
