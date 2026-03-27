@@ -121,9 +121,7 @@ fun GameScreen(
     LaunchedEffect(isDiscussionActive, discussionEndTime) {
         if (isDiscussionActive && discussionEndTime > 0L) {
             while (true) {
-                // Koristi kotlinx.datetime.Clock.System ako treba, ali za sada uzmimo platform-independent način 
-                // ili barem kompatibilan način kroz FirebaseManager/System
-                val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+                val now = currentPlatformMillis()
                 val diff = ((discussionEndTime - now) / 1000).toInt()
                 if (diff <= 0) {
                     timeLeft = 0
@@ -158,18 +156,9 @@ fun GameScreen(
                             Surface(
                                 onClick = {
                                     scope.launch {
-                                        // Brisanje igrača i prekidanje diskusije delegirano kroz poseban API ako ga napravimo,
-                                        // ili možemo kroz DesktopFirebaseManager. Pošto imamo "activeFirebaseManager" koristimo ga ako možemo
-                                        // Kako bismo podržali brisanje (Kick) sa svih platformi bez dodatnog IFirebaseManager proširenja,
-                                        // možemo zatražiti novi API
-                                        if (activeFirebaseManager is DesktopFirebaseManager) {
-                                            val mgr = activeFirebaseManager as DesktopFirebaseManager
-                                            mgr.deleteData("$roomCode/players/$pId")
-                                            FirebaseManager.sendMessage(roomCode, "Sustav", "Korisnik $playerName je izbačen.")
-                                            FirebaseManager.startDiscussion(roomCode, 0)
-                                        } else {
-                                            // TODO: Fallback za Android Firebase za izbacivanje
-                                        }
+                                        FirebaseManager.removePlayer(roomCode, pId)
+                                        FirebaseManager.sendMessage(roomCode, "Sustav", "Korisnik $playerName je izbačen.")
+                                        FirebaseManager.startDiscussion(roomCode, 0)
                                     }
                                     showVoteDialog = false
                                 },
@@ -316,9 +305,9 @@ fun GameScreen(
                             .pointerInput(Unit) {
                                 detectTapGestures(onPress = {
                                     holdJob = scope.launch {
-                                        val start = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+                                        val start = currentPlatformMillis()
                                         while (holdProgress < 2f) { 
-                                            holdProgress = ((kotlinx.datetime.Clock.System.now().toEpochMilliseconds() - start) / 1000f).coerceAtMost(2f)
+                                            holdProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(2f)
                                             delay(10) 
                                         }
                                         // Resetiranje cijele sobe na "waiting" status vraća sve igrače u Lobby
@@ -360,9 +349,9 @@ fun GameScreen(
                     .pointerInput(Unit) {
                         detectTapGestures(onPress = {
                             exitHoldJob = scope.launch {
-                                val start = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+                                val start = currentPlatformMillis()
                                 while (exitHoldProgress < 2f) { 
-                                    exitHoldProgress = ((kotlinx.datetime.Clock.System.now().toEpochMilliseconds() - start) / 1000f).coerceAtMost(2f)
+                                    exitHoldProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(2f)
                                     delay(10) 
                                 }
                                 FirebaseManager.leaveRoomWithAdminTransfer(roomCode, username, onNewGame)

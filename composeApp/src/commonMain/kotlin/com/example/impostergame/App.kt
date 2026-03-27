@@ -47,7 +47,13 @@ fun App() {
     // Također koristimo try-catch kako bismo spriječili pucanje u Preview modu.
     val settings: Settings = remember {
         try {
-            Settings()
+            val s = Settings()
+            // Resetira podatke samo jednom i nikad više
+            if (!s.getBoolean("has_been_reset_once", false)) {
+                s.clear()
+                s.putBoolean("has_been_reset_once", true)
+            }
+            s
         } catch (_: Throwable) {
             MockSettings()
         }

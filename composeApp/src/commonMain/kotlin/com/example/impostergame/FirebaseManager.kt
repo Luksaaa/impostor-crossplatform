@@ -108,7 +108,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
             }
             
             roomRef.child("players").child(sanitizedName).setValue(mapOf("name" to sanitizedName, "isReady" to false))
-            val timestamp = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            val timestamp = currentPlatformMillis()
             roomRef.child("messages").child("join_$timestamp").setValue("$sanitizedName je ušao")
             Result.success(Unit)
         } catch (e: Exception) {
@@ -132,7 +132,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
                 val playersSnapshots = mutableListOf<DataSnapshot>()
                 snapshot.child("players").children.forEach { playersSnapshots.add(it) }
                 
-                val timestamp = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+                val timestamp = currentPlatformMillis()
                 
                 if (currentAdmin == sanitizedName) {
                     val nextAdmin = playersSnapshots.firstOrNull { it.key != sanitizedName }?.key
@@ -200,7 +200,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
         firebaseScope.launch {
             try {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
-                val chatMsg = ChatMessage(sanitizedName, message.trim(), kotlinx.datetime.Clock.System.now().toEpochMilliseconds())
+                val chatMsg = ChatMessage(sanitizedName, message.trim(), currentPlatformMillis())
                 roomsRef.child(roomCode).child("chatMessages").push().setValue(chatMsg)
             } catch (e: Exception) {}
         }
@@ -209,7 +209,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
     override fun startDiscussion(roomCode: String, seconds: Int) {
         firebaseScope.launch {
             try {
-                val endTime = kotlinx.datetime.Clock.System.now().toEpochMilliseconds() + (seconds * 1000L)
+                val endTime = currentPlatformMillis() + (seconds * 1000L)
                 roomsRef.child(roomCode).updateChildren(mapOf(
                     "isDiscussionActive" to true,
                     "discussionEndTime" to endTime
