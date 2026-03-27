@@ -12,3 +12,8 @@ plugins {
     id("com.google.gms.google-services") version "4.4.2" apply false
 }
 
+tasks.register("desktopRun") {
+    dependsOn(":composeApp:run")
+    group = "application"
+    description = "Runs the desktop application."
+}

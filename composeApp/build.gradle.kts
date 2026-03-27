@@ -55,9 +55,6 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            
-            // Add explicitly for commonMain if analyzer suggests it
-            implementation(libs.androidx.compose.ui.tooling.preview)
         }
 
         androidMain.dependencies {
@@ -87,7 +84,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "com.example.impostergame.MainKt"
+        mainClass = "com.example.impostergame.AppMain"
         nativeDistributions {
             targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg, org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi, org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb)
             packageName = "com.example.impostergame"
