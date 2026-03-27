@@ -65,6 +65,9 @@ fun GameScreen(
     var discussionEndTime by remember { mutableLongStateOf(0L) }
     var timeLeft by remember { mutableIntStateOf(0) }
     
+    // UI always relies on the local state computed here. 
+    val showDiscussion = isDiscussionActive && timeLeft > 0
+    
     val isUserAdmin = remember(currentAdmin, username) { currentAdmin == username }
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
@@ -99,8 +102,9 @@ fun GameScreen(
                 else -> room.mainWord
             }
 
-            // Ovdje koristimo ključeve Firebase baze za sortiranje poruka jer su kronološki najprecizniji
-            chatMessages = room.chatMessages.entries.sortedBy { it.key }.map { it.value }
+            // Popravljeno sortiranje: Oslanjamo se isključivo na timestamp poslane poruke,
+            // tako da se redoslijed ne mijenja pri gašenju i paljenju Rasprave / Chata.
+            chatMessages = room.chatMessages.values.sortedBy { it.timestamp }
 
             players = room.players
             isDiscussionActive = room.isDiscussionActive
@@ -122,7 +126,12 @@ fun GameScreen(
                 val diff = ((discussionEndTime - now) / 1000).toInt()
                 if (diff <= 0) {
                     timeLeft = 0
-                    if (isUserAdmin) FirebaseManager.startDiscussion(roomCode, 0)
+                    // Čim vrijeme istekne, vraća se Chat za SVAKOG korisnika (zbog showDiscussion).
+                    // Admin će obavijestiti bazu. Nije bitno ako prođe par stotinki jer 
+                    // je sučelje već reagiralo pomoću 'timeLeft = 0'.
+                    if (isUserAdmin) {
+                         FirebaseManager.startDiscussion(roomCode, 0)
+                    }
                     break
                 }
                 timeLeft = diff
@@ -155,7 +164,8 @@ fun GameScreen(
                                     scope.launch {
                                         FirebaseManager.removePlayer(roomCode, pId)
                                         FirebaseManager.sendMessage(roomCode, "Sustav", "Korisnik $playerName je izbačen.")
-                                        // Ne diramo diskusiju kako bismo ostavili sve kako je.
+                                        // Apsolutno ne diramo raspravu ovdje - izbacivanje uljeza NE
+                                        // briše tajmer niti vraća CHAT! "Nemoj mijenjati stvari kada se uljez izbaci."
                                     }
                                     showVoteDialog = false
                                 },
@@ -199,7 +209,7 @@ fun GameScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    if (isDiscussionActive) {
+                    if (showDiscussion) {
                         Row(
                             modifier = Modifier.align(Alignment.TopEnd).padding(16.dp).background(MutedRose.copy(alpha = 0.15f), RoundedCornerShape(12.dp)).padding(horizontal = 12.dp, vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -232,18 +242,28 @@ fun GameScreen(
 
             Card(modifier = Modifier.fillMaxWidth().weight(1f), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.5f))) {
                 Column(modifier = Modifier.padding(12.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(if (isDiscussionActive) "RASPRAVA" else "CHAT", fontWeight = FontWeight.Bold, color = if (isDiscussionActive) MutedRose else accentColor)
-                        if (isUserAdmin) {
-                            var showTimerMenu by remember { mutableStateOf(false) }
-                            Box {
-                                IconButton(onClick = { showTimerMenu = true }) { Icon(Icons.Default.Timer, null, tint = accentColor) }
-                                DropdownMenu(expanded = showTimerMenu, onDismissRequest = { showTimerMenu = false }) {
-                                    listOf(30, 45, 60).forEach { sec ->
-                                        DropdownMenuItem(text = { Text("$sec sekundi") }, onClick = {
-                                            FirebaseManager.startDiscussion(roomCode, sec)
-                                            showTimerMenu = false
-                                        })
+                    // Ovdje koristimo točnu strukturu koja rezervira fiksni prostor za gumbić sata 
+                    // s obje strane pa se naslov CHAT/RASPRAVA ne miče bez obzira je li gumb prikazan ili ne
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = if (showDiscussion) "RASPRAVA" else "CHAT", 
+                            fontWeight = FontWeight.Bold, 
+                            color = if (showDiscussion) MutedRose else accentColor,
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        )
+                        
+                        Box(modifier = Modifier.align(Alignment.CenterEnd).size(48.dp), contentAlignment = Alignment.CenterEnd) {
+                            if (isUserAdmin && !showDiscussion) {
+                                var showTimerMenu by remember { mutableStateOf(false) }
+                                Box {
+                                    IconButton(onClick = { showTimerMenu = true }) { Icon(Icons.Default.Timer, null, tint = accentColor) }
+                                    DropdownMenu(expanded = showTimerMenu, onDismissRequest = { showTimerMenu = false }) {
+                                        listOf(30, 45, 60).forEach { sec ->
+                                            DropdownMenuItem(text = { Text("$sec sekundi") }, onClick = {
+                                                FirebaseManager.startDiscussion(roomCode, sec)
+                                                showTimerMenu = false
+                                            })
+                                        }
                                     }
                                 }
                             }
