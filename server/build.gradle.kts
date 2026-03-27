@@ -7,7 +7,7 @@ plugins {
 group = "com.example.impostergame"
 version = "1.0.0"
 application {
-    mainClass.set("com.example.impostergame.ApplicationKt")
+    mainClass.set("com.example.impostergame.MainKt")
     
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")

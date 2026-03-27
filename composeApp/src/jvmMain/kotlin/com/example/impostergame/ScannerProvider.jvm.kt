@@ -1,6 +1,5 @@
 package com.example.impostergame
 
-// Placeholder for Desktop
-actual fun startQRScanner(onResult: (String?) -> Unit) {
-    onResult(null)
-}
+// actual fun startQRScanner(onResult: (String?) -> Unit) {
+//     // Not implemented for JVM
+// }
