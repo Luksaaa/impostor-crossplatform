@@ -65,7 +65,6 @@ fun GameScreen(
     var discussionEndTime by remember { mutableLongStateOf(0L) }
     var timeLeft by remember { mutableIntStateOf(0) }
     
-    // UI always relies on the local state computed here. 
     val showDiscussion = isDiscussionActive && timeLeft > 0
     
     val isUserAdmin = remember(currentAdmin, username) { currentAdmin == username }
@@ -91,7 +90,6 @@ fun GameScreen(
             val imposterId = room.imposterId
             val mrWhiteId = room.mrWhiteId
             
-            // Ako admin promijeni status u "waiting", svi se vraćaju u lobby
             if (gameStatus == "waiting") {
                 onRepeat()
             }
@@ -102,7 +100,6 @@ fun GameScreen(
                 else -> room.mainWord
             }
 
-            // Ovdje koristimo ključeve Firebase baze za sortiranje poruka jer su kronološki najprecizniji
             chatMessages = room.chatMessages.entries.sortedBy { it.key }.map { it.value }
 
             players = room.players
@@ -112,9 +109,8 @@ fun GameScreen(
     }
 
     LaunchedEffect(players) {
-        // Ako je igra u tijeku, ali korisnika više nema u listi igrača (izbačen je)
         if (gameStatus == "started" && players.isNotEmpty() && !players.containsKey(username)) {
-            onRepeat() // Vraća u lobby
+            onRepeat()
         }
     }
 
@@ -125,7 +121,9 @@ fun GameScreen(
                 val diff = ((discussionEndTime - now) / 1000).toInt()
                 if (diff <= 0) {
                     timeLeft = 0
-                    if (isUserAdmin) FirebaseManager.startDiscussion(roomCode, 0)
+                    if (isUserAdmin) {
+                        FirebaseManager.startDiscussion(roomCode, 0)
+                    }
                     break
                 }
                 timeLeft = diff
@@ -158,7 +156,6 @@ fun GameScreen(
                                     scope.launch {
                                         FirebaseManager.removePlayer(roomCode, pId)
                                         FirebaseManager.sendMessage(roomCode, "Sustav", "Korisnik $playerName je izbačen.")
-                                        // Ne želimo automatski ugasiti raspravu niti resetirati timer kad nekoga izbacimo.
                                     }
                                     showVoteDialog = false
                                 },
@@ -240,7 +237,6 @@ fun GameScreen(
                         horizontalArrangement = Arrangement.SpaceBetween, 
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Rezerviramo konstantnu širinu teksta (ili koristimo iste proporcije) da poruke ne poskakuju
                         Text(
                             text = if (showDiscussion) "RASPRAVA" else "CHAT", 
                             fontWeight = FontWeight.Bold, 
@@ -248,8 +244,6 @@ fun GameScreen(
                             modifier = Modifier.defaultMinSize(minWidth = 100.dp)
                         )
                         
-                        // Osiguravamo da i kad adminu nije prikazan izbornik (zato sto showDiscussion = true),
-                        // da to polje bude jednako siroko (popuni 48dp) kako se red ne bi prosirio/smanjio
                         Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.CenterEnd) {
                             if (isUserAdmin && !showDiscussion) {
                                 var showTimerMenu by remember { mutableStateOf(false) }
@@ -325,7 +319,6 @@ fun GameScreen(
                                             holdProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(2f)
                                             delay(10) 
                                         }
-                                        // Resetiranje cijele sobe na "waiting" status vraća sve igrače u Lobby
                                         FirebaseManager.resetToLobby(roomCode)
                                         holdProgress = 0f
                                     }
