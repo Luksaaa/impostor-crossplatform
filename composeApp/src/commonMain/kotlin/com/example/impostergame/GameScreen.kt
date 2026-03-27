@@ -102,9 +102,8 @@ fun GameScreen(
                 else -> room.mainWord
             }
 
-            // Popravljeno sortiranje: Oslanjamo se isključivo na timestamp poslane poruke,
-            // tako da se redoslijed ne mijenja pri gašenju i paljenju Rasprave / Chata.
-            chatMessages = room.chatMessages.values.sortedBy { it.timestamp }
+            // Ovdje koristimo ključeve Firebase baze za sortiranje poruka jer su kronološki najprecizniji
+            chatMessages = room.chatMessages.entries.sortedBy { it.key }.map { it.value }
 
             players = room.players
             isDiscussionActive = room.isDiscussionActive
@@ -126,12 +125,7 @@ fun GameScreen(
                 val diff = ((discussionEndTime - now) / 1000).toInt()
                 if (diff <= 0) {
                     timeLeft = 0
-                    // Čim vrijeme istekne, vraća se Chat za SVAKOG korisnika (zbog showDiscussion).
-                    // Admin će obavijestiti bazu. Nije bitno ako prođe par stotinki jer 
-                    // je sučelje već reagiralo pomoću 'timeLeft = 0'.
-                    if (isUserAdmin) {
-                         FirebaseManager.startDiscussion(roomCode, 0)
-                    }
+                    if (isUserAdmin) FirebaseManager.startDiscussion(roomCode, 0)
                     break
                 }
                 timeLeft = diff
@@ -164,8 +158,7 @@ fun GameScreen(
                                     scope.launch {
                                         FirebaseManager.removePlayer(roomCode, pId)
                                         FirebaseManager.sendMessage(roomCode, "Sustav", "Korisnik $playerName je izbačen.")
-                                        // Apsolutno ne diramo raspravu ovdje - izbacivanje uljeza NE
-                                        // briše tajmer niti vraća CHAT! "Nemoj mijenjati stvari kada se uljez izbaci."
+                                        // Ne želimo automatski ugasiti raspravu niti resetirati timer kad nekoga izbacimo.
                                     }
                                     showVoteDialog = false
                                 },
@@ -242,17 +235,22 @@ fun GameScreen(
 
             Card(modifier = Modifier.fillMaxWidth().weight(1f), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.5f))) {
                 Column(modifier = Modifier.padding(12.dp)) {
-                    // Ovdje koristimo točnu strukturu koja rezervira fiksni prostor za gumbić sata 
-                    // s obje strane pa se naslov CHAT/RASPRAVA ne miče bez obzira je li gumb prikazan ili ne
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), 
+                        horizontalArrangement = Arrangement.SpaceBetween, 
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Rezerviramo konstantnu širinu teksta (ili koristimo iste proporcije) da poruke ne poskakuju
                         Text(
                             text = if (showDiscussion) "RASPRAVA" else "CHAT", 
                             fontWeight = FontWeight.Bold, 
                             color = if (showDiscussion) MutedRose else accentColor,
-                            modifier = Modifier.align(Alignment.CenterStart)
+                            modifier = Modifier.defaultMinSize(minWidth = 100.dp)
                         )
                         
-                        Box(modifier = Modifier.align(Alignment.CenterEnd).size(48.dp), contentAlignment = Alignment.CenterEnd) {
+                        // Osiguravamo da i kad adminu nije prikazan izbornik (zato sto showDiscussion = true),
+                        // da to polje bude jednako siroko (popuni 48dp) kako se red ne bi prosirio/smanjio
+                        Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.CenterEnd) {
                             if (isUserAdmin && !showDiscussion) {
                                 var showTimerMenu by remember { mutableStateOf(false) }
                                 Box {

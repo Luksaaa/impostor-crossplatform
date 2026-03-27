@@ -58,7 +58,6 @@ object GitLiveFirebaseManager : IFirebaseManager {
                 val code = generateRandomCode()
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Igrac" }
                 
-                // Using valueEvents.first() as it seems to be the most compatible way in this project's setup
                 val snapshot = roomsRef.child(code).valueEvents.first()
                 
                 if (snapshot.value != null) {
@@ -76,9 +75,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
                         onComplete(code)
                     }
                 }
-            } catch (e: Exception) {
-                println("Firebase Error: ${e.message}")
-            }
+            } catch (e: Exception) {}
         }
     }
 
@@ -209,15 +206,19 @@ object GitLiveFirebaseManager : IFirebaseManager {
     override fun startDiscussion(roomCode: String, seconds: Int) {
         firebaseScope.launch {
             try {
-                val roomRef = roomsRef.child(roomCode)
-                if (seconds > 0) {
+                val updates = if (seconds > 0) {
                     val endTime = currentPlatformMillis() + (seconds * 1000L)
-                    roomRef.child("isDiscussionActive").setValue(true)
-                    roomRef.child("discussionEndTime").setValue(endTime)
+                    mapOf(
+                        "isDiscussionActive" to true,
+                        "discussionEndTime" to endTime
+                    )
                 } else {
-                    roomRef.child("isDiscussionActive").setValue(false)
-                    roomRef.child("discussionEndTime").setValue(0L)
+                    mapOf(
+                        "isDiscussionActive" to false,
+                        "discussionEndTime" to 0L
+                    )
                 }
+                roomsRef.child(roomCode).updateChildren(updates)
             } catch (e: Exception) {}
         }
     }
