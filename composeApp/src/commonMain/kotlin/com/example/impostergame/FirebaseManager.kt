@@ -209,17 +209,14 @@ object GitLiveFirebaseManager : IFirebaseManager {
     override fun startDiscussion(roomCode: String, seconds: Int) {
         firebaseScope.launch {
             try {
+                val roomRef = roomsRef.child(roomCode)
                 if (seconds > 0) {
                     val endTime = currentPlatformMillis() + (seconds * 1000L)
-                    roomsRef.child(roomCode).updateChildren(mapOf(
-                        "isDiscussionActive" to true,
-                        "discussionEndTime" to endTime
-                    ))
+                    roomRef.child("isDiscussionActive").setValue(true)
+                    roomRef.child("discussionEndTime").setValue(endTime)
                 } else {
-                    roomsRef.child(roomCode).updateChildren(mapOf(
-                        "isDiscussionActive" to false,
-                        "discussionEndTime" to 0L
-                    ))
+                    roomRef.child("isDiscussionActive").setValue(false)
+                    roomRef.child("discussionEndTime").setValue(0L)
                 }
             } catch (e: Exception) {}
         }

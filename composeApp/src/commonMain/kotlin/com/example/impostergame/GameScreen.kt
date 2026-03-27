@@ -99,11 +99,8 @@ fun GameScreen(
                 else -> room.mainWord
             }
 
-            val chatList = mutableListOf<ChatMessage>()
-            room.chatMessages.values.forEach { msg ->
-                chatList.add(msg)
-            }
-            chatMessages = chatList.sortedBy { it.timestamp }
+            // Ovdje koristimo ključeve Firebase baze za sortiranje poruka jer su kronološki najprecizniji
+            chatMessages = room.chatMessages.entries.sortedBy { it.key }.map { it.value }
 
             players = room.players
             isDiscussionActive = room.isDiscussionActive
@@ -125,7 +122,7 @@ fun GameScreen(
                 val diff = ((discussionEndTime - now) / 1000).toInt()
                 if (diff <= 0) {
                     timeLeft = 0
-                    if (isUserAdmin) FirebaseManager.startDiscussion(roomCode, 0) // ovo efektivno gasi vrijeme
+                    if (isUserAdmin) FirebaseManager.startDiscussion(roomCode, 0)
                     break
                 }
                 timeLeft = diff
@@ -158,8 +155,7 @@ fun GameScreen(
                                     scope.launch {
                                         FirebaseManager.removePlayer(roomCode, pId)
                                         FirebaseManager.sendMessage(roomCode, "Sustav", "Korisnik $playerName je izbačen.")
-                                        // Ne želimo ugasiti raspravu niti ju resetirati ovdje ako je već aktivna.
-                                        // Zato se briše poziv startDiscussion(roomCode, 0).
+                                        // Ne diramo diskusiju kako bismo ostavili sve kako je.
                                     }
                                     showVoteDialog = false
                                 },
@@ -238,7 +234,7 @@ fun GameScreen(
                 Column(modifier = Modifier.padding(12.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text(if (isDiscussionActive) "RASPRAVA" else "CHAT", fontWeight = FontWeight.Bold, color = if (isDiscussionActive) MutedRose else accentColor)
-                        if (isUserAdmin && !isDiscussionActive) {
+                        if (isUserAdmin) {
                             var showTimerMenu by remember { mutableStateOf(false) }
                             Box {
                                 IconButton(onClick = { showTimerMenu = true }) { Icon(Icons.Default.Timer, null, tint = accentColor) }
@@ -299,7 +295,7 @@ fun GameScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (isUserAdmin && !isDiscussionActive) {
+            if (isUserAdmin) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Surface(
                         modifier = Modifier.weight(1f).height(50.dp).clip(RoundedCornerShape(16.dp))
