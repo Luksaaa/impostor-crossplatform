@@ -30,11 +30,13 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .imePadding()
+            .imePadding(),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .widthIn(max = 500.dp)
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.Center,

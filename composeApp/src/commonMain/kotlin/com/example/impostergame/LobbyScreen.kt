@@ -39,10 +39,6 @@ fun LobbyScreen(
     val primaryBtnBg = if (isDarkTheme) DarkEarthy else SoftCream
     val primaryBtnText = if (isDarkTheme) SoftCream else DeepCharcoal
 
-    // Micanje neiskorištenog warninga
-    val dummy = isAdmin
-    println(dummy)
-
     if (roomCode.isBlank()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = SageGreen)
@@ -103,179 +99,182 @@ fun LobbyScreen(
     Scaffold(
         containerColor = Color.Transparent
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(24.dp)
-                .statusBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(
+                modifier = Modifier
+                    .widthIn(max = 600.dp)
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(24.dp)
+                    .statusBarsPadding(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    modifier = Modifier
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {
-                            clipboardManager.setText(AnnotatedString(roomCode))
-                        },
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "SOBA: $roomCode", 
-                        fontSize = 32.sp, 
-                        fontWeight = FontWeight.ExtraBold,
-                        color = textColor
-                    )
-                    Text(
-                        text = "(Klikni za kopiranje)",
-                        fontSize = 12.sp,
-                        color = textColor.copy(alpha = 0.3f)
-                    )
-                }
-                
-                Spacer(modifier = Modifier.width(16.dp))
-                
-                Surface(
-                    modifier = Modifier.size(80.dp),
-                    color = Color.White,
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Box(modifier = Modifier.padding(4.dp)) {
-                        QRCodeImage(content = "impostergame://join?code=$roomCode", modifier = Modifier.fillMaxSize())
-                    }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = if (isUserAdmin) "Ti si ADMIN" else "Admin je: $currentAdmin", 
-                color = if (isUserAdmin) Gold else textColor.copy(alpha = 0.5f),
-                fontWeight = FontWeight.Medium
-            )
-            
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.9f))
-            ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Igrači", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = textColor)
-                        Text("$playerCount / 16", color = SageGreen, fontWeight = FontWeight.Bold)
-                    }
-                    
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = textColor.copy(alpha = 0.1f))
-                    
-                    Text("Događaji:", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = textColor.copy(alpha = 0.5f))
-                    
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(messages) { msg ->
-                            Surface(
-                                modifier = Modifier.padding(vertical = 4.dp),
-                                color = textColor.copy(alpha = 0.05f),
-                                shape = RoundedCornerShape(8.dp)
+                    Column(
+                        modifier = Modifier
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
                             ) {
-                                Text(
-                                    text = msg,
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                    fontSize = 14.sp,
-                                    color = textColor
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.height(32.dp))
-
-                if (isUserAdmin) {
-                    Button(
-                        onClick = {
-                            val (mainWord, imposterWord) = WordManager.getNextWords()
-                            scope.launch {
-                                try {
-                                    val dbRef = FirebaseManager.roomsRef.child(roomCode)
-                                    val snap = dbRef.valueEvents.first()
-                                    val playersList = mutableListOf<String>()
-                                    snap.child("players").children.forEach { childSnap ->
-                                        childSnap.key?.let { playersList.add(it) }
-                                    }
-                                    val shuffled = playersList.shuffled()
-                                    
-                                    if (shuffled.size >= 2) {
-                                        val imposterId = shuffled[0]
-                                        val mrWhiteId = if (shuffled.size >= 3 && (1..100).random() <= 20) shuffled[1] else ""
-                                        
-                                        val updates = mapOf(
-                                            "mainWord" to mainWord,
-                                            "imposterWord" to imposterWord,
-                                            "imposterId" to imposterId,
-                                            "mrWhiteId" to mrWhiteId,
-                                            "status" to "started"
-                                        )
-                                        dbRef.updateChildren(updates)
-                                    }
-                                } catch (_: Exception) {}
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth().height(60.dp),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (playerCount >= 2) primaryBtnBg else Color.Gray,
-                            contentColor = primaryBtnText
-                        ),
-                        enabled = playerCount >= 2
+                                clipboardManager.setText(AnnotatedString(roomCode))
+                            },
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = if (playerCount < 2) "MIN 2 IGRAČA" else "POKRENI IGRU",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
+                            text = "SOBA: $roomCode", 
+                            fontSize = 32.sp, 
+                            fontWeight = FontWeight.ExtraBold,
+                            color = textColor
+                        )
+                        Text(
+                            text = "(Klikni za kopiranje)",
+                            fontSize = 12.sp,
+                            color = textColor.copy(alpha = 0.3f)
                         )
                     }
-                } else {
-                    Card(
-                        modifier = Modifier.fillMaxWidth().height(60.dp),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Gold.copy(alpha = 0.1f))
+                    
+                    Spacer(modifier = Modifier.width(16.dp))
+                    
+                    Surface(
+                        modifier = Modifier.size(80.dp),
+                        color = Color.White,
+                        shape = RoundedCornerShape(8.dp)
                     ) {
+                        Box(modifier = Modifier.padding(4.dp)) {
+                            QRCodeImage(content = "impostergame://join?code=$roomCode", modifier = Modifier.fillMaxSize())
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = if (isUserAdmin) "Ti si ADMIN" else "Admin je: $currentAdmin", 
+                    color = if (isUserAdmin) Gold else textColor.copy(alpha = 0.5f),
+                    fontWeight = FontWeight.Medium
+                )
+                
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Card(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.9f))
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
                         Row(
-                            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp, color = Gold)
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Text("Čekamo admina...", color = textColor, fontWeight = FontWeight.Bold)
+                            Text("Igrači", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = textColor)
+                            Text("$playerCount / 16", color = SageGreen, fontWeight = FontWeight.Bold)
+                        }
+                        
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = textColor.copy(alpha = 0.1f))
+                        
+                        Text("Događaji:", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = textColor.copy(alpha = 0.5f))
+                        
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                            items(messages) { msg ->
+                                Surface(
+                                    modifier = Modifier.padding(vertical = 4.dp),
+                                    color = textColor.copy(alpha = 0.05f),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text(
+                                        text = msg,
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                        fontSize = 14.sp,
+                                        color = textColor
+                                    )
+                                }
+                            }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Spacer(modifier = Modifier.height(32.dp))
 
-                Button(
-                    onClick = {
-                        FirebaseManager.leaveRoomWithAdminTransfer(roomCode, username, onLeaveRoom)
-                    },
-                    modifier = Modifier.fillMaxWidth().height(60.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = textColor.copy(alpha = 0.1f))
-                ) {
-                    Text("IZAĐI IZ SOBE", color = textColor, fontWeight = FontWeight.Bold)
+                    if (isUserAdmin) {
+                        Button(
+                            onClick = {
+                                val (mainWord, imposterWord) = WordManager.getNextWords()
+                                scope.launch {
+                                    try {
+                                        val dbRef = FirebaseManager.roomsRef.child(roomCode)
+                                        val snap = dbRef.valueEvents.first()
+                                        val playersList = mutableListOf<String>()
+                                        snap.child("players").children.forEach { childSnap ->
+                                            childSnap.key?.let { playersList.add(it) }
+                                        }
+                                        val shuffled = playersList.shuffled()
+                                        
+                                        if (shuffled.size >= 2) {
+                                            val imposterId = shuffled[0]
+                                            val mrWhiteId = if (shuffled.size >= 3 && (1..100).random() <= 20) shuffled[1] else ""
+                                            
+                                            val updates = mapOf(
+                                                "mainWord" to mainWord,
+                                                "imposterWord" to imposterWord,
+                                                "imposterId" to imposterId,
+                                                "mrWhiteId" to mrWhiteId,
+                                                "status" to "started"
+                                            )
+                                            dbRef.updateChildren(updates)
+                                        }
+                                    } catch (_: Exception) {}
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth().height(60.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (playerCount >= 2) primaryBtnBg else Color.Gray,
+                                contentColor = primaryBtnText
+                            ),
+                            enabled = playerCount >= 2
+                        ) {
+                            Text(
+                                text = if (playerCount < 2) "MIN 2 IGRAČA" else "POKRENI IGRU",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    } else {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().height(60.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(containerColor = Gold.copy(alpha = 0.1f))
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp, color = Gold)
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Text("Čekamo admina...", color = textColor, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = {
+                            FirebaseManager.leaveRoomWithAdminTransfer(roomCode, username, onLeaveRoom)
+                        },
+                        modifier = Modifier.fillMaxWidth().height(60.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = textColor.copy(alpha = 0.1f))
+                    ) {
+                        Text("IZAĐI IZ SOBE", color = textColor, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }

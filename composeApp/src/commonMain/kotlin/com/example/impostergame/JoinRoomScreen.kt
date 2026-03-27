@@ -112,119 +112,122 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
         return
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .statusBarsPadding()
-    ) {
-        IconButton(onClick = onBack) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = textColor)
-        }
-
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .widthIn(max = 500.dp)
+                .fillMaxSize()
+                .padding(24.dp)
+                .statusBarsPadding()
         ) {
-            Text(
-                text = "Pridruži se",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = textColor
-            )
-            
-            Spacer(modifier = Modifier.height(48.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = inputContainerColor.copy(alpha = 0.9f)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Unesi kod sobe",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = textColor
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
-                            value = inputCode,
-                            onValueChange = { 
-                                if (it.length <= 6) inputCode = it.uppercase() 
-                                errorMessage = ""
-                            },
-                            placeholder = { Text("ABC 123", color = textColor.copy(alpha = 0.4f)) },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                            isError = errorMessage.isNotEmpty(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = accentColor,
-                                unfocusedBorderColor = textColor.copy(alpha = 0.2f),
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor
-                            )
-                        )
-                    }
-                    
-                    if (errorMessage.isNotEmpty()) {
-                        Text(
-                            text = errorMessage, 
-                            color = MaterialTheme.colorScheme.error, 
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    Button(
-                        onClick = {
-                            if (inputCode.length == 6) {
-                                attemptJoin(inputCode)
-                            } else {
-                                errorMessage = "Kod mora imati 6 znakova"
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (inputCode.length == 6) accentColor else accentColor.copy(alpha = 0.5f),
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("PRIDRUŽI SE", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
-                    }
-                }
+            IconButton(onClick = onBack) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = textColor)
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Surface(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .clickable { showScanner = true },
-                color = inputContainerColor.copy(alpha = 0.9f),
-                tonalElevation = 4.dp,
-                shadowElevation = 8.dp
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.QrCodeScanner,
-                        contentDescription = "Skeniraj QR kod",
-                        modifier = Modifier.size(32.dp),
-                        tint = textColor
-                    )
+                Text(
+                    text = "Pridruži se",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = textColor
+                )
+                
+                Spacer(modifier = Modifier.height(48.dp))
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = inputContainerColor.copy(alpha = 0.9f)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Unesi kod sobe",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = textColor
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedTextField(
+                                value = inputCode,
+                                onValueChange = { 
+                                    if (it.length <= 6) inputCode = it.uppercase() 
+                                    errorMessage = ""
+                                },
+                                placeholder = { Text("ABC 123", color = textColor.copy(alpha = 0.4f)) },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                                isError = errorMessage.isNotEmpty(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = accentColor,
+                                    unfocusedBorderColor = textColor.copy(alpha = 0.2f),
+                                    focusedTextColor = textColor,
+                                    unfocusedTextColor = textColor
+                                )
+                            )
+                        }
+                        
+                        if (errorMessage.isNotEmpty()) {
+                            Text(
+                                text = errorMessage, 
+                                color = MaterialTheme.colorScheme.error, 
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        Button(
+                            onClick = {
+                                if (inputCode.length == 6) {
+                                    attemptJoin(inputCode)
+                                } else {
+                                    errorMessage = "Kod mora imati 6 znakova"
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (inputCode.length == 6) accentColor else accentColor.copy(alpha = 0.5f),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("PRIDRUŽI SE", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Surface(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable { showScanner = true },
+                    color = inputContainerColor.copy(alpha = 0.9f),
+                    tonalElevation = 4.dp,
+                    shadowElevation = 8.dp
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.QrCodeScanner,
+                            contentDescription = "Skeniraj QR kod",
+                            modifier = Modifier.size(32.dp),
+                            tint = textColor
+                        )
+                    }
                 }
             }
         }
