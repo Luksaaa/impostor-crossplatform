@@ -1,1 +1,13 @@
-// Empty to avoid conflict with com.example.impostergame.MainKt
+package com.example.impostergame
+
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+
+fun main() = application {
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "ImposterGame Desktop",
+    ) {
+        App()
+    }
+}
