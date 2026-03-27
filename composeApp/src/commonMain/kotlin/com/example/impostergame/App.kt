@@ -49,9 +49,9 @@ fun App() {
         try {
             val s = Settings()
             // Resetira podatke samo jednom i nikad više
-            if (!s.getBoolean("has_been_reset_once", false)) {
+            if (!s.getBoolean("has_been_reset_once_v3", false)) {
                 s.clear()
-                s.putBoolean("has_been_reset_once", true)
+                s.putBoolean("has_been_reset_once_v3", true)
             }
             s
         } catch (_: Throwable) {

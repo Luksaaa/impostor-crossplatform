@@ -158,7 +158,8 @@ fun GameScreen(
                                     scope.launch {
                                         FirebaseManager.removePlayer(roomCode, pId)
                                         FirebaseManager.sendMessage(roomCode, "Sustav", "Korisnik $playerName je izbačen.")
-                                        FirebaseManager.startDiscussion(roomCode, 0)
+                                        // Ne želimo ugasiti raspravu niti ju resetirati ovdje ako je već aktivna.
+                                        // Zato se briše poziv startDiscussion(roomCode, 0).
                                     }
                                     showVoteDialog = false
                                 },
