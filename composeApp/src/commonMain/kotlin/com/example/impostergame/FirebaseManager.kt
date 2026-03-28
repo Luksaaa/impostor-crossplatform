@@ -126,14 +126,31 @@ object GitLiveFirebaseManager : IFirebaseManager {
                     return@launch
                 }
                 
-                val playerCount = snapshot.child("players").children.count()
+                val currentAdmin = snapshot.child("admin").getValueSafe<String?>()
+                val playersSnapshots = mutableListOf<DataSnapshot>()
+                snapshot.child("players").children.forEach { playersSnapshots.add(it) }
+                
                 val timestamp = currentPlatformMillis()
                 
-                if (playerCount <= 1) {
+                if (playersSnapshots.size <= 1) {
                     roomRef.removeValue()
                 } else {
-                    roomRef.child("players").child(sanitizedName).removeValue()
-                    roomRef.child("messages").child("exit_$timestamp").setValue("$sanitizedName je izašao")
+                    val updates = mutableMapOf<String, Any?>()
+                    updates["players/$sanitizedName"] = null
+                    
+                    if (currentAdmin == sanitizedName) {
+                        val nextActiveAdmin = playersSnapshots
+                            .filter { it.key != sanitizedName }
+                            .mapNotNull { it.getValueSafe<PlayerInfo?>() }
+                            .sortedBy { it.joinedAt }
+                            .firstOrNull()?.name
+                        
+                        updates["messages/exit_$timestamp"] = "$sanitizedName je izašao, privremeni admin je $nextActiveAdmin"
+                    } else {
+                        updates["messages/exit_$timestamp"] = "$sanitizedName je izašao"
+                    }
+                    
+                    roomRef.updateChildren(updates)
                 }
                 
                 withContext(Dispatchers.Main) {
@@ -247,7 +264,32 @@ object GitLiveFirebaseManager : IFirebaseManager {
     override fun removePlayer(roomCode: String, playerName: String) {
         firebaseScope.launch {
             try {
-                roomsRef.child(roomCode).child("players").child(playerName).removeValue()
+                val roomRef = roomsRef.child(roomCode)
+                val snapshot = roomRef.valueEvents.first()
+                if (snapshot.value == null) return@launch
+
+                val currentAdmin = snapshot.child("admin").getValueSafe<String?>()
+                val timestamp = currentPlatformMillis()
+                
+                val updates = mutableMapOf<String, Any?>()
+                updates["players/$playerName"] = null
+
+                if (currentAdmin == playerName) {
+                    val playersSnapshots = mutableListOf<DataSnapshot>()
+                    snapshot.child("players").children.forEach { playersSnapshots.add(it) }
+                    
+                    val nextActiveAdmin = playersSnapshots
+                        .filter { it.key != playerName }
+                        .mapNotNull { it.getValueSafe<PlayerInfo?>() }
+                        .sortedBy { it.joinedAt }
+                        .firstOrNull()?.name
+                        
+                    updates["messages/exit_$timestamp"] = "$playerName je izašao, privremeni admin je $nextActiveAdmin"
+                } else {
+                    updates["messages/exit_$timestamp"] = "$playerName je izašao"
+                }
+                
+                roomRef.updateChildren(updates)
             } catch (e: Exception) {}
         }
     }

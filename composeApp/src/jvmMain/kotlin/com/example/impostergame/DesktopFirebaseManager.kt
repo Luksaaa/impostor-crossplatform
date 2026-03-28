@@ -123,13 +123,25 @@ object DesktopFirebaseManager : IFirebaseManager {
                 
                 val room = json.decodeFromString<Room>(response)
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
+                val timestamp = System.currentTimeMillis()
                 
                 if (room.players.size <= 1) {
                     deleteData(roomCode)
                 } else {
-                    deleteData("$roomCode/players/$sanitizedName")
-                    val timestamp = System.currentTimeMillis()
-                    putData("$roomCode/messages/exit_$timestamp", "$sanitizedName je izašao")
+                    val updates = mutableMapOf<String, JsonElement>()
+                    updates["players/$sanitizedName"] = JsonNull
+                    
+                    if (room.admin == sanitizedName) {
+                        val nextActiveAdmin = room.players.values
+                            .filter { it.name != sanitizedName }
+                            .sortedBy { it.joinedAt }
+                            .firstOrNull()?.name
+                        
+                        updates["messages/exit_$timestamp"] = JsonPrimitive("$sanitizedName je izašao, privremeni admin je $nextActiveAdmin")
+                    } else {
+                        updates["messages/exit_$timestamp"] = JsonPrimitive("$sanitizedName je izašao")
+                    }
+                    patchData(roomCode, JsonObject(updates))
                 }
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")
@@ -260,7 +272,35 @@ object DesktopFirebaseManager : IFirebaseManager {
     
     override fun removePlayer(roomCode: String, playerName: String) {
         scope.launch {
-            deleteData("$roomCode/players/$playerName")
+            try {
+                // Prvo dohvatiti sobu da vidimo tko je admin
+                val url = URL("$BASE_URL/$roomCode.json")
+                val conn = url.openConnection() as HttpURLConnection
+                conn.requestMethod = "GET"
+                val response = conn.inputStream.bufferedReader().readText()
+                conn.disconnect()
+                
+                if (response == "null") return@launch
+                val room = json.decodeFromString<Room>(response)
+                val timestamp = System.currentTimeMillis()
+                
+                val updates = mutableMapOf<String, JsonElement>()
+                updates["players/$playerName"] = JsonNull
+                
+                if (room.admin == playerName) {
+                    val nextActiveAdmin = room.players.values
+                        .filter { it.name != playerName }
+                        .sortedBy { it.joinedAt }
+                        .firstOrNull()?.name
+                    
+                    updates["messages/exit_$timestamp"] = JsonPrimitive("$playerName je izašao, privremeni admin je $nextActiveAdmin")
+                } else {
+                    updates["messages/exit_$timestamp"] = JsonPrimitive("$playerName je izašao")
+                }
+                patchData(roomCode, JsonObject(updates))
+            } catch (e: Exception) {
+                println("Firebase Desktop Error: ${e.message}")
+            }
         }
     }
 }
