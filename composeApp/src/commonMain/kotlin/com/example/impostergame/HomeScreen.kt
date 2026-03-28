@@ -28,11 +28,12 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
     
     var showRules by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        val isWideScreen = maxWidth > 800.dp
         
         Column(
             modifier = Modifier
-                .widthIn(max = 500.dp)
+                .widthIn(max = 600.dp)
                 .fillMaxWidth()
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
@@ -40,39 +41,41 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(if (isWideScreen) 60.dp else 40.dp))
 
             Text(
                 text = "Bok, $username!",
-                fontSize = 32.sp,
+                fontSize = if (isWideScreen) 48.sp else 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = textColor
             )
             
             Text(
                 text = "Spreman za novu rundu?",
-                fontSize = 16.sp,
+                fontSize = if (isWideScreen) 20.sp else 16.sp,
                 color = textColor.copy(alpha = 0.6f)
             )
 
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(if (isWideScreen) 80.dp else 60.dp))
 
             AestheticButton(
                 text = "Napravi sobu",
                 subText = "Postani admin i započni igru",
                 icon = Icons.Default.Add,
                 onClick = onCreateRoom,
-                color = SageGreen
+                color = SageGreen,
+                isWideScreen = isWideScreen
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(if (isWideScreen) 24.dp else 20.dp))
 
             AestheticButton(
                 text = "Pridruži se",
                 subText = "Uđi u postojeću sobu",
                 icon = Icons.Default.Group,
                 onClick = onJoinRoom,
-                color = MutedRose
+                color = MutedRose,
+                isWideScreen = isWideScreen
             )
             
             Spacer(modifier = Modifier.height(40.dp))
@@ -89,14 +92,14 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
                 onClick = { showRules = true },
                 color = Color.Transparent,
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(if (isWideScreen) 64.dp else 48.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = "Pravila",
                         tint = textColor.copy(alpha = 0.4f),
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(if (isWideScreen) 40.dp else 32.dp)
                     )
                 }
             }
@@ -108,7 +111,7 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
             onDismissRequest = { showRules = false },
             containerColor = if (isDarkTheme) DarkInputGray else OffWhite,
             dragHandle = { BottomSheetDefaults.DragHandle(color = textColor.copy(alpha = 0.2f)) },
-            modifier = Modifier.statusBarsPadding() // Dodan modifier da izbjegne statusnu traku
+            modifier = Modifier.statusBarsPadding()
         ) {
             RulesContent(textColor)
         }
@@ -120,8 +123,6 @@ fun RulesContent(textColor: Color) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            // Smanjeno na 0.9f da ne zahvaća cijeli gornji rub i omogući lakše skrolanje
-            // Dodan navigationBarsPadding da se osigura da kartica sa savjetima ne uđe u navigacijsku traku
             .navigationBarsPadding() 
             .fillMaxHeight(0.9f)
             .verticalScroll(rememberScrollState())
@@ -211,11 +212,11 @@ fun RuleSection(title: String, description: String, textColor: Color, isWarning:
 }
 
 @Composable
-fun AestheticButton(text: String, subText: String, icon: ImageVector, onClick: () -> Unit, color: Color) {
+fun AestheticButton(text: String, subText: String, icon: ImageVector, onClick: () -> Unit, color: Color, isWideScreen: Boolean = false) {
     val isDarkTheme = isSystemInDarkTheme()
     Button(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth().height(100.dp).padding(vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 120.dp else 100.dp).padding(vertical = 8.dp),
         shape = RoundedCornerShape(28.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = color.copy(alpha = if (isDarkTheme) 0.15f else 0.9f),
@@ -228,20 +229,20 @@ fun AestheticButton(text: String, subText: String, icon: ImageVector, onClick: (
             modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp)
         ) {
             Surface(
-                modifier = Modifier.size(48.dp), 
+                modifier = Modifier.size(if (isWideScreen) 64.dp else 48.dp), 
                 shape = RoundedCornerShape(14.dp), 
                 color = if (isDarkTheme) color.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.2f)
             ) {
                 Box(contentAlignment = Alignment.Center) { 
-                    Icon(icon, null, modifier = Modifier.size(24.dp)) 
+                    Icon(icon, null, modifier = Modifier.size(if (isWideScreen) 32.dp else 24.dp)) 
                 }
             }
             Spacer(Modifier.width(16.dp))
             Column {
-                Text(text.uppercase(), fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                Text(text.uppercase(), fontWeight = FontWeight.ExtraBold, fontSize = if (isWideScreen) 22.sp else 18.sp)
                 Text(
                     text = subText, 
-                    fontSize = 12.sp, 
+                    fontSize = if (isWideScreen) 14.sp else 12.sp,
                     color = (if (isDarkTheme) color else Color.White).copy(alpha = 0.7f),
                     fontWeight = FontWeight.Medium
                 )

@@ -109,13 +109,13 @@ fun LobbyScreen(
                 ) {
                     Text(
                         text = "SOBA: $roomCode", 
-                        fontSize = if (isWideScreen) 48.sp else 32.sp, 
+                        fontSize = if (isWideScreen) 64.sp else 32.sp, 
                         fontWeight = FontWeight.ExtraBold,
                         color = textColor
                     )
                     Text(
                         text = "(Klikni za kopiranje)",
-                        fontSize = if (isWideScreen) 16.sp else 12.sp,
+                        fontSize = if (isWideScreen) 20.sp else 12.sp,
                         color = textColor.copy(alpha = 0.3f)
                     )
                 }
@@ -123,46 +123,47 @@ fun LobbyScreen(
                 Spacer(modifier = Modifier.width(if (isWideScreen) 32.dp else 16.dp))
                 
                 Surface(
-                    modifier = Modifier.size(if (isWideScreen) 140.dp else 80.dp),
+                    modifier = Modifier.size(if (isWideScreen) 200.dp else 80.dp),
                     color = Color.White,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Box(modifier = Modifier.padding(8.dp)) {
+                    Box(modifier = Modifier.fillMaxSize().padding(12.dp), contentAlignment = Alignment.Center) {
                         QRCodeImage(content = "impostergame://join?code=$roomCode", modifier = Modifier.fillMaxSize())
                     }
                 }
             }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             
             Text(
                 text = if (isUserAdmin) "Ti si ADMIN" else "Admin je: $currentAdmin", 
                 color = if (isUserAdmin) Gold else textColor.copy(alpha = 0.5f),
-                fontWeight = FontWeight.Medium,
-                fontSize = if (isWideScreen) 20.sp else 14.sp
+                fontWeight = FontWeight.Bold,
+                fontSize = if (isWideScreen) 24.sp else 14.sp
             )
         }
     }
 
-    val playersCard = @Composable { modifier: Modifier ->
+    val playersCard = @Composable { modifier: Modifier, isWideScreen: Boolean ->
         Card(
             modifier = modifier,
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.9f))
         ) {
-            Column(modifier = Modifier.padding(20.dp).fillMaxHeight()) {
+            Column(modifier = Modifier.padding(if (isWideScreen) 32.dp else 20.dp).fillMaxHeight()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Igrači", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = textColor)
-                    Text("$playerCount / 16", color = SageGreen, fontWeight = FontWeight.Bold)
+                    Text("Igrači", fontSize = if (isWideScreen) 28.sp else 20.sp, fontWeight = FontWeight.Bold, color = textColor)
+                    Text("$playerCount / 16", color = SageGreen, fontWeight = FontWeight.Bold, fontSize = if (isWideScreen) 20.sp else 16.sp)
                 }
                 
-                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = textColor.copy(alpha = 0.1f))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp), color = textColor.copy(alpha = 0.1f))
                 
-                Text("Događaji:", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = textColor.copy(alpha = 0.5f))
+                Text("Događaji:", fontSize = if (isWideScreen) 18.sp else 14.sp, fontWeight = FontWeight.Medium, color = textColor.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(8.dp))
                 
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(messages) { msg ->
@@ -173,8 +174,8 @@ fun LobbyScreen(
                         ) {
                             Text(
                                 text = msg,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                                fontSize = if (isWideScreen) 18.sp else 14.sp,
                                 color = textColor
                             )
                         }
@@ -184,7 +185,7 @@ fun LobbyScreen(
         }
     }
 
-    val actionButtons = @Composable { modifier: Modifier ->
+    val actionButtons = @Composable { modifier: Modifier, isWideScreen: Boolean ->
         Column(modifier = modifier) {
             if (isUserAdmin) {
                 Button(
@@ -199,7 +200,7 @@ fun LobbyScreen(
                             } catch (_: Exception) {}
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().height(60.dp),
+                    modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 100.dp else 60.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (playerCount >= 2) primaryBtnBg else Color.Gray,
@@ -209,13 +210,13 @@ fun LobbyScreen(
                 ) {
                     Text(
                         text = if (playerCount < 2) "MIN 2 IGRAČA" else "POKRENI IGRU",
-                        fontSize = 20.sp,
+                        fontSize = if (isWideScreen) 24.sp else 20.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
             } else {
                 Card(
-                    modifier = Modifier.fillMaxWidth().height(60.dp),
+                    modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 100.dp else 60.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Gold.copy(alpha = 0.1f))
                 ) {
@@ -224,9 +225,9 @@ fun LobbyScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp, color = Gold)
+                        CircularProgressIndicator(modifier = Modifier.size(if (isWideScreen) 32.dp else 24.dp), strokeWidth = 3.dp, color = Gold)
                         Spacer(modifier = Modifier.width(16.dp))
-                        Text("Čekamo admina...", color = textColor, fontWeight = FontWeight.Bold)
+                        Text("Čekamo admina...", color = textColor, fontWeight = FontWeight.Bold, fontSize = if (isWideScreen) 20.sp else 16.sp)
                     }
                 }
             }
@@ -237,11 +238,11 @@ fun LobbyScreen(
                 onClick = {
                     FirebaseManager.leaveRoomWithAdminTransfer(roomCode, username, onLeaveRoom)
                 },
-                modifier = Modifier.fillMaxWidth().height(60.dp),
+                modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 80.dp else 60.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = textColor.copy(alpha = 0.1f))
             ) {
-                Text("IZAĐI IZ SOBE", color = textColor, fontWeight = FontWeight.Bold)
+                Text("IZAĐI IZ SOBE", color = textColor, fontWeight = FontWeight.Bold, fontSize = if (isWideScreen) 18.sp else 16.sp)
             }
         }
     }
@@ -259,19 +260,19 @@ fun LobbyScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(
-                        modifier = Modifier.weight(1f).fillMaxHeight().padding(end = 32.dp),
+                        modifier = Modifier.weight(1f).fillMaxHeight().padding(end = 48.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        headerInfo(Modifier.fillMaxWidth(), true)
+                        headerInfo(Modifier.widthIn(max = 600.dp).fillMaxWidth(), true)
                         Spacer(modifier = Modifier.height(64.dp))
-                        actionButtons(Modifier.width(500.dp))
+                        actionButtons(Modifier.widthIn(max = 600.dp).fillMaxWidth(), true)
                     }
                     
                     Column(
-                        modifier = Modifier.weight(1f).fillMaxHeight().widthIn(max = 500.dp)
+                        modifier = Modifier.weight(1f).fillMaxHeight()
                     ) {
-                        playersCard(Modifier.fillMaxSize())
+                        playersCard(Modifier.fillMaxSize(), true)
                     }
                 }
             } else {
@@ -285,9 +286,9 @@ fun LobbyScreen(
                 ) {
                     headerInfo(Modifier.fillMaxWidth(), false)
                     Spacer(modifier = Modifier.height(32.dp))
-                    playersCard(Modifier.fillMaxWidth().weight(1f))
+                    playersCard(Modifier.fillMaxWidth().weight(1f), false)
                     Spacer(modifier = Modifier.height(32.dp))
-                    actionButtons(Modifier.fillMaxWidth())
+                    actionButtons(Modifier.fillMaxWidth(), false)
                 }
             }
         }
