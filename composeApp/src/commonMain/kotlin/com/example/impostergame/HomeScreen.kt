@@ -107,7 +107,8 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
         ModalBottomSheet(
             onDismissRequest = { showRules = false },
             containerColor = if (isDarkTheme) DarkInputGray else OffWhite,
-            dragHandle = { BottomSheetDefaults.DragHandle(color = textColor.copy(alpha = 0.2f)) }
+            dragHandle = { BottomSheetDefaults.DragHandle(color = textColor.copy(alpha = 0.2f)) },
+            modifier = Modifier.statusBarsPadding() // Dodan modifier da izbjegne statusnu traku
         ) {
             RulesContent(textColor)
         }
@@ -119,7 +120,10 @@ fun RulesContent(textColor: Color) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.85f)
+            // Smanjeno na 0.9f da ne zahvaća cijeli gornji rub i omogući lakše skrolanje
+            // Dodan navigationBarsPadding da se osigura da kartica sa savjetima ne uđe u navigacijsku traku
+            .navigationBarsPadding() 
+            .fillMaxHeight(0.9f)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp)
             .padding(bottom = 32.dp)

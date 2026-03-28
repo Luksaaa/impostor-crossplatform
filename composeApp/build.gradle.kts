@@ -67,6 +67,9 @@ kotlin {
             implementation(libs.androidx.camera.lifecycle)
             implementation(libs.androidx.camera.view)
             implementation(libs.mlkit.barcode.scanning)
+            
+            // Google Play Services Code Scanner
+            implementation(libs.play.services.code.scanner)
 
             // Fix for Android Studio Preview
             implementation(libs.androidx.compose.ui.tooling)

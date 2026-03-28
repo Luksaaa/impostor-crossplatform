@@ -26,6 +26,7 @@ kotlinx-datetime = "0.6.1"
 zxing = "3.5.3"
 camerax = "1.4.1"
 mlkit-barcode = "17.3.0"
+play-services-code-scanner = "16.1.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -56,6 +57,7 @@ androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.r
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
 mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit-barcode" }
+play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "play-services-code-scanner" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
