@@ -70,10 +70,11 @@ object DesktopFirebaseManager : IFirebaseManager {
         scope.launch {
             val code = generateRandomCode()
             val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Igrac" }
+            val now = System.currentTimeMillis()
             val room = Room(
                 admin = sanitizedName,
                 status = "waiting",
-                players = mapOf(sanitizedName to PlayerInfo(sanitizedName, false)),
+                players = mapOf(sanitizedName to PlayerInfo(sanitizedName, false, now)),
                 messages = mapOf("init" to "$sanitizedName je napravio sobu")
             )
             putData(code, room)
@@ -95,10 +96,10 @@ object DesktopFirebaseManager : IFirebaseManager {
             if (room.players.size >= 16) return@withContext Result.failure(Exception("Soba je puna"))
             
             val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Gost" }
-            putData("$roomCode/players/$sanitizedName", PlayerInfo(sanitizedName, false))
+            val now = System.currentTimeMillis()
+            putData("$roomCode/players/$sanitizedName", PlayerInfo(sanitizedName, false, now))
             
-            val timestamp = System.currentTimeMillis()
-            putData("$roomCode/messages/join_$timestamp", "$sanitizedName je ušao")
+            putData("$roomCode/messages/join_$now", "$sanitizedName je ušao")
             
             Result.success(Unit)
         } catch (e: Exception) {
@@ -123,26 +124,12 @@ object DesktopFirebaseManager : IFirebaseManager {
                 val room = json.decodeFromString<Room>(response)
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
                 
-                if (room.admin == sanitizedName) {
-                    val nextAdmin = room.players.keys.firstOrNull { it != sanitizedName }
-                    if (nextAdmin != null) {
-                        val timestamp = System.currentTimeMillis()
-                        val updates = buildJsonObject {
-                            put("admin", JsonPrimitive(nextAdmin))
-                            put("players/$sanitizedName", JsonNull)
-                            put("messages/exit_$timestamp", JsonPrimitive("$sanitizedName je izašao, novi admin je $nextAdmin"))
-                        }
-                        patchData(roomCode, updates)
-                    } else {
-                        deleteData(roomCode)
-                    }
+                if (room.players.size <= 1) {
+                    deleteData(roomCode)
                 } else {
+                    deleteData("$roomCode/players/$sanitizedName")
                     val timestamp = System.currentTimeMillis()
-                    val updates = buildJsonObject {
-                        put("players/$sanitizedName", JsonNull)
-                        put("messages/exit_$timestamp", JsonPrimitive("$sanitizedName je izašao"))
-                    }
-                    patchData(roomCode, updates)
+                    putData("$roomCode/messages/exit_$timestamp", "$sanitizedName je izašao")
                 }
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")

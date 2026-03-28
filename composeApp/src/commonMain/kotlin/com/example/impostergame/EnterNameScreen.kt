@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.impostergame.ui.theme.*
@@ -96,6 +98,7 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                         shape = RoundedCornerShape(12.dp),
                         isError = errorMessage != null,
                         textStyle = LocalTextStyle.current.copy(fontSize = if (isWideScreen) 20.sp else 16.sp),
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = SageGreen,
                             unfocusedBorderColor = textColor.copy(alpha = 0.2f),
@@ -110,7 +113,7 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                             text = errorMessage!!,
                             color = MutedRose,
                             fontSize = if (isWideScreen) 16.sp else 12.sp,
-                            modifier = Modifier.padding(top = 8.dp).align(Alignment.Start)
+                            modifier = Modifier.padding(top = 4.dp).align(Alignment.Start)
                         )
                     }
 

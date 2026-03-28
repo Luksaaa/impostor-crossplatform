@@ -51,10 +51,12 @@ fun GameScreen(
 ) {
     if (roomCode.isBlank()) return
 
+    val sanitizedName = remember(username) { username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Igrac" } }
+
     var word by remember { mutableStateOf("") }
     var isRevealed by remember { mutableStateOf(false) }
-    var holdProgress by remember { mutableFloatStateOf(0f) }
-    var exitHoldProgress by remember { mutableFloatStateOf(0f) }
+    var holdProgress by remember { mutableStateOf(0f) }
+    var exitHoldProgress by remember { mutableStateOf(0f) }
     var currentAdmin by remember { mutableStateOf("") }
     var chatMessages by remember { mutableStateOf(listOf<ChatMessage>()) }
     var chatInput by remember { mutableStateOf("") }
@@ -72,7 +74,16 @@ fun GameScreen(
     
     val showDiscussion = isDiscussionActive && timeLeft > 0
     
-    val isUserAdmin = remember(currentAdmin, username) { currentAdmin == username }
+    // Provjera tko ima ovlasti (originalni admin ili najstariji preostali igrač)
+    val isUserAdmin = remember(currentAdmin, players, sanitizedName) {
+        if (currentAdmin == sanitizedName) return@remember true
+        if (!players.containsKey(currentAdmin)) {
+            val oldestPlayer = players.values.sortedBy { it.joinedAt }.firstOrNull()
+            return@remember oldestPlayer?.name == sanitizedName
+        }
+        false
+    }
+
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     var holdJob by remember { mutableStateOf<Job?>(null) }
@@ -86,7 +97,8 @@ fun GameScreen(
     val secondaryBtnBg = if (isDarkTheme) Color(0xFF3E3A33) else Color(0xFFFDF5E6)
     val progressColor = SageGreen.copy(alpha = 0.3f)
 
-    val isKeyboardVisible = WindowInsets.isImeVisible
+    // Detekcija tipkovnice preko paddinga
+    val isKeyboardVisible = WindowInsets.ime.asPaddingValues().calculateBottomPadding() > 0.dp
 
     LaunchedEffect(roomCode) {
         FirebaseManager.listenToRoom(roomCode).collectLatest { room ->
@@ -101,7 +113,7 @@ fun GameScreen(
                 onRepeat()
             }
             
-            word = when (username) {
+            word = when (sanitizedName) {
                 mrWhiteId -> "TI SI MR. WHITE"
                 imposterId -> room.imposterWord
                 else -> room.mainWord
@@ -110,6 +122,17 @@ fun GameScreen(
             chatMessages = room.chatMessages.entries.sortedBy { it.key }.map { it.value }
             players = room.players
             
+            // Automatski reset ako je admin izbačen ili ako je impostor izbačen
+            if (gameStatus == "started" && isUserAdmin) {
+                val shouldReset = (imposterId.isNotEmpty() && !room.players.containsKey(imposterId)) || 
+                                 (room.players.size <= 1) ||
+                                 (!room.players.containsKey(room.admin) && sanitizedName != room.admin)
+                
+                if (shouldReset) {
+                    FirebaseManager.resetToLobby(roomCode)
+                }
+            }
+
             val newlyStarted = room.isDiscussionActive && !isDiscussionActive
             isDiscussionActive = room.isDiscussionActive
             discussionStartTime = room.discussionStartTime
@@ -124,7 +147,7 @@ fun GameScreen(
     }
 
     LaunchedEffect(players) {
-        if (gameStatus == "started" && players.isNotEmpty() && !players.containsKey(username)) {
+        if (gameStatus == "started" && players.isNotEmpty() && !players.containsKey(sanitizedName)) {
             onRepeat()
         }
     }
@@ -229,7 +252,7 @@ fun GameScreen(
                 Box(modifier = Modifier.fillMaxSize().clickable { isRevealed = !isRevealed }, contentAlignment = Alignment.Center) {
                     if (isRevealed) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(if (username == isAdmin.toString() || username.isNotEmpty()) "Tvoja riječ:" else "Status:", color = textColor.copy(alpha = 0.6f), fontSize = if (isWideScreen) 20.sp else 14.sp)
+                            Text(if (isAdmin || isUserAdmin) "Tvoja riječ:" else "Status:", color = textColor.copy(alpha = 0.6f), fontSize = if (isWideScreen) 20.sp else 14.sp)
                             Text(word, color = if (word == "TI SI MR. WHITE") MutedRose else textColor, fontSize = if (word == "TI SI MR. WHITE") (if (isWideScreen) 48.sp else 32.sp) else (if (isWideScreen) 64.sp else 42.sp), fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
                         }
                     } else {
@@ -279,7 +302,7 @@ fun GameScreen(
                 }
                 LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(vertical = 8.dp)) {
                     itemsIndexed(chatMessages) { index, msg ->
-                        val isMe = msg.sender == username
+                        val isMe = msg.sender == sanitizedName
                         val isNewGroup = index == 0 || chatMessages[index - 1].sender != msg.sender
                         val verticalPadding = if (isNewGroup) 6.dp else 2.dp
 
@@ -321,7 +344,7 @@ fun GameScreen(
                     Spacer(Modifier.width(8.dp))
                     IconButton(onClick = { 
                         if (chatInput.trim().isNotBlank()) { 
-                            FirebaseManager.sendMessage(roomCode, username, chatInput.trim())
+                            FirebaseManager.sendMessage(roomCode, sanitizedName, chatInput.trim())
                             chatInput = "" 
                         } 
                     }, modifier = Modifier.background(accentColor, CircleShape).size(if (isWideScreen) 56.dp else 48.dp)) { Icon(Icons.AutoMirrored.Filled.Send, null, tint = Color.White, modifier = Modifier.size(if (isWideScreen) 24.dp else 20.dp)) }
@@ -340,8 +363,8 @@ fun GameScreen(
                                 detectTapGestures(onPress = {
                                     holdJob = scope.launch {
                                         val start = currentPlatformMillis()
-                                        while (holdProgress < 2f) { 
-                                            holdProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(2f)
+                                        while (holdProgress < 1.4f) { 
+                                            holdProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(1.4f)
                                             delay(10) 
                                         }
                                         FirebaseManager.resetToLobby(roomCode)
@@ -353,11 +376,11 @@ fun GameScreen(
                         color = secondaryBtnBg
                     ) {
                         Box(contentAlignment = Alignment.Center) {
-                            if (holdProgress > 0f) Box(modifier = Modifier.fillMaxWidth(holdProgress / 2f).fillMaxHeight().background(progressColor).align(Alignment.CenterStart))
+                            if (holdProgress > 0f) Box(modifier = Modifier.fillMaxWidth(holdProgress / 1.4f).fillMaxHeight().background(progressColor).align(Alignment.CenterStart))
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Refresh, null, tint = textColor.copy(0.6f), modifier = Modifier.size(if (isWideScreen) 32.dp else 18.dp))
                                 Spacer(Modifier.width(8.dp))
-                                val remaining = (2f - holdProgress)
+                                val remaining = (1.4f - holdProgress)
                                 Text(if (holdProgress > 0f) "${(remaining * 10).toInt() / 10.0}s" else "PONOVI", fontWeight = FontWeight.ExtraBold, fontSize = if (isWideScreen) 20.sp else 14.sp, color = textColor)
                             }
                         }
@@ -383,11 +406,11 @@ fun GameScreen(
                         detectTapGestures(onPress = {
                             exitHoldJob = scope.launch {
                                 val start = currentPlatformMillis()
-                                while (exitHoldProgress < 2f) { 
-                                    exitHoldProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(2f)
+                                while (exitHoldProgress < 1.4f) { 
+                                    exitHoldProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(1.4f)
                                     delay(10) 
                                 }
-                                FirebaseManager.leaveRoomWithAdminTransfer(roomCode, username, onNewGame)
+                                FirebaseManager.leaveRoomWithAdminTransfer(roomCode, sanitizedName, onNewGame)
                                 exitHoldProgress = 0f
                             }
                             try { awaitRelease() } finally { exitHoldJob?.cancel(); exitHoldProgress = 0f }
@@ -396,8 +419,8 @@ fun GameScreen(
                 color = textColor.copy(alpha = 0.05f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    if (exitHoldProgress > 0f) Box(modifier = Modifier.fillMaxWidth(exitHoldProgress / 2f).fillMaxHeight().background(MutedRose.copy(0.2f)).align(Alignment.CenterStart))
-                    val remaining = (2f - exitHoldProgress)
+                    if (exitHoldProgress > 0f) Box(modifier = Modifier.fillMaxWidth(exitHoldProgress / 1.4f).fillMaxHeight().background(MutedRose.copy(0.2f)).align(Alignment.CenterStart))
+                    val remaining = (1.4f - exitHoldProgress)
                     Text(
                         text = if (exitHoldProgress > 0f) "IZAĐI ZA ${(remaining * 10).toInt() / 10.0}s" else "IZAĐI IZ SOBE",
                         color = textColor.copy(alpha = 0.5f), 
@@ -428,7 +451,7 @@ fun GameScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         wordRevealCard(Modifier.widthIn(max = 600.dp).fillMaxWidth().height(400.dp), true)
-                        Spacer(Modifier.height(64.dp))
+                        Spacer(modifier = Modifier.height(64.dp))
                         actionButtons(Modifier.widthIn(max = 600.dp).fillMaxWidth(), true)
                     }
                     

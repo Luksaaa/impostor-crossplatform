@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +39,9 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
     
     val accentColor = MutedRose
     val scope = rememberCoroutineScope()
+
+    // Detekcija tipkovnice preko paddinga
+    val isKeyboardVisible = WindowInsets.ime.asPaddingValues().calculateBottomPadding() > 0.dp
 
     // Funkcija za zajedničku logiku ulaska u sobu
     fun attemptJoin(code: String) {
@@ -155,7 +159,10 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                                 placeholder = { Text("ABC 123", color = textColor.copy(alpha = 0.4f)) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Text,
+                                    capitalization = KeyboardCapitalization.Characters
+                                ),
                                 isError = errorMessage.isNotEmpty(),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = accentColor,
@@ -203,24 +210,26 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                if (!isKeyboardVisible) {
+                    Spacer(modifier = Modifier.height(32.dp))
 
-                Surface(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .clickable { showScanner = true },
-                    color = inputContainerColor.copy(alpha = 0.9f),
-                    tonalElevation = 4.dp,
-                    shadowElevation = 8.dp
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Default.QrCodeScanner,
-                            contentDescription = "Skeniraj QR kod",
-                            modifier = Modifier.size(32.dp),
-                            tint = textColor
-                        )
+                    Surface(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .clickable { showScanner = true },
+                        color = inputContainerColor.copy(alpha = 0.9f),
+                        tonalElevation = 4.dp,
+                        shadowElevation = 8.dp
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Default.QrCodeScanner,
+                                contentDescription = "Skeniraj QR kod",
+                                modifier = Modifier.size(32.dp),
+                                tint = textColor
+                            )
+                        }
                     }
                 }
             }

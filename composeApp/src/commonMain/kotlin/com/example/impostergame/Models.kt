@@ -14,7 +14,8 @@ enum class Screen {
 @Serializable
 data class PlayerInfo(
     val name: String = "",
-    val isReady: Boolean = false
+    val isReady: Boolean = false,
+    val joinedAt: Long = 0L
 )
 
 @Serializable

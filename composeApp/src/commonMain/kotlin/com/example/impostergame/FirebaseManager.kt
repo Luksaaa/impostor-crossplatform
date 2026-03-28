@@ -57,6 +57,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
             try {
                 val code = generateRandomCode()
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Igrac" }
+                val now = currentPlatformMillis()
                 
                 val snapshot = roomsRef.child(code).valueEvents.first()
                 
@@ -66,7 +67,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
                     val roomData = mapOf(
                         "admin" to sanitizedName,
                         "status" to "waiting",
-                        "players" to mapOf(sanitizedName to mapOf("name" to sanitizedName, "isReady" to false)),
+                        "players" to mapOf(sanitizedName to mapOf("name" to sanitizedName, "isReady" to false, "joinedAt" to now)),
                         "messages" to mapOf("init" to "$sanitizedName je napravio sobu")
                     )
                     roomsRef.child(code).setValue(roomData)
@@ -104,8 +105,8 @@ object GitLiveFirebaseManager : IFirebaseManager {
                 return Result.failure(Exception("Soba je puna"))
             }
             
-            roomRef.child("players").child(sanitizedName).setValue(mapOf("name" to sanitizedName, "isReady" to false))
             val timestamp = currentPlatformMillis()
+            roomRef.child("players").child(sanitizedName).setValue(mapOf("name" to sanitizedName, "isReady" to false, "joinedAt" to timestamp))
             roomRef.child("messages").child("join_$timestamp").setValue("$sanitizedName je ušao")
             Result.success(Unit)
         } catch (e: Exception) {
@@ -125,23 +126,11 @@ object GitLiveFirebaseManager : IFirebaseManager {
                     return@launch
                 }
                 
-                val currentAdmin = snapshot.child("admin").getValueSafe<String?>()
-                val playersSnapshots = mutableListOf<DataSnapshot>()
-                snapshot.child("players").children.forEach { playersSnapshots.add(it) }
-                
+                val playerCount = snapshot.child("players").children.count()
                 val timestamp = currentPlatformMillis()
                 
-                if (currentAdmin == sanitizedName) {
-                    val nextAdmin = playersSnapshots.firstOrNull { it.key != sanitizedName }?.key
-                    if (nextAdmin != null) {
-                        roomRef.updateChildren(mapOf(
-                            "admin" to nextAdmin,
-                            "players/$sanitizedName" to null,
-                            "messages/exit_$timestamp" to "$sanitizedName je izašao, novi admin je $nextAdmin"
-                        ))
-                    } else {
-                        roomRef.removeValue()
-                    }
+                if (playerCount <= 1) {
+                    roomRef.removeValue()
                 } else {
                     roomRef.child("players").child(sanitizedName).removeValue()
                     roomRef.child("messages").child("exit_$timestamp").setValue("$sanitizedName je izašao")

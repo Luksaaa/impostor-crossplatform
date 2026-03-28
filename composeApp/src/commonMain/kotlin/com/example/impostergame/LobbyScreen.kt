@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun LobbyScreen(
     roomCode: String, 
@@ -42,6 +42,11 @@ fun LobbyScreen(
     val primaryBtnBg = if (isDarkTheme) DarkEarthy else SoftCream
     val primaryBtnText = if (isDarkTheme) SoftCream else DeepCharcoal
 
+    val sanitizedName = remember(username) { username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Gost" } }
+
+    // Detekcija tipkovnice preko paddinga
+    val isKeyboardVisible = WindowInsets.ime.asPaddingValues().calculateBottomPadding() > 0.dp
+
     if (roomCode.isBlank()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = SageGreen)
@@ -49,13 +54,21 @@ fun LobbyScreen(
         return
     }
 
-    val sanitizedName = remember(username) { username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Gost" } }
-
     var messages by remember { mutableStateOf(listOf<String>()) }
     var playerCount by remember { mutableStateOf(0) }
     var status by remember { mutableStateOf("waiting") }
     var currentAdmin by remember { mutableStateOf("") }
-    val isUserAdmin = currentAdmin == sanitizedName
+    var players by remember { mutableStateOf<Map<String, PlayerInfo>>(emptyMap()) }
+    
+    // Provjera tko ima ovlasti (originalni admin ili najstariji preostali igrač)
+    val isUserAdmin = remember(currentAdmin, players, sanitizedName) {
+        if (currentAdmin == sanitizedName) return@remember true
+        if (!players.containsKey(currentAdmin)) {
+            val oldestPlayer = players.values.sortedBy { it.joinedAt }.firstOrNull()
+            return@remember oldestPlayer?.name == sanitizedName
+        }
+        false
+    }
     
     @Suppress("DEPRECATION")
     val clipboardManager = LocalClipboardManager.current
@@ -67,21 +80,22 @@ fun LobbyScreen(
             
             status = room.status
             currentAdmin = room.admin
+            players = room.players
             
-            var isInGame = false
+            var isInRoom = false
             var count = 0
             
             room.players.forEach { (key, _) ->
                 count++
-                if (key == sanitizedName) isInGame = true
+                if (key == sanitizedName) isInRoom = true
             }
             playerCount = count
             
-            if (status == "started" && isInGame) {
+            if (status == "started" && isInRoom) {
                 onGameStarted()
             }
 
-            if (status == "waiting" && !isInGame) {
+            if (status == "waiting" && !isInRoom) {
                 FirebaseManager.joinRoom(roomCode, sanitizedName)
             }
 
@@ -203,14 +217,17 @@ fun LobbyScreen(
     val actionButtons = @Composable { modifier: Modifier, isWideScreen: Boolean ->
         Column(modifier = modifier) {
             if (isUserAdmin) {
+                val isGameRunning = status == "started" || status == "finished"
                 Button(
                     onClick = {
                         scope.launch {
                             try {
-                                val room = FirebaseManager.listenToRoom(roomCode).first()
-                                if (room != null) {
-                                    val playersList = room.players.keys.toList()
-                                    FirebaseManager.startGame(roomCode, playersList)
+                                if (!isGameRunning) {
+                                    val room = FirebaseManager.listenToRoom(roomCode).first()
+                                    if (room != null) {
+                                        val playersList = room.players.keys.toList()
+                                        FirebaseManager.startGame(roomCode, playersList)
+                                    }
                                 }
                             } catch (_: Exception) {}
                         }
@@ -218,13 +235,17 @@ fun LobbyScreen(
                     modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 100.dp else 60.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (playerCount >= 2) primaryBtnBg else Color.Gray,
-                        contentColor = primaryBtnText
+                        containerColor = if (isGameRunning) Color.Gray.copy(alpha = 0.5f) else (if (playerCount >= 2) primaryBtnBg else Color.Gray),
+                        contentColor = if (isGameRunning) textColor.copy(alpha = 0.5f) else primaryBtnText
                     ),
-                    enabled = playerCount >= 2
+                    enabled = !isGameRunning && playerCount >= 2
                 ) {
                     Text(
-                        text = if (playerCount < 2) "MIN 2 IGRAČA" else "POKRENI IGRU",
+                        text = when {
+                            isGameRunning -> "IGRA JE U TIJEKU..."
+                            playerCount < 2 -> "MIN 2 IGRAČA"
+                            else -> "POKRENI IGRU"
+                        },
                         fontSize = if (isWideScreen) 24.sp else 20.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -302,8 +323,11 @@ fun LobbyScreen(
                     headerInfo(Modifier.fillMaxWidth(), false)
                     Spacer(modifier = Modifier.height(32.dp))
                     playersCard(Modifier.fillMaxWidth().weight(1f), false)
-                    Spacer(modifier = Modifier.height(32.dp))
-                    actionButtons(Modifier.fillMaxWidth(), false)
+                    
+                    if (!isKeyboardVisible) {
+                        Spacer(modifier = Modifier.height(32.dp))
+                        actionButtons(Modifier.fillMaxWidth(), false)
+                    }
                 }
             }
         }
