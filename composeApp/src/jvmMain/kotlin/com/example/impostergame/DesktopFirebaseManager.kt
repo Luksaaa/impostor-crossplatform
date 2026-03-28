@@ -194,6 +194,7 @@ object DesktopFirebaseManager : IFirebaseManager {
                 put("status", JsonPrimitive("started"))
                 put("chatMessages", JsonNull)
                 put("isDiscussionActive", JsonPrimitive(false))
+                put("discussionStartTime", JsonPrimitive(0L))
                 put("discussionEndTime", JsonPrimitive(0L))
                 put("resultMessage", JsonPrimitive(""))
             }
@@ -208,8 +209,15 @@ object DesktopFirebaseManager : IFirebaseManager {
                 val timestamp = System.currentTimeMillis()
                 val chatMsg = ChatMessage(sanitizedName, message.trim(), timestamp)
                 
-                // Put with unique key to simulate push()
-                putData("$roomCode/chatMessages/msg_$timestamp", chatMsg)
+                // POST requests stvara `push()` kljuc unutar Firebasea
+                val url = URL("$BASE_URL/$roomCode/chatMessages.json")
+                val conn = url.openConnection() as HttpURLConnection
+                conn.requestMethod = "POST"
+                conn.doOutput = true
+                conn.setRequestProperty("Content-Type", "application/json")
+                conn.outputStream.write(json.encodeToString(chatMsg).toByteArray())
+                conn.responseCode
+                conn.disconnect()
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")
             }
@@ -218,12 +226,23 @@ object DesktopFirebaseManager : IFirebaseManager {
 
     override fun startDiscussion(roomCode: String, seconds: Int) {
         scope.launch {
-            val endTime = System.currentTimeMillis() + (seconds * 1000L)
-            val updates = buildJsonObject {
-                put("isDiscussionActive", JsonPrimitive(true))
-                put("discussionEndTime", JsonPrimitive(endTime))
+            if (seconds > 0) {
+                val now = System.currentTimeMillis()
+                val endTime = now + (seconds * 1000L)
+                val updates = buildJsonObject {
+                    put("isDiscussionActive", JsonPrimitive(true))
+                    put("discussionStartTime", JsonPrimitive(now))
+                    put("discussionEndTime", JsonPrimitive(endTime))
+                }
+                patchData(roomCode, updates)
+            } else {
+                val updates = buildJsonObject {
+                    put("isDiscussionActive", JsonPrimitive(false))
+                    put("discussionStartTime", JsonPrimitive(0L))
+                    put("discussionEndTime", JsonPrimitive(0L))
+                }
+                patchData(roomCode, updates)
             }
-            patchData(roomCode, updates)
         }
     }
 
@@ -244,6 +263,7 @@ object DesktopFirebaseManager : IFirebaseManager {
                 put("status", JsonPrimitive("waiting"))
                 put("chatMessages", JsonNull)
                 put("isDiscussionActive", JsonPrimitive(false))
+                put("discussionStartTime", JsonPrimitive(0L))
                 put("discussionEndTime", JsonPrimitive(0L))
                 put("resultMessage", JsonPrimitive(""))
             }

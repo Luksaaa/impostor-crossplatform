@@ -36,6 +36,7 @@ data class Room(
     val imposterId: String = "",
     val mrWhiteId: String = "",
     val isDiscussionActive: Boolean = false,
+    val discussionStartTime: Long = 0L,
     val discussionEndTime: Long = 0L,
     val resultMessage: String = ""
 )

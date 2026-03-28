@@ -185,6 +185,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
                     "status" to "started",
                     "chatMessages" to null,
                     "isDiscussionActive" to false,
+                    "discussionStartTime" to 0L,
                     "discussionEndTime" to 0L,
                     "resultMessage" to ""
                 )
@@ -197,8 +198,9 @@ object GitLiveFirebaseManager : IFirebaseManager {
         firebaseScope.launch {
             try {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
-                val chatMsg = ChatMessage(sanitizedName, message.trim(), currentPlatformMillis())
-                roomsRef.child(roomCode).child("chatMessages").push().setValue(chatMsg)
+                val timestamp = currentPlatformMillis()
+                val chatMsg = ChatMessage(sanitizedName, message.trim(), timestamp)
+                roomsRef.child(roomCode).child("chatMessages").child("msg_$timestamp").setValue(chatMsg)
             } catch (e: Exception) {}
         }
     }
@@ -207,14 +209,17 @@ object GitLiveFirebaseManager : IFirebaseManager {
         firebaseScope.launch {
             try {
                 val updates = if (seconds > 0) {
-                    val endTime = currentPlatformMillis() + (seconds * 1000L)
+                    val now = currentPlatformMillis()
+                    val endTime = now + (seconds * 1000L)
                     mapOf(
                         "isDiscussionActive" to true,
+                        "discussionStartTime" to now,
                         "discussionEndTime" to endTime
                     )
                 } else {
                     mapOf(
                         "isDiscussionActive" to false,
+                        "discussionStartTime" to 0L,
                         "discussionEndTime" to 0L
                     )
                 }
@@ -242,6 +247,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
                     "status" to "waiting",
                     "chatMessages" to null,
                     "isDiscussionActive" to false,
+                    "discussionStartTime" to 0L,
                     "discussionEndTime" to 0L,
                     "resultMessage" to ""
                 ))
