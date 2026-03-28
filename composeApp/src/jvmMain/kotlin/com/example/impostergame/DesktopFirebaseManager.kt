@@ -131,16 +131,22 @@ object DesktopFirebaseManager : IFirebaseManager {
                     val updates = mutableMapOf<String, JsonElement>()
                     updates["players/$sanitizedName"] = JsonNull
                     
+                    val exitMsg: String
                     if (room.admin == sanitizedName) {
                         val nextActiveAdmin = room.players.values
                             .filter { it.name != sanitizedName }
                             .sortedBy { it.joinedAt }
                             .firstOrNull()?.name
                         
-                        updates["messages/exit_$timestamp"] = JsonPrimitive("$sanitizedName je izašao, privremeni admin je $nextActiveAdmin")
+                        exitMsg = "$sanitizedName je izašao, privremeni admin je $nextActiveAdmin"
                     } else {
-                        updates["messages/exit_$timestamp"] = JsonPrimitive("$sanitizedName je izašao")
+                        exitMsg = "$sanitizedName je izašao"
                     }
+                    
+                    updates["messages/exit_$timestamp"] = JsonPrimitive(exitMsg)
+                    // Dodajemo u chatMessages za prikaz u igri
+                    updates["chatMessages/sys_$timestamp"] = json.encodeToJsonElement(ChatMessage("Sustav", exitMsg, timestamp))
+                    
                     patchData(roomCode, JsonObject(updates))
                 }
             } catch (e: Exception) {
@@ -287,16 +293,21 @@ object DesktopFirebaseManager : IFirebaseManager {
                 val updates = mutableMapOf<String, JsonElement>()
                 updates["players/$playerName"] = JsonNull
                 
+                val exitMsg: String
                 if (room.admin == playerName) {
                     val nextActiveAdmin = room.players.values
                         .filter { it.name != playerName }
                         .sortedBy { it.joinedAt }
                         .firstOrNull()?.name
                     
-                    updates["messages/exit_$timestamp"] = JsonPrimitive("$playerName je izašao, privremeni admin je $nextActiveAdmin")
+                    exitMsg = "$playerName je izašao, privremeni admin je $nextActiveAdmin"
                 } else {
-                    updates["messages/exit_$timestamp"] = JsonPrimitive("$playerName je izašao")
+                    exitMsg = "$playerName je izašao"
                 }
+                
+                updates["messages/exit_$timestamp"] = JsonPrimitive(exitMsg)
+                updates["chatMessages/sys_$timestamp"] = json.encodeToJsonElement(ChatMessage("Sustav", exitMsg, timestamp))
+
                 patchData(roomCode, JsonObject(updates))
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")

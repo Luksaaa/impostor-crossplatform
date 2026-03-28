@@ -104,7 +104,6 @@ fun GameScreen(
         FirebaseManager.listenToRoom(roomCode).collectLatest { room ->
             if (room == null) return@collectLatest
             
-            val prevStatus = gameStatus
             currentAdmin = room.admin
             gameStatus = room.status
             val imposterId = room.imposterId
@@ -123,19 +122,13 @@ fun GameScreen(
             chatMessages = room.chatMessages.entries.sortedBy { it.key }.map { it.value }
             players = room.players
             
-            // AUTOMATSKI RESET: Ako je igra u tijeku, a ostao je samo 1 igrač (ili je impostor izbačen)
-            if (gameStatus == "started") {
-                // Određujemo jesmo li MI ti koji trebaju poslati reset (kako ne bi svi odjednom slali)
-                val currentEffAdmin = if (room.players.containsKey(room.admin)) room.admin 
-                                     else room.players.values.sortedBy { it.joinedAt }.firstOrNull()?.name
+            // AUTOMATSKI RESET: Samo ako je Impostor izbačen ili ostane samo jedan igrač
+            if (gameStatus == "started" && isUserAdmin) {
+                val impostorKicked = imposterId.isNotEmpty() && !room.players.containsKey(imposterId)
+                val onlyOneLeft = room.players.size <= 1
                 
-                if (sanitizedName == currentEffAdmin) {
-                    val impostorKicked = imposterId.isNotEmpty() && !room.players.containsKey(imposterId)
-                    val onlyOneLeft = room.players.size <= 1
-                    
-                    if (impostorKicked || onlyOneLeft) {
-                        FirebaseManager.resetToLobby(roomCode)
-                    }
+                if (impostorKicked || onlyOneLeft) {
+                    FirebaseManager.resetToLobby(roomCode)
                 }
             }
 
