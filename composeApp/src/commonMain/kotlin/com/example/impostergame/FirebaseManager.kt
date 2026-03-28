@@ -200,7 +200,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
                 val timestamp = currentPlatformMillis()
                 val chatMsg = ChatMessage(sanitizedName, message.trim(), timestamp)
-                roomsRef.child(roomCode).child("chatMessages").child("msg_$timestamp").setValue(chatMsg)
+                roomsRef.child(roomCode).child("chatMessages").push().setValue(chatMsg)
             } catch (e: Exception) {}
         }
     }
