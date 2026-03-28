@@ -112,7 +112,6 @@ fun GameScreen(
             discussionEndTime = room.discussionEndTime
 
             if (newlyStarted) {
-                // Točno hvatamo vrijeme kad nam je stigao event kako bi izbjegli grešku sata između uređaja
                 localStartTime = currentPlatformMillis()
             } else if (!room.isDiscussionActive) {
                 localStartTime = 0L
@@ -146,7 +145,7 @@ fun GameScreen(
                     break
                 }
                 timeLeft = diff
-                delay(100) // Češći tick za super točan timer
+                delay(100)
             }
         } else { 
             timeLeft = 0 
@@ -203,208 +202,243 @@ fun GameScreen(
         }
     }
 
+    val wordRevealCard = @Composable { modifier: Modifier, isWideScreen: Boolean ->
+        Card(
+            modifier = modifier,
+            shape = RoundedCornerShape(32.dp),
+            colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.9f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (showDiscussion) {
+                    Row(
+                        modifier = Modifier.align(Alignment.TopEnd).padding(16.dp).background(MutedRose.copy(alpha = 0.15f), RoundedCornerShape(12.dp)).padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Timer, null, tint = MutedRose, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        val minutes = timeLeft / 60
+                        val seconds = timeLeft % 60
+                        Text("${if(minutes < 10) "0" else ""}$minutes:${if(seconds < 10) "0" else ""}$seconds", color = MutedRose, fontWeight = FontWeight.Bold)
+                    }
+                }
+                Box(modifier = Modifier.fillMaxSize().clickable { isRevealed = !isRevealed }, contentAlignment = Alignment.Center) {
+                    if (isRevealed) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(if (username == isAdmin.toString() || username.isNotEmpty()) "Tvoja riječ:" else "Status:", color = textColor.copy(alpha = 0.6f), fontSize = if (isWideScreen) 20.sp else 14.sp)
+                            Text(word, color = if (word == "TI SI MR. WHITE") MutedRose else textColor, fontSize = if (word == "TI SI MR. WHITE") (if (isWideScreen) 48.sp else 32.sp) else (if (isWideScreen) 64.sp else 42.sp), fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                        }
+                    } else {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Visibility, null, tint = accentColor, modifier = Modifier.size(if (isWideScreen) 48.dp else 32.dp))
+                            Spacer(Modifier.width(16.dp))
+                            Text("DODIRNI ZA OTKRIVANJE", color = textColor.copy(alpha = 0.5f), fontWeight = FontWeight.Bold, fontSize = if (isWideScreen) 20.sp else 14.sp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    val chatCard = @Composable { modifier: Modifier, isWideScreen: Boolean ->
+        Card(modifier = modifier, shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.5f))) {
+            Column(modifier = Modifier.padding(if (isWideScreen) 24.dp else 12.dp).fillMaxHeight()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(), 
+                    horizontalArrangement = Arrangement.SpaceBetween, 
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (showDiscussion) "RASPRAVA" else "CHAT", 
+                        fontWeight = FontWeight.Bold, 
+                        color = if (showDiscussion) MutedRose else accentColor,
+                        modifier = Modifier.defaultMinSize(minWidth = 100.dp),
+                        fontSize = if (isWideScreen) 20.sp else 16.sp
+                    )
+                    
+                    Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.CenterEnd) {
+                        if (isUserAdmin && !showDiscussion) {
+                            var showTimerMenu by remember { mutableStateOf(false) }
+                            Box {
+                                IconButton(onClick = { showTimerMenu = true }) { Icon(Icons.Default.Timer, null, tint = accentColor) }
+                                DropdownMenu(expanded = showTimerMenu, onDismissRequest = { showTimerMenu = false }) {
+                                    listOf(30, 45, 60).forEach { sec ->
+                                        DropdownMenuItem(text = { Text("$sec sekundi") }, onClick = {
+                                            FirebaseManager.startDiscussion(roomCode, sec)
+                                            showTimerMenu = false
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(vertical = 8.dp)) {
+                    itemsIndexed(chatMessages) { index, msg ->
+                        val isMe = msg.sender == username
+                        val isNewGroup = index == 0 || chatMessages[index - 1].sender != msg.sender
+                        val verticalPadding = if (isNewGroup) 6.dp else 2.dp
+
+                        Column(modifier = Modifier.fillMaxWidth().padding(vertical = verticalPadding), horizontalAlignment = if (isMe) Alignment.End else Alignment.Start) {
+                            if (isNewGroup) {
+                                Text(
+                                    text = msg.sender,
+                                    fontSize = if (isWideScreen) 13.sp else 11.sp, 
+                                    color = textColor.copy(alpha = 0.5f), 
+                                    modifier = Modifier.padding(start = if(isMe) 0.dp else 4.dp, end = if(isMe) 4.dp else 0.dp, bottom = 2.dp)
+                                )
+                            }
+                            Surface(
+                                color = if (isMe) accentColor.copy(alpha = if(isDarkTheme) 0.25f else 0.85f) 
+                                        else (if (isDarkTheme) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f)), 
+                                shape = RoundedCornerShape(
+                                    topStart = if (isNewGroup || isMe) 16.dp else 4.dp, 
+                                    topEnd = if (isNewGroup || !isMe) 16.dp else 4.dp, 
+                                    bottomStart = if (isMe) 16.dp else 4.dp, 
+                                    bottomEnd = if (isMe) 4.dp else 16.dp
+                                ), 
+                                contentColor = if (isMe && !isDarkTheme) Color.White else textColor
+                            ) {
+                                Text(msg.message, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp), fontSize = if (isWideScreen) 18.sp else 15.sp)
+                            }
+                        }
+                    }
+                }
+                Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    TextField(value = chatInput, onValueChange = { chatInput = it }, modifier = Modifier.weight(1f), placeholder = { Text("Napiši nešto...", fontSize = if (isWideScreen) 18.sp else 16.sp) }, colors = TextFieldDefaults.colors(focusedContainerColor = textColor.copy(alpha = 0.05f), unfocusedContainerColor = textColor.copy(alpha = 0.05f), focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent), shape = RoundedCornerShape(24.dp))
+                    Spacer(Modifier.width(8.dp))
+                    IconButton(onClick = { 
+                        if (chatInput.trim().isNotBlank()) { 
+                            FirebaseManager.sendMessage(roomCode, username, chatInput.trim())
+                            chatInput = "" 
+                        } 
+                    }, modifier = Modifier.background(accentColor, CircleShape).size(if (isWideScreen) 56.dp else 48.dp)) { Icon(Icons.AutoMirrored.Filled.Send, null, tint = Color.White, modifier = Modifier.size(if (isWideScreen) 24.dp else 20.dp)) }
+                }
+            }
+        }
+    }
+
+    val actionButtons = @Composable { modifier: Modifier, isWideScreen: Boolean ->
+        Column(modifier = modifier) {
+            if (isUserAdmin) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Surface(
+                        modifier = Modifier.weight(1f).height(if (isWideScreen) 100.dp else 50.dp).clip(RoundedCornerShape(16.dp))
+                            .pointerInput(Unit) {
+                                detectTapGestures(onPress = {
+                                    holdJob = scope.launch {
+                                        val start = currentPlatformMillis()
+                                        while (holdProgress < 2f) { 
+                                            holdProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(2f)
+                                            delay(10) 
+                                        }
+                                        FirebaseManager.resetToLobby(roomCode)
+                                        holdProgress = 0f
+                                    }
+                                    try { awaitRelease() } finally { holdJob?.cancel(); holdProgress = 0f }
+                                })
+                            },
+                        color = secondaryBtnBg
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            if (holdProgress > 0f) Box(modifier = Modifier.fillMaxWidth(holdProgress / 2f).fillMaxHeight().background(progressColor).align(Alignment.CenterStart))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Refresh, null, tint = textColor.copy(0.6f), modifier = Modifier.size(if (isWideScreen) 32.dp else 18.dp))
+                                Spacer(Modifier.width(12.dp))
+                                val remaining = (2f - holdProgress)
+                                Text(if (holdProgress > 0f) "${(remaining * 10).toInt() / 10.0}s" else "PONOVI", fontWeight = FontWeight.ExtraBold, fontSize = if (isWideScreen) 20.sp else 14.sp, color = textColor)
+                            }
+                        }
+                    }
+
+                    Button(
+                        onClick = { showVoteDialog = true },
+                        modifier = Modifier.weight(1.2f).height(if (isWideScreen) 100.dp else 50.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MutedRose.copy(alpha = 0.9f))
+                    ) {
+                        Icon(Icons.Default.Gavel, null, modifier = Modifier.size(if (isWideScreen) 32.dp else 18.dp))
+                        Spacer(Modifier.width(12.dp))
+                        Text("IZBACI ULJEZA", fontWeight = FontWeight.ExtraBold, fontSize = if (isWideScreen) 20.sp else 12.sp)
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 100.dp else 50.dp).clip(RoundedCornerShape(16.dp))
+                    .pointerInput(Unit) {
+                        detectTapGestures(onPress = {
+                            exitHoldJob = scope.launch {
+                                val start = currentPlatformMillis()
+                                while (exitHoldProgress < 2f) { 
+                                    exitHoldProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(2f)
+                                    delay(10) 
+                                }
+                                FirebaseManager.leaveRoomWithAdminTransfer(roomCode, username, onNewGame)
+                                exitHoldProgress = 0f
+                            }
+                            try { awaitRelease() } finally { exitHoldJob?.cancel(); exitHoldProgress = 0f }
+                        })
+                    },
+                color = textColor.copy(alpha = 0.05f)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    if (exitHoldProgress > 0f) Box(modifier = Modifier.fillMaxWidth(exitHoldProgress / 2f).fillMaxHeight().background(MutedRose.copy(0.2f)).align(Alignment.CenterStart))
+                    val remaining = (2f - exitHoldProgress)
+                    Text(
+                        text = if (exitHoldProgress > 0f) "IZAĐI ZA ${(remaining * 10).toInt() / 10.0}s" else "IZAĐI IZ SOBE",
+                        color = textColor.copy(alpha = 0.5f), 
+                        fontWeight = FontWeight.Bold, 
+                        fontSize = if (isWideScreen) 20.sp else 14.sp
+                    )
+                }
+            }
+        }
+    }
+
     Scaffold(
         containerColor = Color.Transparent,
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(
-                modifier = Modifier
-                    .widthIn(max = 700.dp)
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .imePadding()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth().height(160.dp),
-                    shape = RoundedCornerShape(32.dp),
-                    colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.9f)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(paddingValues).imePadding(), contentAlignment = Alignment.Center) {
+            val isWideScreen = maxWidth > 800.dp
+
+            if (isWideScreen) {
+                Row(
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 64.dp, vertical = 48.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        if (showDiscussion) {
-                            Row(
-                                modifier = Modifier.align(Alignment.TopEnd).padding(16.dp).background(MutedRose.copy(alpha = 0.15f), RoundedCornerShape(12.dp)).padding(horizontal = 12.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(Icons.Default.Timer, null, tint = MutedRose, modifier = Modifier.size(18.dp))
-                                Spacer(Modifier.width(6.dp))
-                                val minutes = timeLeft / 60
-                                val seconds = timeLeft % 60
-                                Text("${if(minutes < 10) "0" else ""}$minutes:${if(seconds < 10) "0" else ""}$seconds", color = MutedRose, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                        Box(modifier = Modifier.fillMaxSize().clickable { isRevealed = !isRevealed }, contentAlignment = Alignment.Center) {
-                            if (isRevealed) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(if (username == isAdmin.toString() || username.isNotEmpty()) "Tvoja riječ:" else "Status:", color = textColor.copy(alpha = 0.6f), fontSize = 14.sp)
-                                    Text(word, color = if (word == "TI SI MR. WHITE") MutedRose else textColor, fontSize = if (word == "TI SI MR. WHITE") 32.sp else 42.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
-                                }
-                            } else {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.Visibility, null, tint = accentColor, modifier = Modifier.size(32.dp))
-                                    Spacer(Modifier.width(12.dp))
-                                    Text("DODIRNI ZA OTKRIVANJE", color = textColor.copy(alpha = 0.5f), fontWeight = FontWeight.Bold)
-                                }
-                            }
-                        }
+                    Column(
+                        modifier = Modifier.weight(1f).fillMaxHeight().padding(end = 48.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        wordRevealCard(Modifier.widthIn(max = 600.dp).fillMaxWidth().height(400.dp), true)
+                        Spacer(Modifier.height(64.dp))
+                        actionButtons(Modifier.widthIn(max = 600.dp).fillMaxWidth(), true)
+                    }
+                    
+                    Column(
+                        modifier = Modifier.weight(1f).fillMaxHeight()
+                    ) {
+                        chatCard(Modifier.fillMaxSize(), true)
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Card(modifier = Modifier.fillMaxWidth().weight(1f), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.5f))) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(), 
-                            horizontalArrangement = Arrangement.SpaceBetween, 
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = if (showDiscussion) "RASPRAVA" else "CHAT", 
-                                fontWeight = FontWeight.Bold, 
-                                color = if (showDiscussion) MutedRose else accentColor,
-                                modifier = Modifier.defaultMinSize(minWidth = 100.dp)
-                            )
-                            
-                            Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.CenterEnd) {
-                                if (isUserAdmin && !showDiscussion) {
-                                    var showTimerMenu by remember { mutableStateOf(false) }
-                                    Box {
-                                        IconButton(onClick = { showTimerMenu = true }) { Icon(Icons.Default.Timer, null, tint = accentColor) }
-                                        DropdownMenu(expanded = showTimerMenu, onDismissRequest = { showTimerMenu = false }) {
-                                            listOf(30, 45, 60).forEach { sec ->
-                                                DropdownMenuItem(text = { Text("$sec sekundi") }, onClick = {
-                                                    FirebaseManager.startDiscussion(roomCode, sec)
-                                                    showTimerMenu = false
-                                                })
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(vertical = 8.dp)) {
-                            itemsIndexed(chatMessages) { index, msg ->
-                                val isMe = msg.sender == username
-                                val isNewGroup = index == 0 || chatMessages[index - 1].sender != msg.sender
-                                val verticalPadding = if (isNewGroup) 6.dp else 2.dp
-
-                                Column(modifier = Modifier.fillMaxWidth().padding(vertical = verticalPadding), horizontalAlignment = if (isMe) Alignment.End else Alignment.Start) {
-                                    if (isNewGroup) {
-                                        Text(
-                                            text = msg.sender,
-                                            fontSize = 11.sp, 
-                                            color = textColor.copy(alpha = 0.5f), 
-                                            modifier = Modifier.padding(start = if(isMe) 0.dp else 4.dp, end = if(isMe) 4.dp else 0.dp, bottom = 2.dp)
-                                        )
-                                    }
-                                    Surface(
-                                        color = if (isMe) accentColor.copy(alpha = if(isDarkTheme) 0.25f else 0.85f) 
-                                                else (if (isDarkTheme) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f)), 
-                                        shape = RoundedCornerShape(
-                                            topStart = if (isNewGroup || isMe) 16.dp else 4.dp, 
-                                            topEnd = if (isNewGroup || !isMe) 16.dp else 4.dp, 
-                                            bottomStart = if (isMe) 16.dp else 4.dp, 
-                                            bottomEnd = if (isMe) 4.dp else 16.dp
-                                        ), 
-                                        contentColor = if (isMe && !isDarkTheme) Color.White else textColor
-                                    ) {
-                                        Text(msg.message, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp), fontSize = 15.sp)
-                                    }
-                                }
-                            }
-                        }
-                        Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            TextField(value = chatInput, onValueChange = { chatInput = it }, modifier = Modifier.weight(1f), placeholder = { Text("Napiši nešto...") }, colors = TextFieldDefaults.colors(focusedContainerColor = textColor.copy(alpha = 0.05f), unfocusedContainerColor = textColor.copy(alpha = 0.05f), focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent), shape = RoundedCornerShape(24.dp))
-                            Spacer(Modifier.width(8.dp))
-                            IconButton(onClick = { 
-                                if (chatInput.trim().isNotBlank()) { 
-                                    FirebaseManager.sendMessage(roomCode, username, chatInput.trim())
-                                    chatInput = "" 
-                                } 
-                            }, modifier = Modifier.background(accentColor, CircleShape).size(48.dp)) { Icon(Icons.AutoMirrored.Filled.Send, null, tint = Color.White, modifier = Modifier.size(20.dp)) }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (isUserAdmin) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Surface(
-                            modifier = Modifier.weight(1f).height(50.dp).clip(RoundedCornerShape(16.dp))
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onPress = {
-                                        holdJob = scope.launch {
-                                            val start = currentPlatformMillis()
-                                            while (holdProgress < 2f) { 
-                                                holdProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(2f)
-                                                delay(10) 
-                                            }
-                                            FirebaseManager.resetToLobby(roomCode)
-                                            holdProgress = 0f
-                                        }
-                                        try { awaitRelease() } finally { holdJob?.cancel(); holdProgress = 0f }
-                                    })
-                                },
-                            color = secondaryBtnBg
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                if (holdProgress > 0f) Box(modifier = Modifier.fillMaxWidth(holdProgress / 2f).fillMaxHeight().background(progressColor).align(Alignment.CenterStart))
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.Refresh, null, tint = textColor.copy(0.6f), modifier = Modifier.size(18.dp))
-                                    Spacer(Modifier.width(8.dp))
-                                    val remaining = (2f - holdProgress)
-                                    Text(if (holdProgress > 0f) "${(remaining * 10).toInt() / 10.0}s" else "PONOVI", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = textColor)
-                                }
-                            }
-                        }
-
-                        Button(
-                            onClick = { showVoteDialog = true },
-                            modifier = Modifier.weight(1.2f).height(50.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MutedRose.copy(alpha = 0.9f))
-                        ) {
-                            Icon(Icons.Default.Gavel, null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text("IZBACI ULJEZA", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-
-                Surface(
-                    modifier = Modifier.fillMaxWidth().height(50.dp).clip(RoundedCornerShape(16.dp))
-                        .pointerInput(Unit) {
-                            detectTapGestures(onPress = {
-                                exitHoldJob = scope.launch {
-                                    val start = currentPlatformMillis()
-                                    while (exitHoldProgress < 2f) { 
-                                        exitHoldProgress = ((currentPlatformMillis() - start) / 1000f).coerceAtMost(2f)
-                                        delay(10) 
-                                    }
-                                    FirebaseManager.leaveRoomWithAdminTransfer(roomCode, username, onNewGame)
-                                    exitHoldProgress = 0f
-                                }
-                                try { awaitRelease() } finally { exitHoldJob?.cancel(); exitHoldProgress = 0f }
-                            })
-                        },
-                    color = textColor.copy(alpha = 0.05f)
+            } else {
+                Column(
+                    modifier = Modifier
+                        .widthIn(max = 700.dp)
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        if (exitHoldProgress > 0f) Box(modifier = Modifier.fillMaxWidth(exitHoldProgress / 2f).fillMaxHeight().background(MutedRose.copy(0.2f)).align(Alignment.CenterStart))
-                        val remaining = (2f - exitHoldProgress)
-                        Text(
-                            text = if (exitHoldProgress > 0f) "IZAĐI ZA ${(remaining * 10).toInt() / 10.0}s" else "IZAĐI IZ SOBE",
-                            color = textColor.copy(alpha = 0.5f), 
-                            fontWeight = FontWeight.Bold, 
-                            fontSize = 14.sp
-                        )
-                    }
+                    wordRevealCard(Modifier.fillMaxWidth().height(160.dp), false)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    chatCard(Modifier.fillMaxWidth().weight(1f), false)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    actionButtons(Modifier.fillMaxWidth(), false)
                 }
             }
         }
