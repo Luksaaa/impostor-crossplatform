@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Gavel
@@ -27,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +40,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun GameScreen(
     roomCode: String, 
@@ -83,6 +85,8 @@ fun GameScreen(
     
     val secondaryBtnBg = if (isDarkTheme) Color(0xFF3E3A33) else Color(0xFFFDF5E6)
     val progressColor = SageGreen.copy(alpha = 0.3f)
+
+    val isKeyboardVisible = WindowInsets.isImeVisible
 
     LaunchedEffect(roomCode) {
         FirebaseManager.listenToRoom(roomCode).collectLatest { room ->
@@ -305,7 +309,15 @@ fun GameScreen(
                     }
                 }
                 Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    TextField(value = chatInput, onValueChange = { chatInput = it }, modifier = Modifier.weight(1f), placeholder = { Text("Napiši nešto...", fontSize = if (isWideScreen) 18.sp else 16.sp) }, colors = TextFieldDefaults.colors(focusedContainerColor = textColor.copy(alpha = 0.05f), unfocusedContainerColor = textColor.copy(alpha = 0.05f), focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent), shape = RoundedCornerShape(24.dp))
+                    TextField(
+                        value = chatInput, 
+                        onValueChange = { chatInput = it }, 
+                        modifier = Modifier.weight(1f), 
+                        placeholder = { Text("Napiši nešto...", fontSize = if (isWideScreen) 18.sp else 16.sp) }, 
+                        colors = TextFieldDefaults.colors(focusedContainerColor = textColor.copy(alpha = 0.05f), unfocusedContainerColor = textColor.copy(alpha = 0.05f), focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent), 
+                        shape = RoundedCornerShape(24.dp),
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
+                    )
                     Spacer(Modifier.width(8.dp))
                     IconButton(onClick = { 
                         if (chatInput.trim().isNotBlank()) { 
@@ -344,7 +356,7 @@ fun GameScreen(
                             if (holdProgress > 0f) Box(modifier = Modifier.fillMaxWidth(holdProgress / 2f).fillMaxHeight().background(progressColor).align(Alignment.CenterStart))
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Refresh, null, tint = textColor.copy(0.6f), modifier = Modifier.size(if (isWideScreen) 32.dp else 18.dp))
-                                Spacer(Modifier.width(12.dp))
+                                Spacer(Modifier.width(8.dp))
                                 val remaining = (2f - holdProgress)
                                 Text(if (holdProgress > 0f) "${(remaining * 10).toInt() / 10.0}s" else "PONOVI", fontWeight = FontWeight.ExtraBold, fontSize = if (isWideScreen) 20.sp else 14.sp, color = textColor)
                             }
@@ -358,7 +370,7 @@ fun GameScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = MutedRose.copy(alpha = 0.9f))
                     ) {
                         Icon(Icons.Default.Gavel, null, modifier = Modifier.size(if (isWideScreen) 32.dp else 18.dp))
-                        Spacer(Modifier.width(12.dp))
+                        Spacer(Modifier.width(8.dp))
                         Text("IZBACI ULJEZA", fontWeight = FontWeight.ExtraBold, fontSize = if (isWideScreen) 20.sp else 12.sp)
                     }
                 }
@@ -402,7 +414,7 @@ fun GameScreen(
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(paddingValues).imePadding(), contentAlignment = Alignment.Center) {
-            val isWideScreen = maxWidth > 800.dp
+            val isWideScreen = maxWidth > 1100.dp
 
             if (isWideScreen) {
                 Row(
@@ -437,8 +449,11 @@ fun GameScreen(
                     wordRevealCard(Modifier.fillMaxWidth().height(160.dp), false)
                     Spacer(modifier = Modifier.height(16.dp))
                     chatCard(Modifier.fillMaxWidth().weight(1f), false)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    actionButtons(Modifier.fillMaxWidth(), false)
+                    
+                    if (!isKeyboardVisible) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        actionButtons(Modifier.fillMaxWidth(), false)
+                    }
                 }
             }
         }

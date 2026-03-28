@@ -11,9 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -99,6 +102,7 @@ fun LobbyScreen(
             ) {
                 Column(
                     modifier = Modifier
+                        .weight(1f, fill = false)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
@@ -109,13 +113,20 @@ fun LobbyScreen(
                 ) {
                     Text(
                         text = "SOBA: $roomCode", 
-                        fontSize = if (isWideScreen) 64.sp else 32.sp, 
+                        fontSize = if (isWideScreen) 50.sp else 32.sp, 
                         fontWeight = FontWeight.ExtraBold,
-                        color = textColor
+                        color = textColor,
+                        style = if (isWideScreen) TextStyle(
+                            shadow = Shadow(
+                                color = Color.Black.copy(alpha = 0.5f),
+                                offset = Offset(4f, 4f),
+                                blurRadius = 8f
+                            )
+                        ) else LocalTextStyle.current
                     )
                     Text(
                         text = "(Klikni za kopiranje)",
-                        fontSize = if (isWideScreen) 20.sp else 12.sp,
+                        fontSize = if (isWideScreen) 16.sp else 12.sp,
                         color = textColor.copy(alpha = 0.3f)
                     )
                 }
@@ -123,12 +134,16 @@ fun LobbyScreen(
                 Spacer(modifier = Modifier.width(if (isWideScreen) 32.dp else 16.dp))
                 
                 Surface(
-                    modifier = Modifier.size(if (isWideScreen) 200.dp else 80.dp),
+                    modifier = Modifier
+                        .requiredSize(if (isWideScreen) 180.dp else 80.dp),
                     color = Color.White,
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Box(modifier = Modifier.fillMaxSize().padding(12.dp), contentAlignment = Alignment.Center) {
-                        QRCodeImage(content = "impostergame://join?code=$roomCode", modifier = Modifier.fillMaxSize())
+                        QRCodeImage(
+                            content = "impostergame://join?code=$roomCode", 
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                 }
             }
@@ -251,7 +266,7 @@ fun LobbyScreen(
         containerColor = Color.Transparent
     ) { paddingValues ->
         BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
-            val isWideScreen = maxWidth > 800.dp
+            val isWideScreen = maxWidth > 1100.dp
 
             if (isWideScreen) {
                 Row(
