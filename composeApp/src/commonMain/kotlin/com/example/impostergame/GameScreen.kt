@@ -104,6 +104,7 @@ fun GameScreen(
         FirebaseManager.listenToRoom(roomCode).collectLatest { room ->
             if (room == null) return@collectLatest
             
+            val prevStatus = gameStatus
             currentAdmin = room.admin
             gameStatus = room.status
             val imposterId = room.imposterId
@@ -122,14 +123,19 @@ fun GameScreen(
             chatMessages = room.chatMessages.entries.sortedBy { it.key }.map { it.value }
             players = room.players
             
-            // Automatski reset ako je admin izbačen ili ako je impostor izbačen
-            if (gameStatus == "started" && isUserAdmin) {
-                val shouldReset = (imposterId.isNotEmpty() && !room.players.containsKey(imposterId)) || 
-                                 (room.players.size <= 1) ||
-                                 (!room.players.containsKey(room.admin) && sanitizedName != room.admin)
+            // AUTOMATSKI RESET: Ako je igra u tijeku, a ostao je samo 1 igrač (ili je impostor izbačen)
+            if (gameStatus == "started") {
+                // Određujemo jesmo li MI ti koji trebaju poslati reset (kako ne bi svi odjednom slali)
+                val currentEffAdmin = if (room.players.containsKey(room.admin)) room.admin 
+                                     else room.players.values.sortedBy { it.joinedAt }.firstOrNull()?.name
                 
-                if (shouldReset) {
-                    FirebaseManager.resetToLobby(roomCode)
+                if (sanitizedName == currentEffAdmin) {
+                    val impostorKicked = imposterId.isNotEmpty() && !room.players.containsKey(imposterId)
+                    val onlyOneLeft = room.players.size <= 1
+                    
+                    if (impostorKicked || onlyOneLeft) {
+                        FirebaseManager.resetToLobby(roomCode)
+                    }
                 }
             }
 
@@ -147,6 +153,7 @@ fun GameScreen(
     }
 
     LaunchedEffect(players) {
+        // Ako smo izbačeni iz liste igrača, a igra još traje, vratimo se u lobby
         if (gameStatus == "started" && players.isNotEmpty() && !players.containsKey(sanitizedName)) {
             onRepeat()
         }
@@ -451,7 +458,7 @@ fun GameScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         wordRevealCard(Modifier.widthIn(max = 600.dp).fillMaxWidth().height(400.dp), true)
-                        Spacer(modifier = Modifier.height(64.dp))
+                        Spacer(Modifier.height(64.dp))
                         actionButtons(Modifier.widthIn(max = 600.dp).fillMaxWidth(), true)
                     }
                     
