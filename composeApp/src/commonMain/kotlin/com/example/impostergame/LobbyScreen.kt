@@ -149,7 +149,8 @@ fun LobbyScreen(
                 
                 Surface(
                     modifier = Modifier
-                        .requiredSize(if (isWideScreen) 180.dp else 80.dp),
+                        .requiredSize(if (isWideScreen) 180.dp else 80.dp)
+                        .aspectRatio(1f),
                     color = Color.White,
                     shape = RoundedCornerShape(12.dp)
                 ) {
