@@ -78,21 +78,21 @@ fun App() {
         settings.putBoolean("isAdmin", isAdmin)
     }
 
-    // Logika za animiranu pozadinu
+    // Logika za animiranu pozadinu (sada koristimo 0..1 progress)
     val infiniteTransition = rememberInfiniteTransition()
-    val xOffset by infiniteTransition.animateFloat(
+    val xProgress by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 400f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(10000, easing = LinearEasing),
+            animation = tween(12000, easing = LinearOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         )
     )
-    val yOffset by infiniteTransition.animateFloat(
+    val yProgress by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 800f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(15000, easing = LinearEasing),
+            animation = tween(18000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         )
     )
@@ -109,7 +109,7 @@ fun App() {
     }
 
     ImposterGameTheme {
-        AnimatedBackground(xOffset = xOffset, yOffset = yOffset) {
+        AnimatedBackground(xOffset = xProgress, yOffset = yProgress) {
             Surface(modifier = Modifier.fillMaxSize(), color = androidx.compose.ui.graphics.Color.Transparent) {
                 when (currentScreen) {
                     Screen.ENTER_NAME -> {

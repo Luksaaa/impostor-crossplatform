@@ -15,19 +15,16 @@ import com.example.impostergame.ui.theme.*
 
 @Composable
 fun AnimatedBackground(
-    xOffset: Float,
-    yOffset: Float,
+    xOffset: Float, // Očekuje se 0..1f progress
+    yOffset: Float, // Očekuje se 0..1f progress
     content: @Composable () -> Unit
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val backgroundColor = if (isDarkTheme) Color(0xFF121212) else Color(0xFFF5F5F5)
     
     // Povećavamo vidljivost boja
-    val blueAlpha = if (isDarkTheme) 0.3f else 0.5f
-    val purpleAlpha = if (isDarkTheme) 0.3f else 0.5f
-
-    val blueRadius = 400.dp
-    val purpleRadius = 350.dp
+    val blueAlpha = if (isDarkTheme) 0.25f else 0.4f
+    val purpleAlpha = if (isDarkTheme) 0.25f else 0.4f
 
     Box(
         modifier = Modifier
@@ -35,30 +32,37 @@ fun AnimatedBackground(
             .background(backgroundColor)
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
+            val width = size.width
+            val height = size.height
+
+            // Plavi krug koji se kreće po cijelom ekranu
+            val blueRadius = (width.coerceAtMost(height) * 0.6f)
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
                         BlueGradient.copy(alpha = blueAlpha),
                         Color.Transparent
                     ),
-                    center = Offset(xOffset.dp.toPx(), yOffset.dp.toPx()),
-                    radius = blueRadius.toPx()
+                    center = Offset(width * xOffset, height * yOffset),
+                    radius = blueRadius
                 ),
-                radius = blueRadius.toPx(),
-                center = Offset(xOffset.dp.toPx(), yOffset.dp.toPx())
+                radius = blueRadius,
+                center = Offset(width * xOffset, height * yOffset)
             )
             
+            // Ljubičasti krug koji se kreće suprotno
+            val purpleRadius = (width.coerceAtMost(height) * 0.5f)
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
                         PurpleGradient.copy(alpha = purpleAlpha),
                         Color.Transparent
                     ),
-                    center = Offset((400 - xOffset).dp.toPx(), (800 - yOffset).dp.toPx()),
-                    radius = purpleRadius.toPx()
+                    center = Offset(width * (1f - xOffset), height * (1f - yOffset)),
+                    radius = purpleRadius
                 ),
-                radius = purpleRadius.toPx(),
-                center = Offset((400 - xOffset).dp.toPx(), (800 - yOffset).dp.toPx())
+                radius = purpleRadius,
+                center = Offset(width * (1f - xOffset), height * (1f - yOffset))
             )
         }
         content()
