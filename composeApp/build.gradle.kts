@@ -88,7 +88,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "com.example.impostergame.AppMain"
+        mainClass = "com.example.impostergame.MainKt"
         nativeDistributions {
             targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg, org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi, org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb)
             packageName = "com.example.impostergame"

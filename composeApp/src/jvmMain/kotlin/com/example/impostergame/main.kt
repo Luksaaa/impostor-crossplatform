@@ -1,4 +1,3 @@
-@file:JvmName("AppMain")
 package com.example.impostergame
 
 import androidx.compose.ui.unit.dp
