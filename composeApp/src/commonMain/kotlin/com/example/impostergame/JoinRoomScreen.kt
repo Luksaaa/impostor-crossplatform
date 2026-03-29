@@ -186,7 +186,8 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                                     textAlign = TextAlign.Center
                                 ) 
                             },
-                            modifier = Modifier.weight(1f).height(if (isWideScreen) 80.dp else 64.dp),
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 80.dp else 64.dp),
                             shape = RoundedCornerShape(12.dp),
                             textStyle = LocalTextStyle.current.copy(
                                 fontSize = if (isWideScreen) 20.sp else 16.sp,
