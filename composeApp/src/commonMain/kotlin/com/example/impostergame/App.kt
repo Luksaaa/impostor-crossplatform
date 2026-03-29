@@ -10,6 +10,9 @@ import com.example.impostergame.ui.components.AnimatedBackground
 import com.example.impostergame.ui.theme.ImposterGameTheme
 import com.russhwolf.settings.Settings
 
+/**
+ * Minimalna implementacija Settings za Preview okruženje
+ */
 private class MockSettings : Settings {
     private val data = mutableMapOf<String, Any?>()
     override val keys: Set<String> get() = data.keys
