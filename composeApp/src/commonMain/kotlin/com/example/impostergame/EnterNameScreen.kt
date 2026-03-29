@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.impostergame.ui.theme.*
@@ -92,12 +93,23 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                             name = it
                             errorMessage = null 
                         },
-                        placeholder = { Text("Username...", color = textColor.copy(alpha = 0.4f), fontSize = if (isWideScreen) 20.sp else 16.sp) },
+                        placeholder = { 
+                            Text(
+                                "Username...", 
+                                color = textColor.copy(alpha = 0.4f), 
+                                fontSize = if (isWideScreen) 20.sp else 16.sp,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            ) 
+                        },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 72.dp else 64.dp),
                         shape = RoundedCornerShape(12.dp),
                         isError = errorMessage != null,
-                        textStyle = LocalTextStyle.current.copy(fontSize = if (isWideScreen) 20.sp else 16.sp),
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = if (isWideScreen) 20.sp else 16.sp,
+                            textAlign = TextAlign.Center
+                        ),
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = SageGreen,
@@ -113,7 +125,7 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                             text = errorMessage!!,
                             color = MutedRose,
                             fontSize = if (isWideScreen) 16.sp else 12.sp,
-                            modifier = Modifier.padding(top = 4.dp).align(Alignment.Start)
+                            modifier = Modifier.padding(top = 8.dp).align(Alignment.Start)
                         )
                     }
 
@@ -121,7 +133,8 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         Checkbox(
                             checked = rememberMe,

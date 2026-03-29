@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.impostergame.ui.components.CameraScanner
@@ -26,6 +27,7 @@ import com.example.impostergame.ui.theme.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> Unit) {
     var inputCode by remember { mutableStateOf("") }
@@ -104,132 +106,162 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
         return
     }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        val isWideScreen = maxWidth > 800.dp
+        
+        // Back Button (Top Left for Desktop)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(if (isWideScreen) 32.dp else 16.dp),
+            contentAlignment = Alignment.TopStart
+        ) {
+            Surface(
+                onClick = onBack,
+                color = if (isWideScreen) textColor.copy(alpha = 0.1f) else Color.Transparent,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.size(if (isWideScreen) 64.dp else 48.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, 
+                        contentDescription = "Back", 
+                        tint = textColor,
+                        modifier = Modifier.size(if (isWideScreen) 32.dp else 24.dp)
+                    )
+                }
+            }
+        }
+
         Column(
             modifier = Modifier
-                .widthIn(max = 500.dp)
+                .widthIn(max = if (isWideScreen) 800.dp else 600.dp)
                 .fillMaxSize()
-                .padding(24.dp)
-                .statusBarsPadding()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            IconButton(onClick = onBack) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = textColor)
-            }
+            Text(
+                text = "Pridruži se",
+                fontSize = if (isWideScreen) 56.sp else 32.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = textColor
+            )
+            
+            Spacer(modifier = Modifier.height(if (isWideScreen) 64.dp else 48.dp))
 
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = inputContainerColor.copy(alpha = 0.9f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                Text(
-                    text = "Pridruži se",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = textColor
-                )
-                
-                Spacer(modifier = Modifier.height(48.dp))
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = inputContainerColor.copy(alpha = 0.9f)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                Column(
+                    modifier = Modifier.padding(if (isWideScreen) 48.dp else 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Unesi kod sobe",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = textColor
-                        )
-                        
-                        Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Unesi kod sobe",
+                        fontSize = if (isWideScreen) 24.sp else 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    )
+                    
+                    Spacer(modifier = Modifier.height(if (isWideScreen) 24.dp else 16.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            OutlinedTextField(
-                                value = inputCode,
-                                onValueChange = { 
-                                    if (it.length <= 6) inputCode = it.uppercase() 
-                                    errorMessage = ""
-                                },
-                                placeholder = { Text("ABC 123", color = textColor.copy(alpha = 0.4f)) },
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Text,
-                                    capitalization = KeyboardCapitalization.Characters
-                                ),
-                                isError = errorMessage.isNotEmpty(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = accentColor,
-                                    unfocusedBorderColor = textColor.copy(alpha = 0.2f),
-                                    focusedTextColor = textColor,
-                                    unfocusedTextColor = textColor
-                                ),
-                                enabled = !isJoining
-                            )
-                        }
-                        
-                        if (errorMessage.isNotEmpty()) {
-                            Text(
-                                text = errorMessage, 
-                                color = MaterialTheme.colorScheme.error, 
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
-                        
-                        Button(
-                            onClick = {
-                                if (inputCode.length == 6) {
-                                    attemptJoin(inputCode)
-                                } else {
-                                    errorMessage = "Kod mora imati 6 znakova"
-                                }
+                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            value = inputCode,
+                            onValueChange = { 
+                                if (it.length <= 6) inputCode = it.uppercase() 
+                                errorMessage = ""
                             },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (inputCode.length == 6 && !isJoining) accentColor else accentColor.copy(alpha = 0.5f),
-                                contentColor = Color.White
+                            placeholder = { 
+                                Text(
+                                    "ABC 123", 
+                                    color = textColor.copy(alpha = 0.4f), 
+                                    fontSize = if (isWideScreen) 20.sp else 16.sp,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                ) 
+                            },
+                            modifier = Modifier.weight(1f).height(if (isWideScreen) 80.dp else 64.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            textStyle = LocalTextStyle.current.copy(
+                                fontSize = if (isWideScreen) 20.sp else 16.sp,
+                                textAlign = TextAlign.Center
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                capitalization = KeyboardCapitalization.Characters
+                            ),
+                            isError = errorMessage.isNotEmpty(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = accentColor,
+                                unfocusedBorderColor = textColor.copy(alpha = 0.2f),
+                                focusedTextColor = textColor,
+                                unfocusedTextColor = textColor
                             ),
                             enabled = !isJoining
-                        ) {
-                            if (isJoining) {
-                                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+                        )
+                    }
+                    
+                    if (errorMessage.isNotEmpty()) {
+                        Text(
+                            text = errorMessage, 
+                            color = MaterialTheme.colorScheme.error, 
+                            fontSize = if (isWideScreen) 16.sp else 14.sp,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(if (isWideScreen) 32.dp else 24.dp))
+                    
+                    Button(
+                        onClick = {
+                            if (inputCode.length == 6) {
+                                attemptJoin(inputCode)
                             } else {
-                                Text("PRIDRUŽI SE", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                                errorMessage = "Kod mora imati 6 znakova"
                             }
+                        },
+                        modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 80.dp else 56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (inputCode.length == 6 && !isJoining) accentColor else accentColor.copy(alpha = 0.5f),
+                            contentColor = Color.White
+                        ),
+                        enabled = !isJoining
+                    ) {
+                        if (isJoining) {
+                            CircularProgressIndicator(modifier = Modifier.size(if (isWideScreen) 32.dp else 24.dp), color = Color.White, strokeWidth = 2.dp)
+                        } else {
+                            Text("PRIDRUŽI SE", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp, fontSize = if (isWideScreen) 20.sp else 16.sp)
                         }
                     }
                 }
+            }
 
-                if (!isKeyboardVisible) {
-                    Spacer(modifier = Modifier.height(32.dp))
+            if (!isKeyboardVisible) {
+                Spacer(modifier = Modifier.height(if (isWideScreen) 48.dp else 32.dp))
 
-                    Surface(
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .clickable { showScanner = true },
-                        color = inputContainerColor.copy(alpha = 0.9f),
-                        tonalElevation = 4.dp,
-                        shadowElevation = 8.dp
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = Icons.Default.QrCodeScanner,
-                                contentDescription = "Skeniraj QR kod",
-                                modifier = Modifier.size(32.dp),
-                                tint = textColor
-                            )
-                        }
+                Surface(
+                    modifier = Modifier
+                        .size(if (isWideScreen) 100.dp else 64.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable { showScanner = true },
+                    color = inputContainerColor.copy(alpha = 0.9f),
+                    tonalElevation = 4.dp,
+                    shadowElevation = 8.dp
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.QrCodeScanner,
+                            contentDescription = "Skeniraj QR kod",
+                            modifier = Modifier.size(if (isWideScreen) 48.dp else 32.dp),
+                            tint = textColor
+                        )
                     }
                 }
             }
