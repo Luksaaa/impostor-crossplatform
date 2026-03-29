@@ -290,9 +290,9 @@ object GitLiveFirebaseManager : IFirebaseManager {
                         .sortedBy { it.joinedAt }
                         .firstOrNull()?.name
                         
-                    exitMsg = "$playerName je izašao, privremeni admin je $nextActiveAdmin"
+                    exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
                 } else {
-                    exitMsg = "$playerName je izašao"
+                    exitMsg = "$playerName je izbačen"
                 }
                 
                 updates["messages/exit_$timestamp"] = exitMsg

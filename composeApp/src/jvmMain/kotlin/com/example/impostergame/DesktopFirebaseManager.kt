@@ -144,7 +144,6 @@ object DesktopFirebaseManager : IFirebaseManager {
                     }
                     
                     updates["messages/exit_$timestamp"] = JsonPrimitive(exitMsg)
-                    // Dodajemo u chatMessages za prikaz u igri
                     updates["chatMessages/sys_$timestamp"] = json.encodeToJsonElement(ChatMessage("Sustav", exitMsg, timestamp))
                     
                     patchData(roomCode, JsonObject(updates))
@@ -300,9 +299,9 @@ object DesktopFirebaseManager : IFirebaseManager {
                         .sortedBy { it.joinedAt }
                         .firstOrNull()?.name
                     
-                    exitMsg = "$playerName je izašao, privremeni admin je $nextActiveAdmin"
+                    exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
                 } else {
-                    exitMsg = "$playerName je izašao"
+                    exitMsg = "$playerName je izbačen"
                 }
                 
                 updates["messages/exit_$timestamp"] = JsonPrimitive(exitMsg)
