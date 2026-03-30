@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -339,16 +341,21 @@ fun GameScreen(
                         }
                     }
                 }
+
+                fun sendMessage() {
+                    if (chatInput.trim().isNotBlank()) {
+                        FirebaseManager.sendMessage(roomCode, sanitizedName, chatInput.trim())
+                        chatInput = ""
+                    }
+                }
+
                 Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     TextField(
                         value = chatInput, 
                         onValueChange = { chatInput = it }, 
                         modifier = Modifier.weight(1f).onKeyEvent { event ->
-                            if (event.key == Key.Enter && event.type == KeyEventType.KeyDown) {
-                                if (chatInput.trim().isNotBlank()) {
-                                    FirebaseManager.sendMessage(roomCode, sanitizedName, chatInput.trim())
-                                    chatInput = ""
-                                }
+                            if ((event.key == Key.Enter || event.key == Key.NumPadEnter) && event.type == KeyEventType.KeyDown) {
+                                sendMessage()
                                 true
                             } else {
                                 false
@@ -357,15 +364,15 @@ fun GameScreen(
                         placeholder = { Text("Napiši nešto...", fontSize = if (isWideScreen) 18.sp else 16.sp) }, 
                         colors = TextFieldDefaults.colors(focusedContainerColor = textColor.copy(alpha = 0.05f), unfocusedContainerColor = textColor.copy(alpha = 0.05f), focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent), 
                         shape = RoundedCornerShape(24.dp),
-                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            imeAction = ImeAction.Send
+                        ),
+                        keyboardActions = KeyboardActions(onSend = { sendMessage() })
                     )
                     Spacer(Modifier.width(8.dp))
-                    IconButton(onClick = { 
-                        if (chatInput.trim().isNotBlank()) { 
-                            FirebaseManager.sendMessage(roomCode, sanitizedName, chatInput.trim())
-                            chatInput = "" 
-                        } 
-                    }, modifier = Modifier.background(accentColor, CircleShape).size(if (isWideScreen) 56.dp else 48.dp)) { Icon(Icons.AutoMirrored.Filled.Send, null, tint = Color.White, modifier = Modifier.size(if (isWideScreen) 24.dp else 20.dp)) }
+                    IconButton(onClick = { sendMessage() }, modifier = Modifier.background(accentColor, CircleShape).size(if (isWideScreen) 56.dp else 48.dp)) { Icon(Icons.AutoMirrored.Filled.Send, null, tint = Color.White, modifier = Modifier.size(if (isWideScreen) 24.dp else 20.dp)) }
                 }
             }
         }
