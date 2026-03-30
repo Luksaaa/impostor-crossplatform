@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Imposter Game</title>
+    <style>
+        html, body {
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+        #compose-container {
+            height: 100%;
+            width: 100%;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="compose-container"></div>
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVCAt5v_bHtr78NPu3ZSuixJFYFvPeIJ8",
+            authDomain: "gameofimpostor.firebaseapp.com",
+            databaseURL: "https://gameofimpostor-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "gameofimpostor",
+            storageBucket: "gameofimpostor.firebasestorage.app",
+            messagingSenderId: "96950655117",
+            appId: "1:96950655117:web:0fc5eeb2b12ca36a7a6ac4",
+            measurementId: "G-8T89RQW3SS"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <script src="skiko.js"></script>
+    <script src="composeApp.js"></script>
+</body>
+</html>
