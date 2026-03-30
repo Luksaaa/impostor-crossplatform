@@ -27,10 +27,10 @@ kotlin {
 
     // Standardni JS target za Web
     js {
-        outputModuleName.set("composeApp")
+        outputModuleName.set("impostor-cross-platform")
         browser {
             commonWebpackConfig {
-                outputFileName = "composeApp.js"
+                outputFileName = "impostor-cross-platform.js"
             }
         }
         binaries.executable()
@@ -42,7 +42,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "ImpostorCrossPlatform"
             isStatic = true
         }
     }

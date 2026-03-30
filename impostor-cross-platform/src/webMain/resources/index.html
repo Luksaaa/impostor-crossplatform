@@ -10,6 +10,7 @@
             padding: 0;
             height: 100%;
             width: 100%;
+            background-color: #000;
         }
         #compose-container {
             height: 100%;
@@ -21,9 +22,9 @@
 <body>
     <div id="compose-container"></div>
 
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js"></script>
+    <!-- Koristimo COMPAT verzije Firebase-a za jednostavnije učitavanje putem script taga -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -37,11 +38,11 @@
             measurementId: "G-8T89RQW3SS"
         };
 
-        // Initialize Firebase
+        // Inicijalizacija globalnog firebase objekta
         firebase.initializeApp(firebaseConfig);
     </script>
 
     <script src="skiko.js"></script>
-    <script src="composeApp.js"></script>
+    <script src="impostor-cross-platform.js"></script>
 </body>
 </html>

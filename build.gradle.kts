@@ -13,7 +13,7 @@ plugins {
 }
 
 tasks.register("desktopRun") {
-    dependsOn(":composeApp:run")
+    dependsOn(":impostor-cross-platform:run")
     group = "application"
     description = "Runs the desktop application."
 }
