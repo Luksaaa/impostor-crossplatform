@@ -146,14 +146,16 @@ object GitLiveFirebaseManager : IFirebaseManager {
                             .sortedBy { it.joinedAt }
                             .firstOrNull()?.name
                         
-                        exitMsg = "$sanitizedName je izašao, privremeni admin je $nextActiveAdmin"
+                        exitMsg = "$sanitizedName je izašao, novi admin je $nextActiveAdmin"
+                        updates["admin"] = nextActiveAdmin
                     } else {
                         exitMsg = "$sanitizedName je izašao"
                     }
                     
                     updates["messages/exit_$timestamp"] = exitMsg
-                    // Dodajemo i u chat poruke za prikaz tijekom igre
-                    updates["chatMessages/sys_$timestamp"] = ChatMessage("Sustav", exitMsg, timestamp)
+                    
+                    val sysMsgKey = roomRef.child("chatMessages").push().key
+                    updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
                     
                     roomRef.updateChildren(updates)
                 }
@@ -279,7 +281,6 @@ object GitLiveFirebaseManager : IFirebaseManager {
                 val updates = mutableMapOf<String, Any?>()
                 updates["players/$playerName"] = null
 
-                val exitMsg: String
                 if (currentAdmin == playerName) {
                     val playersSnapshots = mutableListOf<DataSnapshot>()
                     snapshot.child("players").children.forEach { playersSnapshots.add(it) }
@@ -290,13 +291,14 @@ object GitLiveFirebaseManager : IFirebaseManager {
                         .sortedBy { it.joinedAt }
                         .firstOrNull()?.name
                         
-                    exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
-                } else {
-                    exitMsg = "$playerName je izbačen"
+                    updates["admin"] = nextActiveAdmin
                 }
                 
+                val exitMsg = "$playerName je izbačen"
                 updates["messages/exit_$timestamp"] = exitMsg
-                updates["chatMessages/sys_$timestamp"] = ChatMessage("Sustav", exitMsg, timestamp)
+                
+                val sysMsgKey = roomRef.child("chatMessages").push().key
+                updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
                 
                 roomRef.updateChildren(updates)
             } catch (e: Exception) {}

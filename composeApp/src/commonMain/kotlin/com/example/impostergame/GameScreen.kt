@@ -120,7 +120,8 @@ fun GameScreen(
                 else -> room.mainWord
             }
 
-            chatMessages = room.chatMessages.entries.sortedBy { it.key }.map { it.value }
+            // Sortiramo po timestampu kako bi poruke (uključujući sistemske) bile u točnom kronološkom redoslijedu
+            chatMessages = room.chatMessages.values.sortedBy { it.timestamp }
             players = room.players
             
             // AUTOMATSKI RESET: Ako je igra u tijeku, a ostao je samo 1 igrač (ili je impostor izbačen)

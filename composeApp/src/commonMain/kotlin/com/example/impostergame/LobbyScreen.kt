@@ -61,14 +61,12 @@ fun LobbyScreen(
     var players by remember { mutableStateOf<Map<String, PlayerInfo>>(emptyMap()) }
     
     // Provjera tko ima ovlasti (originalni admin ili najstariji preostali igrač)
-    val isUserAdmin = remember(currentAdmin, players, sanitizedName) {
-        if (currentAdmin == sanitizedName) return@remember true
-        if (!players.containsKey(currentAdmin)) {
-            val oldestPlayer = players.values.sortedBy { it.joinedAt }.firstOrNull()
-            return@remember oldestPlayer?.name == sanitizedName
-        }
-        false
+    val effectiveAdminName = remember(currentAdmin, players) {
+        if (players.containsKey(currentAdmin)) currentAdmin
+        else players.values.sortedBy { it.joinedAt }.firstOrNull()?.name ?: currentAdmin
     }
+    
+    val isUserAdmin = sanitizedName == effectiveAdminName
     
     @Suppress("DEPRECATION")
     val clipboardManager = LocalClipboardManager.current
@@ -99,11 +97,12 @@ fun LobbyScreen(
                 FirebaseManager.joinRoom(roomCode, sanitizedName)
             }
 
-            val msgList = mutableListOf<String>()
-            room.messages.values.forEach { msg ->
-                msgList.add(msg)
-            }
-            messages = msgList.reversed()
+            // Sortiramo poruke tako da najnovija bude na vrhu popisa
+            val sortedMsgs = room.messages.entries
+                .sortedByDescending { it.key } 
+                .map { it.value }
+            
+            messages = sortedMsgs
         }
     }
 
@@ -166,7 +165,7 @@ fun LobbyScreen(
             Spacer(modifier = Modifier.height(32.dp))
             
             Text(
-                text = if (isUserAdmin) "Ti si ADMIN" else "Admin je: $currentAdmin", 
+                text = if (isUserAdmin) "Ti si ADMIN" else "Admin je: $effectiveAdminName",
                 color = if (isUserAdmin) Gold else textColor.copy(alpha = 0.5f),
                 fontWeight = FontWeight.Bold,
                 fontSize = if (isWideScreen) 24.sp else 14.sp
