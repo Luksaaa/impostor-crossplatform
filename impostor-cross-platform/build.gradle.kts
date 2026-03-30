@@ -27,10 +27,10 @@ kotlin {
 
     // Standardni JS target za Web
     js {
-        outputModuleName.set("impostor-cross-platform")
+        outputModuleName.set("impostergame_web")
         browser {
             commonWebpackConfig {
-                outputFileName = "impostor-cross-platform.js"
+                outputFileName = "impostergame_web.js"
             }
         }
         binaries.executable()
@@ -96,12 +96,7 @@ kotlin {
         }
 
         val jsMain by getting {
-            // Povezujemo jsMain s webMain kodom
-            kotlin.srcDirs("src/webMain/kotlin")
-            resources.srcDirs("src/webMain/resources")
-            dependencies {
-                implementation(compose.html.core)
-            }
+            // Using standard directories
         }
     }
 }
