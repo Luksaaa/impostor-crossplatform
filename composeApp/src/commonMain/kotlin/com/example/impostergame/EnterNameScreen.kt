@@ -37,7 +37,20 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
             .imePadding(),
         contentAlignment = Alignment.Center
     ) {
-        val isWideScreen = maxWidth > 800.dp
+        val width = maxWidth
+        val height = maxHeight
+        
+        val isMobile = width < 600.dp
+        val isDesktop = width >= 1000.dp
+        
+        val titleSize = when {
+            isDesktop -> 56.sp
+            width >= 600.dp -> 48.sp
+            else -> 36.sp
+        }
+        
+        val cardPadding = if (isMobile) 24.dp else 48.dp
+        val spacerHeight = if (height < 600.dp) 20.dp else 40.dp
         
         Column(
             modifier = Modifier
@@ -48,15 +61,15 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(if (isWideScreen) 60.dp else 40.dp))
+            Spacer(modifier = Modifier.height(spacerHeight))
 
             Text(
                 text = "IMPOSTOR GAME",
-                fontSize = if (isWideScreen) 56.sp else 36.sp,
+                fontSize = titleSize,
                 fontWeight = FontWeight.ExtraBold,
                 color = SageGreen,
-                letterSpacing = if (isWideScreen) 6.sp else 4.sp,
-                lineHeight = if (isWideScreen) 64.sp else 42.sp,
+                letterSpacing = if (width > 600.dp) 6.sp else 4.sp,
+                lineHeight = if (width > 600.dp) 64.sp else 42.sp,
                 textAlign = TextAlign.Center
             )
             
@@ -64,12 +77,12 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
             
             Text(
                 text = "Tko je među nama?",
-                fontSize = if (isWideScreen) 22.sp else 16.sp,
+                fontSize = if (width > 600.dp) 22.sp else 16.sp,
                 color = textColor.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(if (isWideScreen) 80.dp else 60.dp))
+            Spacer(modifier = Modifier.height(if (height < 700.dp) 40.dp else 60.dp))
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -78,17 +91,17 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(if (isWideScreen) 48.dp else 24.dp),
+                    modifier = Modifier.padding(cardPadding),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "Unesi svoje ime",
-                        fontSize = if (isWideScreen) 24.sp else 18.sp,
+                        fontSize = if (width > 600.dp) 24.sp else 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = textColor
                     )
                     
-                    Spacer(modifier = Modifier.height(if (isWideScreen) 24.dp else 16.dp))
+                    Spacer(modifier = Modifier.height(if (width > 600.dp) 24.dp else 16.dp))
 
                     OutlinedTextField(
                         value = name,
@@ -100,17 +113,17 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                             Text(
                                 "Username...", 
                                 color = textColor.copy(alpha = 0.4f), 
-                                fontSize = if (isWideScreen) 20.sp else 16.sp,
+                                fontSize = if (width > 600.dp) 20.sp else 16.sp,
                                 modifier = Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Center
                             ) 
                         },
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 72.dp else 64.dp),
+                        modifier = Modifier.fillMaxWidth().height(if (width > 600.dp) 72.dp else 64.dp),
                         shape = RoundedCornerShape(12.dp),
                         isError = errorMessage != null,
                         textStyle = LocalTextStyle.current.copy(
-                            fontSize = if (isWideScreen) 20.sp else 16.sp,
+                            fontSize = if (width > 600.dp) 20.sp else 16.sp,
                             textAlign = TextAlign.Center
                         ),
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
@@ -127,12 +140,12 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                         Text(
                             text = errorMessage!!,
                             color = MutedRose,
-                            fontSize = if (isWideScreen) 16.sp else 12.sp,
+                            fontSize = if (width > 600.dp) 16.sp else 12.sp,
                             modifier = Modifier.padding(top = 8.dp).align(Alignment.Start)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(if (isWideScreen) 24.dp else 12.dp))
+                    Spacer(modifier = Modifier.height(if (width > 600.dp) 24.dp else 12.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -143,18 +156,18 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                             checked = rememberMe,
                             onCheckedChange = { rememberMe = it },
                             colors = CheckboxDefaults.colors(checkedColor = SageGreen),
-                            modifier = Modifier.scale(if (isWideScreen) 1.5f else 1.0f)
+                            modifier = Modifier.scale(if (width > 600.dp) 1.5f else 1.0f)
                         )
-                        Spacer(Modifier.width(if (isWideScreen) 12.dp else 0.dp))
+                        Spacer(Modifier.width(if (width > 600.dp) 12.dp else 0.dp))
                         Text(
                             text = "Zapamti me",
                             color = textColor,
-                            fontSize = if (isWideScreen) 18.sp else 14.sp,
+                            fontSize = if (width > 600.dp) 18.sp else 14.sp,
                             modifier = Modifier.clickable { rememberMe = !rememberMe }
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(if (isWideScreen) 48.dp else 24.dp))
+                    Spacer(modifier = Modifier.height(if (width > 600.dp) 48.dp else 24.dp))
 
                     Button(
                         onClick = { 
@@ -167,14 +180,14 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(if (isWideScreen) 80.dp else 56.dp),
+                            .height(if (width > 600.dp) 80.dp else 56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = SageGreen,
                             contentColor = Color.White
                         )
                     ) {
-                        Text("KRENI", fontWeight = FontWeight.Bold, fontSize = if (isWideScreen) 24.sp else 18.sp)
+                        Text("KRENI", fontWeight = FontWeight.Bold, fontSize = if (width > 600.dp) 24.sp else 18.sp)
                     }
                 }
             }

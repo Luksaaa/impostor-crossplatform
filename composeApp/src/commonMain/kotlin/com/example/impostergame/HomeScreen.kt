@@ -34,35 +34,61 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
     var showRules by remember { mutableStateOf(false) }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val isWideScreen = maxWidth > 800.dp
+        val width = maxWidth
+        val height = maxHeight
+        
+        // Adaptive scaling factors
+        val isMobile = width < 600.dp
+        val isTablet = width >= 600.dp && width < 1000.dp
+        val isDesktop = width >= 1000.dp
+        
+        val titleSize = when {
+            isDesktop -> 64.sp
+            isTablet -> 48.sp
+            else -> 32.sp
+        }
+        
+        val subTitleSize = when {
+            isDesktop -> 24.sp
+            isTablet -> 20.sp
+            else -> 16.sp
+        }
+        
+        val buttonHeight = when {
+            isDesktop -> 160.dp
+            isTablet -> 130.dp
+            else -> 100.dp
+        }
+
+        val buttonPadding = if (isMobile) 24.dp else 40.dp
         
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(
                 modifier = Modifier
-                    .widthIn(max = if (isWideScreen) 800.dp else 600.dp)
+                    .widthIn(max = 800.dp)
                     .fillMaxWidth()
                     .statusBarsPadding()
                     .verticalScroll(rememberScrollState())
-                    .padding(24.dp),
+                    .padding(horizontal = buttonPadding, vertical = 24.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(if (isWideScreen) 100.dp else 60.dp))
+                Spacer(modifier = Modifier.height(if (height < 600.dp) 20.dp else 60.dp))
 
                 Text(
                     text = "Bok, $username!",
-                    fontSize = if (isWideScreen) 80.sp else 32.sp,
+                    fontSize = titleSize,
                     fontWeight = FontWeight.ExtraBold,
                     color = textColor
                 )
                 
                 Text(
                     text = "Spreman za novu rundu?",
-                    fontSize = if (isWideScreen) 32.sp else 16.sp,
+                    fontSize = subTitleSize,
                     color = textColor.copy(alpha = 0.6f)
                 )
 
-                Spacer(modifier = Modifier.height(if (isWideScreen) 100.dp else 60.dp))
+                Spacer(modifier = Modifier.height(if (height < 600.dp) 40.dp else 80.dp))
 
                 AestheticButton(
                     text = "Napravi sobu",
@@ -70,10 +96,11 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
                     icon = Icons.Default.Add,
                     onClick = onCreateRoom,
                     color = SageGreen,
-                    isWideScreen = isWideScreen
+                    height = buttonHeight,
+                    isDesktop = isDesktop || isTablet
                 )
 
-                Spacer(modifier = Modifier.height(if (isWideScreen) 40.dp else 24.dp))
+                Spacer(modifier = Modifier.height(if (isMobile) 24.dp else 32.dp))
 
                 AestheticButton(
                     text = "Pridruži se",
@@ -81,43 +108,41 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
                     icon = Icons.Default.Group,
                     onClick = onJoinRoom,
                     color = MutedRose,
-                    isWideScreen = isWideScreen
+                    height = buttonHeight,
+                    isDesktop = isDesktop || isTablet
                 )
                 
                 Spacer(modifier = Modifier.height(60.dp))
             }
 
-            // Info gumb u kutu (prikazuje se samo ako panel nije otvoren)
-            if (!showRules || !isWideScreen) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .statusBarsPadding()
-                        .padding(24.dp),
-                    contentAlignment = Alignment.TopEnd
+            // Info gumb u kutu
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .padding(if (isMobile) 16.dp else 24.dp),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                Surface(
+                    onClick = { showRules = true },
+                    color = Color.Transparent,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.size(if (isMobile) 48.dp else 64.dp)
                 ) {
-                    Surface(
-                        onClick = { showRules = true },
-                        color = Color.Transparent,
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.size(if (isWideScreen) 80.dp else 48.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = "Pravila",
-                                tint = textColor.copy(alpha = 0.6f),
-                                modifier = Modifier.size(if (isWideScreen) 56.dp else 32.dp)
-                            )
-                        }
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Pravila",
+                            tint = textColor.copy(alpha = 0.6f),
+                            modifier = Modifier.size(if (isMobile) 32.dp else 40.dp)
+                        )
                     }
                 }
             }
         }
 
-        // Responzivni prikaz pravila (Side Panel za Desktop/Web/Mac)
-        if (isWideScreen) {
-            // Prozirna pozadina koja zatvara panel na klik izvan njega
+        // Rules Panel/Sheet remains similar but with slightly adjusted widths
+        if (!isMobile) {
             if (showRules) {
                 Box(
                     modifier = Modifier
@@ -138,7 +163,7 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
                 Surface(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(520.dp),
+                        .width(if (width > 1200.dp) 520.dp else 400.dp),
                     color = (if (isDarkTheme) Color(0xFF1E1E1E) else Color.White).copy(alpha = 0.95f),
                     shape = RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp),
                     tonalElevation = 0.dp,
@@ -162,7 +187,7 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
                                 ) {
                                     Text(
                                         text = "Kako igrati?",
-                                        fontSize = 36.sp,
+                                        fontSize = if (isDesktop) 36.sp else 28.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         color = textColor
                                     )
@@ -171,19 +196,17 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
                                             imageVector = Icons.Default.Close,
                                             contentDescription = "Zatvori",
                                             tint = textColor,
-                                            modifier = Modifier.size(40.dp)
+                                            modifier = Modifier.size(if (isDesktop) 40.dp else 32.dp)
                                         )
                                     }
                                 }
                             }
-                            // Koristimo boju teksta za pravila unutar prozirnog panela
-                            RulesContent(textColor, isSidePanel = true)
+                            RulesContent(textColor, isSidePanel = true, isDesktop = isDesktop)
                         }
                     }
                 }
             }
         } else {
-            // ModalBottomSheet za mobitele
             if (showRules) {
                 ModalBottomSheet(
                     onDismissRequest = { showRules = false },
@@ -191,7 +214,7 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
                     dragHandle = { BottomSheetDefaults.DragHandle(color = textColor.copy(alpha = 0.2f)) },
                     modifier = Modifier.statusBarsPadding()
                 ) {
-                    RulesContent(textColor, isSidePanel = false)
+                    RulesContent(textColor, isSidePanel = false, isDesktop = false)
                 }
             }
         }
@@ -199,7 +222,7 @@ fun HomeScreen(username: String, onCreateRoom: () -> Unit, onJoinRoom: () -> Uni
 }
 
 @Composable
-fun RulesContent(textColor: Color, isSidePanel: Boolean) {
+fun RulesContent(textColor: Color, isSidePanel: Boolean, isDesktop: Boolean) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -212,39 +235,43 @@ fun RulesContent(textColor: Color, isSidePanel: Boolean) {
         RuleSection(
             "1. Dodjela uloga", 
             "Svi igrači dobivaju tajnu riječ. Većina dobiva istu, dok Imposter dobiva sličan pojam koji ga može zbuniti.", 
-            textColor
+            textColor,
+            isDesktop
         )
         
         RuleSection(
             "2. Opisivanje", 
             "Svaki igrač u krugu kaže točno JEDNU riječ (asocijaciju) koja opisuje njegov pojam.",
-            textColor
+            textColor,
+            isDesktop
         )
         
         RuleSection(
             "3. Zabranjene riječi", 
             "Strogo je zabranjeno izgovoriti samu tajnu riječ, njezine korijene ili njezine prijevode na druge jezike.", 
             textColor, 
+            isDesktop,
             isWarning = true
         )
         
         RuleSection(
             "4. Glasanje", 
             "Nakon kratke rasprave, svi na signal prstom upiru u sumnjivca. Osoba s najviše glasova ispada.", 
-            textColor
+            textColor,
+            isDesktop
         )
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 24.dp), color = textColor.copy(alpha = 0.2f))
 
-        Text("🏆 Cilj igre", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = textColor)
+        Text("🏆 Cilj igre", fontSize = if (isDesktop) 22.sp else 18.sp, fontWeight = FontWeight.Bold, color = textColor)
         Spacer(Modifier.height(12.dp))
         Text(
             "Većina: Razotkriti Impostera prije nego što on shvati vašu riječ.",
-            fontSize = 16.sp, color = textColor.copy(alpha = 0.9f)
+            fontSize = if (isDesktop) 16.sp else 14.sp, color = textColor.copy(alpha = 0.9f)
         )
         Text(
             "Imposter: Preživjeti blefiranjem i uklopiti se u ekipu do samog kraja.",
-            fontSize = 16.sp, color = textColor.copy(alpha = 0.9f), modifier = Modifier.padding(top = 6.dp)
+            fontSize = if (isDesktop) 16.sp else 14.sp, color = textColor.copy(alpha = 0.9f), modifier = Modifier.padding(top = 6.dp)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -254,19 +281,19 @@ fun RulesContent(textColor: Color, isSidePanel: Boolean) {
             shape = RoundedCornerShape(20.dp)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
-                Text("💡 Savjeti", fontWeight = FontWeight.Bold, color = if (isSidePanel) textColor else SageGreen, fontSize = 18.sp)
+                Text("💡 Savjeti", fontWeight = FontWeight.Bold, color = if (isSidePanel) textColor else SageGreen, fontSize = if (isDesktop) 18.sp else 16.sp)
                 Spacer(Modifier.height(12.dp))
                 Text(
                     "• Ne budi previše očigledan: Ako kažeš previše, Imposter će lako pogoditi vašu riječ i pobijediti.",
-                    fontSize = 15.sp, color = textColor.copy(alpha = 0.9f)
+                    fontSize = if (isDesktop) 15.sp else 13.sp, color = textColor.copy(alpha = 0.9f)
                 )
                 Text(
                     "• Pažljivo slušaj: Imposter često griješi u nijansama – prati tko se \"čudno\" nadovezuje.",
-                    fontSize = 15.sp, color = textColor.copy(alpha = 0.9f), modifier = Modifier.padding(top = 10.dp)
+                    fontSize = if (isDesktop) 15.sp else 13.sp, color = textColor.copy(alpha = 0.9f), modifier = Modifier.padding(top = 10.dp)
                 )
                 Text(
                     "• Blefiraj do kraja: Čak i ako si otkriven, uvjeri ih da je netko drugi zapravo uljez!",
-                    fontSize = 15.sp, color = textColor.copy(alpha = 0.9f), modifier = Modifier.padding(top = 10.dp)
+                    fontSize = if (isDesktop) 15.sp else 13.sp, color = textColor.copy(alpha = 0.9f), modifier = Modifier.padding(top = 10.dp)
                 )
             }
         }
@@ -275,20 +302,20 @@ fun RulesContent(textColor: Color, isSidePanel: Boolean) {
 }
 
 @Composable
-fun RuleSection(title: String, description: String, textColor: Color, isWarning: Boolean = false) {
+fun RuleSection(title: String, description: String, textColor: Color, isDesktop: Boolean, isWarning: Boolean = false) {
     Column(modifier = Modifier.padding(vertical = 12.dp)) {
-        Text(title, fontWeight = FontWeight.Bold, color = if (isWarning) MutedRose else textColor, fontSize = 18.sp)
+        Text(title, fontWeight = FontWeight.Bold, color = if (isWarning) MutedRose else textColor, fontSize = if (isDesktop) 18.sp else 16.sp)
         Spacer(Modifier.height(6.dp))
-        Text(description, color = textColor.copy(alpha = 0.8f), fontSize = 16.sp, lineHeight = 22.sp)
+        Text(description, color = textColor.copy(alpha = 0.8f), fontSize = if (isDesktop) 16.sp else 14.sp, lineHeight = if (isDesktop) 22.sp else 18.sp)
     }
 }
 
 @Composable
-fun AestheticButton(text: String, subText: String, icon: ImageVector, onClick: () -> Unit, color: Color, isWideScreen: Boolean = false) {
+fun AestheticButton(text: String, subText: String, icon: ImageVector, onClick: () -> Unit, color: Color, height: androidx.compose.ui.unit.Dp, isDesktop: Boolean) {
     val isDarkTheme = isSystemInDarkTheme()
     Button(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth().height(if (isWideScreen) 180.dp else 100.dp).padding(vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().height(height).padding(vertical = 4.dp),
         shape = RoundedCornerShape(28.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = color.copy(alpha = if (isDarkTheme) 0.15f else 0.9f),
@@ -298,23 +325,23 @@ fun AestheticButton(text: String, subText: String, icon: ImageVector, onClick: (
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically, 
-            modifier = Modifier.fillMaxSize().padding(horizontal = if (isWideScreen) 48.dp else 24.dp)
+            modifier = Modifier.fillMaxSize().padding(horizontal = if (isDesktop) 40.dp else 24.dp)
         ) {
             Surface(
-                modifier = Modifier.size(if (isWideScreen) 100.dp else 48.dp), 
+                modifier = Modifier.size(if (isDesktop) 80.dp else 56.dp), 
                 shape = RoundedCornerShape(24.dp), 
                 color = if (isDarkTheme) color.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.2f)
             ) {
                 Box(contentAlignment = Alignment.Center) { 
-                    Icon(icon, null, modifier = Modifier.size(if (isWideScreen) 56.dp else 24.dp)) 
+                    Icon(icon, null, modifier = Modifier.size(if (isDesktop) 40.dp else 28.dp)) 
                 }
             }
-            Spacer(Modifier.width(if (isWideScreen) 32.dp else 16.dp))
+            Spacer(Modifier.width(if (isDesktop) 24.dp else 16.dp))
             Column {
-                Text(text.uppercase(), fontWeight = FontWeight.ExtraBold, fontSize = if (isWideScreen) 36.sp else 18.sp)
+                Text(text.uppercase(), fontWeight = FontWeight.ExtraBold, fontSize = if (isDesktop) 28.sp else 18.sp)
                 Text(
                     text = subText, 
-                    fontSize = if (isWideScreen) 20.sp else 12.sp,
+                    fontSize = if (isDesktop) 16.sp else 12.sp,
                     color = (if (isDarkTheme) color else Color.White).copy(alpha = 0.7f),
                     fontWeight = FontWeight.Medium
                 )

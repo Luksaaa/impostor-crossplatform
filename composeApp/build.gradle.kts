@@ -25,6 +25,17 @@ kotlin {
         }
     }
 
+    // Standardni JS target za Web
+    js {
+        outputModuleName.set("composeApp")
+        browser {
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+            }
+        }
+        binaries.executable()
+    }
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -61,7 +72,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.zxing.core)
             
-            // CameraX & ML Kit for inline scanning
+            // CameraX & ML Kit
             implementation(libs.androidx.camera.core)
             implementation(libs.androidx.camera.camera2)
             implementation(libs.androidx.camera.lifecycle)
@@ -81,6 +92,12 @@ kotlin {
                 implementation(libs.kotlinx.coroutinesSwing)
                 implementation(libs.zxing.core)
                 implementation(libs.kotlinx.datetime)
+            }
+        }
+
+        val jsMain by getting {
+            dependencies {
+                implementation(compose.html.core)
             }
         }
     }
@@ -116,6 +133,5 @@ android {
 }
 
 dependencies {
-    // This is required for Android Studio Preview to find the Compose View Adapter
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

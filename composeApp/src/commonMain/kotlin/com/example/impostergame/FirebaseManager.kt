@@ -281,6 +281,7 @@ object GitLiveFirebaseManager : IFirebaseManager {
                 val updates = mutableMapOf<String, Any?>()
                 updates["players/$playerName"] = null
 
+                val exitMsg: String
                 if (currentAdmin == playerName) {
                     val playersSnapshots = mutableListOf<DataSnapshot>()
                     snapshot.child("players").children.forEach { playersSnapshots.add(it) }
@@ -292,9 +293,11 @@ object GitLiveFirebaseManager : IFirebaseManager {
                         .firstOrNull()?.name
                         
                     updates["admin"] = nextActiveAdmin
+                    exitMsg = "$playerName je izbačen, novi admin je $nextActiveAdmin"
+                } else {
+                    exitMsg = "$playerName je izbačen"
                 }
                 
-                val exitMsg = "$playerName je izbačen"
                 updates["messages/exit_$timestamp"] = exitMsg
                 
                 val sysMsgKey = roomRef.child("chatMessages").push().key
