@@ -135,6 +135,10 @@ android {
     }
 }
 
+tasks.withType<ProcessResources>().configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
