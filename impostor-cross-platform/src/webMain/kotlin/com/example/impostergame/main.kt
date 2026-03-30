@@ -1,11 +1,1 @@
-package com.example.impostergame
-
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.ComposeViewport
-
-@OptIn(ExperimentalComposeUiApi::class)
-fun main() {
-    ComposeViewport {
-        App()
-    }
-}
+// Moved to jsMain
