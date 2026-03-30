@@ -96,6 +96,9 @@ kotlin {
         }
 
         val jsMain by getting {
+            // Povezujemo jsMain s webMain kodom
+            kotlin.srcDirs("src/webMain/kotlin")
+            resources.srcDirs("src/webMain/resources")
             dependencies {
                 implementation(compose.html.core)
             }
