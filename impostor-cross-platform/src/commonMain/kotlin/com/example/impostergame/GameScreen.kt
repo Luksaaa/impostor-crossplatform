@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -342,7 +343,17 @@ fun GameScreen(
                     TextField(
                         value = chatInput, 
                         onValueChange = { chatInput = it }, 
-                        modifier = Modifier.weight(1f), 
+                        modifier = Modifier.weight(1f).onKeyEvent { event ->
+                            if (event.key == Key.Enter && event.type == KeyEventType.KeyDown) {
+                                if (chatInput.trim().isNotBlank()) {
+                                    FirebaseManager.sendMessage(roomCode, sanitizedName, chatInput.trim())
+                                    chatInput = ""
+                                }
+                                true
+                            } else {
+                                false
+                            }
+                        },
                         placeholder = { Text("Napiši nešto...", fontSize = if (isWideScreen) 18.sp else 16.sp) }, 
                         colors = TextFieldDefaults.colors(focusedContainerColor = textColor.copy(alpha = 0.05f), unfocusedContainerColor = textColor.copy(alpha = 0.05f), focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent), 
                         shape = RoundedCornerShape(24.dp),

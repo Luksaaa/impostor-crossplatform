@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -195,7 +196,19 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                                 ) 
                             },
                             singleLine = true,
-                            modifier = Modifier.fillMaxWidth().height(if (isWide) 80.dp else 64.dp),
+                            modifier = Modifier.fillMaxWidth().height(if (isWide) 80.dp else 64.dp)
+                                .onKeyEvent { event ->
+                                    if (event.key == Key.Enter && event.type == KeyEventType.KeyDown) {
+                                        if (inputCode.length == 6) {
+                                            attemptJoin(inputCode)
+                                        } else {
+                                            errorMessage = "Kod mora imati 6 znakova"
+                                        }
+                                        true
+                                    } else {
+                                        false
+                                    }
+                                },
                             shape = RoundedCornerShape(12.dp),
                             textStyle = LocalTextStyle.current.copy(
                                 fontSize = if (isWide) 20.sp else 16.sp,

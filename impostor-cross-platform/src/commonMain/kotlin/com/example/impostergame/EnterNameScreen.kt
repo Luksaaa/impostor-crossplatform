@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +30,16 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
     val isDarkTheme = isSystemInDarkTheme()
     val textColor = if (isDarkTheme) OffWhite else DeepCharcoal
     val inputContainerColor = if (isDarkTheme) DarkInputGray else Color.White
+
+    // Helper function for submission logic
+    fun submit() {
+        when {
+            name.isBlank() -> errorMessage = "Ime ne smije biti prazno"
+            name.length > 8 -> errorMessage = "Ime ne smije biti duže od 8 znakova"
+            !name.all { it.isLetterOrDigit() || it == '_' } -> errorMessage = "Samo slova, brojke i _"
+            else -> onNameEntered(name, rememberMe)
+        }
+    }
 
     BoxWithConstraints(
         modifier = Modifier
@@ -119,7 +130,15 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                             ) 
                         },
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth().height(if (width > 600.dp) 72.dp else 64.dp),
+                        modifier = Modifier.fillMaxWidth().height(if (width > 600.dp) 72.dp else 64.dp)
+                            .onKeyEvent { event ->
+                                if (event.key == Key.Enter && event.type == KeyEventType.KeyDown) {
+                                    submit()
+                                    true
+                                } else {
+                                    false
+                                }
+                            },
                         shape = RoundedCornerShape(12.dp),
                         isError = errorMessage != null,
                         textStyle = LocalTextStyle.current.copy(
@@ -170,14 +189,7 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                     Spacer(modifier = Modifier.height(if (width > 600.dp) 48.dp else 24.dp))
 
                     Button(
-                        onClick = { 
-                            when {
-                                name.isBlank() -> errorMessage = "Ime ne smije biti prazno"
-                                name.length > 8 -> errorMessage = "Ime ne smije biti duže od 8 znakova"
-                                !name.all { it.isLetterOrDigit() || it == '_' } -> errorMessage = "Samo slova, brojke i _"
-                                else -> onNameEntered(name, rememberMe)
-                            }
-                        },
+                        onClick = { submit() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(if (width > 600.dp) 80.dp else 56.dp),
