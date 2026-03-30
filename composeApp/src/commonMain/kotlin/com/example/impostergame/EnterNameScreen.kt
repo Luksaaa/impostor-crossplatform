@@ -55,7 +55,9 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
                 fontSize = if (isWideScreen) 56.sp else 36.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = SageGreen,
-                letterSpacing = if (isWideScreen) 6.sp else 4.sp
+                letterSpacing = if (isWideScreen) 6.sp else 4.sp,
+                lineHeight = if (isWideScreen) 64.sp else 42.sp,
+                textAlign = TextAlign.Center
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -63,7 +65,8 @@ fun EnterNameScreen(onNameEntered: (String, Boolean) -> Unit) {
             Text(
                 text = "Tko je među nama?",
                 fontSize = if (isWideScreen) 22.sp else 16.sp,
-                color = textColor.copy(alpha = 0.7f)
+                color = textColor.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(if (isWideScreen) 80.dp else 60.dp))

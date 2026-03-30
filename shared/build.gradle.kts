@@ -22,11 +22,6 @@ kotlin {
         browser()
     }
     
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-    }
-    
     sourceSets {
         commonMain.dependencies {
             // put your Multiplatform dependencies here
