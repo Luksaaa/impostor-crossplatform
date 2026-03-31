@@ -18,11 +18,13 @@
             touch-action: none;
         }
     </style>
+    <!-- Biblioteka za QR kodove -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 <body>
     <div id="compose-container"></div>
 
-    <!-- Koristimo COMPAT verzije Firebase-a za jednostavnije učitavanje putem script taga -->
+    <!-- Koristimo COMPAT verzije Firebase-a -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -38,7 +40,7 @@
             measurementId: "G-8T89RQW3SS"
         };
 
-        // Inicijalizacija globalnog firebase objekta
+        // Inicijalizacija
         firebase.initializeApp(firebaseConfig);
     </script>
 
