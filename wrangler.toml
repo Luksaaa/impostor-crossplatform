@@ -1,5 +1,0 @@
-name = "imposter-game"
-compatibility_date = "2024-03-30"
-
-[site]
-bucket = "impostor-cross-platform/build/dist/js/productionExecutable"
