@@ -5,23 +5,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.withContext
 import kotlin.js.Json
 import kotlin.js.json
 
 actual object FirebaseManager {
     private val firebaseScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     
-    // Completely dynamic access to avoid mapping crashes
-    private fun getRoomsRef(): dynamic {
-        return try {
-            val fb: dynamic = js("typeof firebase !== 'undefined' ? firebase : null")
-            fb?.database()?.ref("rooms")
-        } catch (e: Exception) {
-            null
-        }
+    private fun isFirebaseReady(): Boolean {
+        return js("typeof firebase !== 'undefined' && typeof firebase.database === 'function'").unsafeCast<Boolean>()
     }
 
     private fun generateRandomCode(): String {
@@ -32,8 +24,8 @@ actual object FirebaseManager {
     }
 
     actual fun generateRoom(username: String, onComplete: (String) -> Unit) {
-        val ref = getRoomsRef()
-        if (ref == null) {
+        if (!isFirebaseReady()) {
+            console.error("Firebase NOT READY")
             onComplete("")
             return
         }
@@ -43,192 +35,184 @@ actual object FirebaseManager {
                 val code = generateRandomCode()
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Igrac" }
                 val now = currentPlatformMillis().toDouble()
-
-                val snapshot: dynamic = ref.child(code).once("value").await()
-                if (snapshot.exists().unsafeCast<Boolean>()) {
-                    generateRoom(username, onComplete)
-                } else {
-                    val roomData = json(
-                        "admin" to sanitizedName,
-                        "status" to "waiting",
-                        "imposterId" to "",
-                        "mrWhiteId" to "",
-                        "imposterWord" to "",
-                        "mainWord" to "",
-                        "isDiscussionActive" to false,
-                        "discussionStartTime" to 0.0,
-                        "discussionEndTime" to 0.0,
-                        "resultMessage" to "",
-                        "players" to json(sanitizedName to json("name" to sanitizedName, "isReady" to false, "joinedAt" to now)),
-                        "messages" to json("init" to "$sanitizedName je napravio sobu")
-                    )
-                    ref.child(code).set(roomData).await()
-                    withContext(Dispatchers.Main) { onComplete(code) }
-                }
+                
+                console.log("Attempting to create room: $code")
+                val db = firebase.database()
+                
+                db.ref("rooms/$code").once("value", { snapshot ->
+                    if (snapshot.exists().unsafeCast<Boolean>()) {
+                        generateRoom(username, onComplete)
+                    } else {
+                        val roomData = json(
+                            "admin" to sanitizedName,
+                            "status" to "waiting",
+                            "players" to json(sanitizedName to json("name" to sanitizedName, "isReady" to false, "joinedAt" to now)),
+                            "messages" to json("init" to "$sanitizedName je napravio sobu")
+                        )
+                        db.ref("rooms/$code").set(roomData, { err ->
+                            if (err == null) {
+                                console.log("Room created: $code")
+                                onComplete(code)
+                            } else {
+                                console.error("Set error", err)
+                                onComplete("")
+                            }
+                        })
+                    }
+                }, { err ->
+                    console.error("Once error", err)
+                    onComplete("")
+                })
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) { onComplete("") }
+                console.error("generateRoom crash", e)
+                onComplete("")
             }
         }
     }
 
     actual suspend fun joinRoom(roomCode: String, username: String): Result<Unit> {
-        val ref = getRoomsRef() ?: return Result.failure(Exception("Firebase unavailable"))
+        if (!isFirebaseReady()) return Result.failure(Exception("Firebase not ready"))
+        
         return try {
             val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Gost" }
             val timestamp = currentPlatformMillis().toDouble()
-            val playerUpdate = json("name" to sanitizedName, "isReady" to false, "joinedAt" to timestamp)
+            val db = firebase.database()
             
-            ref.child(roomCode).child("players").child(sanitizedName).set(playerUpdate).await()
-            ref.child(roomCode).child("messages").child("join_${currentPlatformMillis()}").set("$sanitizedName je ušao").await()
+            console.log("Joining room: $roomCode as $sanitizedName")
+            
+            db.ref("rooms/$roomCode/players/$sanitizedName").set(json(
+                "name" to sanitizedName, "isReady" to false, "joinedAt" to timestamp
+            ))
+            db.ref("rooms/$roomCode/messages/join_${currentPlatformMillis()}").set("$sanitizedName je ušao")
+            
             Result.success(Unit)
         } catch (e: Exception) {
+            console.error("Join error", e)
             Result.failure(e)
         }
     }
 
     actual fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit) {
-        val ref = getRoomsRef()
-        if (ref == null) { onComplete(); return }
-        firebaseScope.launch {
-            try {
-                val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
-                ref.child(roomCode).child("players").child(sanitizedName).remove().await()
-                withContext(Dispatchers.Main) { onComplete() }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) { onComplete() }
-            }
+        if (!isFirebaseReady()) { onComplete(); return }
+        try {
+            val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
+            firebase.database().ref("rooms/$roomCode/players/$sanitizedName").remove()
+            onComplete()
+        } catch (e: Exception) {
+            onComplete()
         }
     }
 
     actual fun listenToRoom(roomCode: String): Flow<Room?> = callbackFlow {
-        val ref = getRoomsRef()
-        if (ref == null) { trySend(null); close(); return@callbackFlow }
+        if (!isFirebaseReady()) { 
+            trySend(null)
+            close()
+            return@callbackFlow 
+        }
         
-        val roomRef = ref.child(roomCode)
+        val db = firebase.database()
+        val ref = db.ref("rooms/$roomCode")
         val callback = { snapshot: dynamic ->
             try {
-                if (!snapshot.exists().unsafeCast<Boolean>()) {
+                if (snapshot == null || !snapshot.exists().unsafeCast<Boolean>()) {
                     trySend(null)
                 } else {
                     val data = snapshot.`val`()
-                    
-                    val playersMap = mutableMapOf<String, PlayerInfo>()
-                    val pJson = data.players
-                    if (pJson != null) {
-                        val keys = js("Object.keys(pJson)").unsafeCast<Array<String>>()
-                        for (k in keys) {
-                            val p = pJson[k]
-                            playersMap[k] = PlayerInfo(
-                                p.name?.toString() ?: "", 
-                                p.isReady?.unsafeCast<Boolean>() ?: false, 
-                                (p.joinedAt?.unsafeCast<Double>() ?: 0.0).toLong()
-                            )
+                    if (data == null) {
+                        trySend(null)
+                    } else {
+                        val playersMap = mutableMapOf<String, PlayerInfo>()
+                        val pJson = data.players
+                        if (pJson != null) {
+                            val keys = js("Object.keys(pJson)").unsafeCast<Array<String>>()
+                            for (k in keys) {
+                                val p = pJson[k]
+                                playersMap[k] = PlayerInfo(
+                                    p.name?.toString() ?: "", 
+                                    p.isReady?.unsafeCast<Boolean>() ?: false, 
+                                    (p.joinedAt?.unsafeCast<Double>() ?: 0.0).toLong()
+                                )
+                            }
                         }
-                    }
 
-                    val chatMap = mutableMapOf<String, ChatMessage>()
-                    val cJson = data.chatMessages
-                    if (cJson != null) {
-                        val keys = js("Object.keys(cJson)").unsafeCast<Array<String>>()
-                        for (k in keys) {
-                            val c = cJson[k]
-                            chatMap[k] = ChatMessage(
-                                c.sender?.toString() ?: "", 
-                                c.message?.toString() ?: "", 
-                                (c.timestamp?.unsafeCast<Double>() ?: 0.0).toLong()
-                            )
+                        val chatMap = mutableMapOf<String, ChatMessage>()
+                        val cJson = data.chatMessages
+                        if (cJson != null) {
+                            val keys = js("Object.keys(cJson)").unsafeCast<Array<String>>()
+                            for (k in keys) {
+                                val c = cJson[k]
+                                chatMap[k] = ChatMessage(
+                                    c.sender?.toString() ?: "", 
+                                    c.message?.toString() ?: "", 
+                                    (c.timestamp?.unsafeCast<Double>() ?: 0.0).toLong()
+                                )
+                            }
                         }
-                    }
-                    
-                    val msgMap = mutableMapOf<String, String>()
-                    val mJson = data.messages
-                    if (mJson != null) {
-                        val keys = js("Object.keys(mJson)").unsafeCast<Array<String>>()
-                        for (k in keys) {
-                            msgMap[k] = mJson[k]?.toString() ?: ""
-                        }
-                    }
 
-                    trySend(Room(
-                        admin = data.admin?.toString() ?: "",
-                        status = data.status?.toString() ?: "waiting",
-                        imposterId = data.imposterId?.toString() ?: "",
-                        mrWhiteId = data.mrWhiteId?.toString() ?: "",
-                        imposterWord = data.imposterWord?.toString() ?: "",
-                        mainWord = data.mainWord?.toString() ?: "",
-                        chatMessages = chatMap,
-                        players = playersMap,
-                        messages = msgMap,
-                        isDiscussionActive = data.isDiscussionActive?.unsafeCast<Boolean>() ?: false,
-                        discussionStartTime = (data.discussionStartTime?.unsafeCast<Double>() ?: 0.0).toLong(),
-                        discussionEndTime = (data.discussionEndTime?.unsafeCast<Double>() ?: 0.0).toLong(),
-                        resultMessage = data.resultMessage?.toString() ?: ""
-                    ))
+                        trySend(Room(
+                            admin = data.admin?.toString() ?: "",
+                            status = data.status?.toString() ?: "waiting",
+                            imposterId = data.imposterId?.toString() ?: "",
+                            chatMessages = chatMap,
+                            players = playersMap,
+                            isDiscussionActive = data.isDiscussionActive?.unsafeCast<Boolean>() ?: false,
+                            resultMessage = data.resultMessage?.toString() ?: ""
+                        ))
+                    }
                 }
             } catch (e: Exception) {
-                console.error("Parse error", e)
+                console.error("Listen parse error", e)
             }
         }
-        roomRef.on("value", callback)
-        awaitClose { roomRef.off("value", callback) }
+        
+        ref.on("value", callback)
+        awaitClose { ref.off("value", callback) }
     }
 
     actual fun toggleReady(roomCode: String, username: String, isReady: Boolean) {
-        val ref = getRoomsRef() ?: return
-        firebaseScope.launch {
-            val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
-            ref.child(roomCode).child("players").child(sanitizedName).child("isReady").set(isReady).await()
-        }
+        if (!isFirebaseReady()) return
+        val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
+        firebase.database().ref("rooms/$roomCode/players/$sanitizedName/isReady").set(isReady)
     }
 
     actual fun startGame(roomCode: String, playersList: List<String>) {
-        val ref = getRoomsRef() ?: return
-        firebaseScope.launch {
-            val (main, imp) = WordManager.getNextWords()
-            val shuffled = playersList.shuffled()
-            val update = json(
-                "mainWord" to main, "imposterWord" to imp,
-                "imposterId" to shuffled[0], "status" to "started"
-            )
-            ref.child(roomCode).asDynamic().update(update)
-        }
+        if (!isFirebaseReady()) return
+        val (main, imp) = WordManager.getNextWords()
+        val shuffled = playersList.shuffled()
+        val update = json(
+            "mainWord" to main, "imposterWord" to imp,
+            "imposterId" to shuffled[0], "status" to "started"
+        )
+        firebase.database().ref("rooms/$roomCode").asDynamic().update(update)
     }
 
     actual fun sendMessage(roomCode: String, username: String, message: String) {
-        val ref = getRoomsRef() ?: return
-        firebaseScope.launch {
-            val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
-            val chatMsg = json("sender" to sanitizedName, "message" to message.trim(), "timestamp" to currentPlatformMillis().toDouble())
-            ref.child(roomCode).child("chatMessages").push().set(chatMsg).await()
-        }
+        if (!isFirebaseReady()) return
+        val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
+        val chatMsg = json("sender" to sanitizedName, "message" to message.trim(), "timestamp" to currentPlatformMillis().toDouble())
+        firebase.database().ref("rooms/$roomCode/chatMessages").push().set(chatMsg)
     }
 
     actual fun startDiscussion(roomCode: String, seconds: Int) {
-        val ref = getRoomsRef() ?: return
-        firebaseScope.launch {
-            val now = currentPlatformMillis().toDouble()
-            val update = if (seconds > 0) json("isDiscussionActive" to true, "discussionStartTime" to now, "discussionEndTime" to (now + seconds * 1000))
-                         else json("isDiscussionActive" to false)
-            ref.child(roomCode).asDynamic().update(update)
-        }
+        if (!isFirebaseReady()) return
+        val now = currentPlatformMillis().toDouble()
+        val update = if (seconds > 0) json("isDiscussionActive" to true, "discussionStartTime" to now, "discussionEndTime" to (now + seconds * 1000))
+                     else json("isDiscussionActive" to false)
+        firebase.database().ref("rooms/$roomCode").asDynamic().update(update)
     }
 
     actual fun endRound(roomCode: String, resultMessage: String) {
-        val ref = getRoomsRef() ?: return
-        firebaseScope.launch {
-            ref.child(roomCode).asDynamic().update(json("status" to "finished", "resultMessage" to resultMessage, "isDiscussionActive" to false))
-        }
+        if (!isFirebaseReady()) return
+        firebase.database().ref("rooms/$roomCode").asDynamic().update(json("status" to "finished", "resultMessage" to resultMessage, "isDiscussionActive" to false))
     }
 
     actual fun resetToLobby(roomCode: String) {
-        val ref = getRoomsRef() ?: return
-        firebaseScope.launch {
-            ref.child(roomCode).asDynamic().update(json("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false))
-        }
+        if (!isFirebaseReady()) return
+        firebase.database().ref("rooms/$roomCode").asDynamic().update(json("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false))
     }
 
     actual fun removePlayer(roomCode: String, playerName: String) {
-        val ref = getRoomsRef() ?: return
-        firebaseScope.launch { ref.child(roomCode).child("players").child(playerName).remove().await() }
+        if (!isFirebaseReady()) return
+        firebase.database().ref("rooms/$roomCode/players/$playerName").remove()
     }
 }
