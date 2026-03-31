@@ -20,37 +20,48 @@ actual fun QRCodeImage(content: String, modifier: Modifier) {
 
     LaunchedEffect(content) {
         try {
+            // Sigurna provjera objekta QRCode iz qrcode.min.js
             if (js("typeof QRCode !== 'undefined'").unsafeCast<Boolean>()) {
-                val options = js("({ errorCorrectionLevel: 'H' })")
+                val options = js("({ errorCorrectionLevel: 'M' })")
+                // qrcode biblioteka (v1.5.3) ima QRCode.create metodu
                 val qr = js("QRCode.create(content, options)")
-                val size = qr.modules.size.unsafeCast<Int>()
-                val data = qr.modules.data
-                modules = size to data
+                if (qr != null && qr.modules != null) {
+                    val size = qr.modules.size.unsafeCast<Int>()
+                    val data = qr.modules.data
+                    modules = size to data
+                }
             }
-        } catch (e: Exception) { }
+        } catch (e: Exception) { 
+            // Ne dozvoljavamo da greška sruši UI
+            println("QR Error: ${e.message}")
+        }
     }
 
     Box(modifier = modifier.size(200.dp).background(Color.White), contentAlignment = Alignment.Center) {
         val current = modules
         if (current != null) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                val size = current.first
-                val data = current.second
-                val cellSize = this.size.width / size
-                for (row in 0 until size) {
-                    for (col in 0 until size) {
-                        val isBlack = js("data[row * size + col] === 1").unsafeCast<Boolean>()
-                        if (isBlack) {
-                            drawRect(
-                                color = Color.Black,
-                                topLeft = Offset(col * cellSize, row * cellSize),
-                                size = Size(cellSize + 0.5f, cellSize + 0.5f)
-                            )
+                try {
+                    val size = current.first
+                    val data = current.second
+                    val cellSize = this.size.width / size
+                    for (row in 0 until size) {
+                        for (col in 0 until size) {
+                            // Provjera crne boje (vrijednost različita od nule je crna)
+                            val isBlack = js("data[row * size + col] !== 0").unsafeCast<Boolean>()
+                            if (isBlack) {
+                                drawRect(
+                                    color = Color.Black,
+                                    topLeft = Offset(col * cellSize, row * cellSize),
+                                    size = Size(cellSize + 0.1f, cellSize + 0.1f)
+                                )
+                            }
                         }
                     }
-                }
+                } catch (e: Exception) {}
             }
         } else {
+            // Sivi kvadrat dok se podaci ne učitaju
             Box(modifier = Modifier.fillMaxSize().background(Color.LightGray))
         }
     }
