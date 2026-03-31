@@ -60,13 +60,8 @@ fun LobbyScreen(
     var currentAdmin by remember { mutableStateOf("") }
     var players by remember { mutableStateOf<Map<String, PlayerInfo>>(emptyMap()) }
     
-    // Provjera tko ima ovlasti (originalni admin ili najstariji preostali igrač)
-    val effectiveAdminName = remember(currentAdmin, players) {
-        if (players.containsKey(currentAdmin)) currentAdmin
-        else players.values.sortedBy { it.joinedAt }.firstOrNull()?.name ?: currentAdmin
-    }
-    
-    val isUserAdmin = sanitizedName == effectiveAdminName
+    // U lobbyu je admin UVIJEK onaj tko je zapisan u bazi (stalan je)
+    val isUserAdmin = sanitizedName == currentAdmin
     
     @Suppress("DEPRECATION")
     val clipboardManager = LocalClipboardManager.current
@@ -165,7 +160,7 @@ fun LobbyScreen(
             Spacer(modifier = Modifier.height(32.dp))
             
             Text(
-                text = if (isUserAdmin) "Ti si ADMIN" else "Admin je: $effectiveAdminName",
+                text = if (isUserAdmin) "Ti si ADMIN" else "Admin je: $currentAdmin",
                 color = if (isUserAdmin) Gold else textColor.copy(alpha = 0.5f),
                 fontWeight = FontWeight.Bold,
                 fontSize = if (isWideScreen) 24.sp else 14.sp
