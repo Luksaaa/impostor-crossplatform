@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.gradle.api.tasks.Copy
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -34,6 +35,9 @@ kotlin {
             }
         }
         binaries.executable()
+        compilerOptions {
+            freeCompilerArgs.add("-Xir-per-module")
+        }
     }
 
     listOf(
@@ -57,9 +61,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
 
-            // Multiplatform Libraries
-            implementation(libs.firebase.database)
-            implementation(libs.firebase.common)
+            // Multiplatform Libraries (Firebase Uklonjen iz commonMain, dodan specifično za Android i JVM)
             implementation(libs.multiplatform.settings)
             implementation(libs.multiplatform.settings.no.arg)
             implementation(libs.kotlinx.serialization.json)
@@ -84,6 +86,10 @@ kotlin {
 
             // Fix for Android Studio Preview
             implementation(libs.androidx.compose.ui.tooling)
+
+            // Firebase dodan samo za Android
+            implementation(libs.firebase.database)
+            implementation(libs.firebase.common)
         }
 
         val jvmMain by getting {
@@ -92,11 +98,17 @@ kotlin {
                 implementation(libs.kotlinx.coroutinesSwing)
                 implementation(libs.zxing.core)
                 implementation(libs.kotlinx.datetime)
+
+                // Firebase dodan samo za JVM
+                implementation(libs.firebase.database)
+                implementation(libs.firebase.common)
             }
         }
 
         val jsMain by getting {
-            // Using standard directories
+            dependencies {
+                // Firebase zavisnosti su isključene za JS target (jer su uklonjene iz commonMain).
+            }
         }
     }
 }
@@ -125,12 +137,12 @@ android {
     }
     
     compileOptions {
-        sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17
-        targetCompatibility = org.gradle.api.JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
-tasks.withType<ProcessResources>().configureEach {
+tasks.withType<Copy>().configureEach {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
