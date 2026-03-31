@@ -131,7 +131,7 @@ object DesktopFirebaseManager : IFirebaseManager {
                     emit(null)
                 }
             } catch (e: Exception) {
-                // Ignore network errors in polling loop
+
             }
             delay(1500)
         }
