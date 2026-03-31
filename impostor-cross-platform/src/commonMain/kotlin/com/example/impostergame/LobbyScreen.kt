@@ -97,7 +97,7 @@ fun LobbyScreen(
                 FirebaseManager.joinRoom(roomCode, sanitizedName)
             }
 
-
+            // Sortiramo poruke tako da najnovija bude na vrhu popisa
             val sortedMsgs = room.messages.entries
                 .sortedByDescending { it.key } 
                 .map { it.value }
