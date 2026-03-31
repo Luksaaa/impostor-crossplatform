@@ -35,9 +35,6 @@ kotlin {
             }
         }
         binaries.executable()
-        compilerOptions {
-            freeCompilerArgs.add("-Xir-per-module")
-        }
     }
 
     listOf(
@@ -61,7 +58,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
 
-            // Multiplatform Libraries (Firebase Uklonjen iz commonMain, dodan specifično za Android i JVM)
+            // Multiplatform Libraries
             implementation(libs.multiplatform.settings)
             implementation(libs.multiplatform.settings.no.arg)
             implementation(libs.kotlinx.serialization.json)
@@ -87,7 +84,7 @@ kotlin {
             // Fix for Android Studio Preview
             implementation(libs.androidx.compose.ui.tooling)
 
-            // Firebase dodan samo za Android
+            // Firebase dodan za Android
             implementation(libs.firebase.database)
             implementation(libs.firebase.common)
         }
@@ -99,7 +96,23 @@ kotlin {
                 implementation(libs.zxing.core)
                 implementation(libs.kotlinx.datetime)
 
-                // Firebase dodan samo za JVM
+                // Firebase dodan za JVM
+                implementation(libs.firebase.database)
+                implementation(libs.firebase.common)
+            }
+        }
+
+        val iosX64Main by getting
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+        
+        val iosMain by creating {
+            dependsOn(commonMain.get())
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+            dependencies {
+                // Firebase dodan za iOS
                 implementation(libs.firebase.database)
                 implementation(libs.firebase.common)
             }
@@ -107,7 +120,8 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                // Firebase zavisnosti su isključene za JS target (jer su uklonjene iz commonMain).
+                // Eksplicitno dodajemo datetime za JS target kako bismo izbjegli LinkageError
+                implementation(libs.kotlinx.datetime)
             }
         }
     }

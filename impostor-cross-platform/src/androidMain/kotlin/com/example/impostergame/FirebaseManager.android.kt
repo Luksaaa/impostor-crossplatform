@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-actual object FirebaseManager {
+actual object FirebaseManager : IFirebaseManager {
     private val database: FirebaseDatabase get() = Firebase.database
     private val roomsRef: DatabaseReference get() = database.reference("rooms")
     
     private val firebaseScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-    actual fun generateRoom(username: String, onComplete: (String) -> Unit) {
+    override fun generateRoom(username: String, onComplete: (String) -> Unit) {
         firebaseScope.launch {
             try {
                 val code = generateRandomCode()
@@ -52,7 +52,7 @@ actual object FirebaseManager {
                (1..3).map { numbers.random() }.joinToString("")
     }
 
-    actual suspend fun joinRoom(roomCode: String, username: String): Result<Unit> {
+    override suspend fun joinRoom(roomCode: String, username: String): Result<Unit> {
         return try {
             val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Gost" }
             val roomRef = roomsRef.child(roomCode)
@@ -79,7 +79,7 @@ actual object FirebaseManager {
         }
     }
 
-    actual fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit) {
+    override fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit) {
         firebaseScope.launch {
             try {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
@@ -134,11 +134,11 @@ actual object FirebaseManager {
         }
     }
 
-    actual fun listenToRoom(roomCode: String): Flow<Room?> {
+    override fun listenToRoom(roomCode: String): Flow<Room?> {
         return roomsRef.child(roomCode).valueEvents.map { it.getValueSafe<Room?>() }
     }
 
-    actual fun toggleReady(roomCode: String, username: String, isReady: Boolean) {
+    override fun toggleReady(roomCode: String, username: String, isReady: Boolean) {
         firebaseScope.launch {
             try {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
@@ -147,7 +147,7 @@ actual object FirebaseManager {
         }
     }
 
-    actual fun startGame(roomCode: String, playersList: List<String>) {
+    override fun startGame(roomCode: String, playersList: List<String>) {
         firebaseScope.launch {
             try {
                 val (mainWord, imposterWord) = WordManager.getNextWords()
@@ -172,7 +172,7 @@ actual object FirebaseManager {
         }
     }
 
-    actual fun sendMessage(roomCode: String, username: String, message: String) {
+    override fun sendMessage(roomCode: String, username: String, message: String) {
         firebaseScope.launch {
             try {
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
@@ -183,7 +183,7 @@ actual object FirebaseManager {
         }
     }
 
-    actual fun startDiscussion(roomCode: String, seconds: Int) {
+    override fun startDiscussion(roomCode: String, seconds: Int) {
         firebaseScope.launch {
             try {
                 val updates = if (seconds > 0) {
@@ -206,7 +206,7 @@ actual object FirebaseManager {
         }
     }
 
-    actual fun endRound(roomCode: String, resultMessage: String) {
+    override fun endRound(roomCode: String, resultMessage: String) {
         firebaseScope.launch {
             try {
                 roomsRef.child(roomCode).updateChildren(mapOf(
@@ -218,7 +218,7 @@ actual object FirebaseManager {
         }
     }
 
-    actual fun resetToLobby(roomCode: String) {
+    override fun resetToLobby(roomCode: String) {
         firebaseScope.launch {
             try {
                 roomsRef.child(roomCode).updateChildren(mapOf(
@@ -233,7 +233,7 @@ actual object FirebaseManager {
         }
     }
     
-    actual fun removePlayer(roomCode: String, playerName: String) {
+    override fun removePlayer(roomCode: String, playerName: String) {
         firebaseScope.launch {
             try {
                 val roomRef = roomsRef.child(roomCode)
@@ -246,27 +246,24 @@ actual object FirebaseManager {
                 val updates = mutableMapOf<String, Any?>()
                 updates["players/$playerName"] = null
 
-                val playersSnapshots = mutableListOf<DataSnapshot>()
-                snapshot.child("players").children.forEach { playersSnapshots.add(it) }
-
                 if (currentAdmin == playerName) {
+                    val playersSnapshots = mutableListOf<DataSnapshot>()
+                    snapshot.child("players").children.forEach { playersSnapshots.add(it) }
+                    
                     val nextActiveAdmin = playersSnapshots
                         .filter { it.key != playerName }
                         .mapNotNull { it.getValueSafe<PlayerInfo?>() }
                         .sortedBy { it.joinedAt }
                         .firstOrNull()?.name
-                    
+                        
                     updates["admin"] = nextActiveAdmin
-                    val exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
-                    updates["messages/exit_$timestamp"] = exitMsg
-                    val sysMsgKey = roomRef.child("chatMessages").push().key
-                    updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
-                } else {
-                    val exitMsg = "$playerName je izbačen"
-                    updates["messages/exit_$timestamp"] = exitMsg
-                    val sysMsgKey = roomRef.child("chatMessages").push().key
-                    updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
                 }
+                
+                val exitMsg = "$playerName je izbačen"
+                updates["messages/exit_$timestamp"] = exitMsg
+                
+                val sysMsgKey = roomRef.child("chatMessages").push().key
+                updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
                 
                 roomRef.updateChildren(updates)
             } catch (e: Exception) {}

@@ -1,6 +1,5 @@
 package com.example.impostergame
 
-import dev.gitlive.firebase.database.DatabaseReference
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.encodeToString
@@ -9,9 +8,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object DesktopFirebaseManager : IFirebaseManager {
-    // We throw exception if accessed because this is used only in Android
-    override val roomsRef: DatabaseReference get() = throw UnsupportedOperationException("roomsRef not available on Desktop")
-    
     private const val BASE_URL = "https://gameofimpostor-default-rtdb.europe-west1.firebasedatabase.app/rooms"
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
@@ -138,7 +134,7 @@ object DesktopFirebaseManager : IFirebaseManager {
                             .sortedBy { it.joinedAt }
                             .firstOrNull()?.name
                         
-                        exitMsg = "$sanitizedName je izašao, privremeni admin je $nextActiveAdmin"
+                        exitMsg = "$sanitizedName je izašao, novi admin je $nextActiveAdmin"
                     } else {
                         exitMsg = "$sanitizedName je izašao"
                     }
@@ -299,7 +295,7 @@ object DesktopFirebaseManager : IFirebaseManager {
                         .sortedBy { it.joinedAt }
                         .firstOrNull()?.name
                     
-                    exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
+                    exitMsg = "$playerName je izbačen, novi admin je $nextActiveAdmin"
                 } else {
                     exitMsg = "$playerName je izbačen"
                 }
