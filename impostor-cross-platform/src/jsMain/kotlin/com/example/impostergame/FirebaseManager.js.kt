@@ -9,7 +9,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlin.js.Json
 import kotlin.js.json
 
-actual object FirebaseManager {
+actual object FirebaseManager : IFirebaseManager {
     private val firebaseScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     
     private fun isFirebaseReady(): Boolean {
@@ -23,7 +23,7 @@ actual object FirebaseManager {
                (1..3).map { numbers.random() }.joinToString("")
     }
 
-    actual fun generateRoom(username: String, onComplete: (String) -> Unit) {
+    override fun generateRoom(username: String, onComplete: (String) -> Unit) {
         if (!isFirebaseReady()) {
             console.error("Firebase NOT READY")
             onComplete("")
@@ -39,7 +39,7 @@ actual object FirebaseManager {
                 console.log("Attempting to create room: $code")
                 val db = firebase.database()
                 
-                db.ref("rooms/$code").once("value", { snapshot ->
+                db.ref("rooms/$code").once("value", { snapshot: dynamic ->
                     if (snapshot.exists().unsafeCast<Boolean>()) {
                         generateRoom(username, onComplete)
                     } else {
@@ -49,7 +49,7 @@ actual object FirebaseManager {
                             "players" to json(sanitizedName to json("name" to sanitizedName, "isReady" to false, "joinedAt" to now)),
                             "messages" to json("init" to "$sanitizedName je napravio sobu")
                         )
-                        db.ref("rooms/$code").set(roomData, { err ->
+                        db.ref("rooms/$code").set(roomData, { err: dynamic ->
                             if (err == null) {
                                 console.log("Room created: $code")
                                 onComplete(code)
@@ -59,7 +59,7 @@ actual object FirebaseManager {
                             }
                         })
                     }
-                }, { err ->
+                }, { err: dynamic ->
                     console.error("Once error", err)
                     onComplete("")
                 })
@@ -70,7 +70,7 @@ actual object FirebaseManager {
         }
     }
 
-    actual suspend fun joinRoom(roomCode: String, username: String): Result<Unit> {
+    override suspend fun joinRoom(roomCode: String, username: String): Result<Unit> {
         if (!isFirebaseReady()) return Result.failure(Exception("Firebase not ready"))
         
         return try {
@@ -92,7 +92,7 @@ actual object FirebaseManager {
         }
     }
 
-    actual fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit) {
+    override fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit) {
         if (!isFirebaseReady()) { onComplete(); return }
         try {
             val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
@@ -103,7 +103,7 @@ actual object FirebaseManager {
         }
     }
 
-    actual fun listenToRoom(roomCode: String): Flow<Room?> = callbackFlow {
+    override fun listenToRoom(roomCode: String): Flow<Room?> = callbackFlow {
         if (!isFirebaseReady()) { 
             trySend(null)
             close()
@@ -169,13 +169,13 @@ actual object FirebaseManager {
         awaitClose { ref.off("value", callback) }
     }
 
-    actual fun toggleReady(roomCode: String, username: String, isReady: Boolean) {
+    override fun toggleReady(roomCode: String, username: String, isReady: Boolean) {
         if (!isFirebaseReady()) return
         val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
         firebase.database().ref("rooms/$roomCode/players/$sanitizedName/isReady").set(isReady)
     }
 
-    actual fun startGame(roomCode: String, playersList: List<String>) {
+    override fun startGame(roomCode: String, playersList: List<String>) {
         if (!isFirebaseReady()) return
         val (main, imp) = WordManager.getNextWords()
         val shuffled = playersList.shuffled()
@@ -186,14 +186,14 @@ actual object FirebaseManager {
         firebase.database().ref("rooms/$roomCode").asDynamic().update(update)
     }
 
-    actual fun sendMessage(roomCode: String, username: String, message: String) {
+    override fun sendMessage(roomCode: String, username: String, message: String) {
         if (!isFirebaseReady()) return
         val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
         val chatMsg = json("sender" to sanitizedName, "message" to message.trim(), "timestamp" to currentPlatformMillis().toDouble())
         firebase.database().ref("rooms/$roomCode/chatMessages").push().set(chatMsg)
     }
 
-    actual fun startDiscussion(roomCode: String, seconds: Int) {
+    override fun startDiscussion(roomCode: String, seconds: Int) {
         if (!isFirebaseReady()) return
         val now = currentPlatformMillis().toDouble()
         val update = if (seconds > 0) json("isDiscussionActive" to true, "discussionStartTime" to now, "discussionEndTime" to (now + seconds * 1000))
@@ -201,18 +201,20 @@ actual object FirebaseManager {
         firebase.database().ref("rooms/$roomCode").asDynamic().update(update)
     }
 
-    actual fun endRound(roomCode: String, resultMessage: String) {
+    override fun endRound(roomCode: String, resultMessage: String) {
         if (!isFirebaseReady()) return
         firebase.database().ref("rooms/$roomCode").asDynamic().update(json("status" to "finished", "resultMessage" to resultMessage, "isDiscussionActive" to false))
     }
 
-    actual fun resetToLobby(roomCode: String) {
+    override fun resetToLobby(roomCode: String) {
         if (!isFirebaseReady()) return
         firebase.database().ref("rooms/$roomCode").asDynamic().update(json("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false))
     }
 
-    actual fun removePlayer(roomCode: String, playerName: String) {
+    override fun removePlayer(roomCode: String, playerName: String) {
         if (!isFirebaseReady()) return
         firebase.database().ref("rooms/$roomCode/players/$playerName").remove()
     }
 }
+
+private external val firebase: dynamic
