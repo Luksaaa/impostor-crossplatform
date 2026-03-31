@@ -165,11 +165,13 @@ actual object FirebaseManager : IFirebaseManager {
                             mrWhiteId = data.mrWhiteId?.toString() ?: "",
                             imposterWord = data.imposterWord?.toString() ?: "",
                             mainWord = data.mainWord?.toString() ?: "",
+                            isDiscussionActive = data.isDiscussionActive?.unsafeCast<Boolean>() ?: false,
+                            discussionStartTime = (data.discussionStartTime?.unsafeCast<Double>() ?: 0.0).toLong(),
+                            discussionEndTime = (data.discussionEndTime?.unsafeCast<Double>() ?: 0.0).toLong(),
+                            resultMessage = data.resultMessage?.toString() ?: "",
                             chatMessages = chatMap,
                             players = playersMap,
-                            messages = eventMsgs,
-                            isDiscussionActive = data.isDiscussionActive?.unsafeCast<Boolean>() ?: false,
-                            resultMessage = data.resultMessage?.toString() ?: ""
+                            messages = eventMsgs
                         ))
                     }
                 }
@@ -205,7 +207,6 @@ actual object FirebaseManager : IFirebaseManager {
             "isDiscussionActive" to false,
             "resultMessage" to ""
         )
-        // Uklonjen .asDynamic() jer uzrokuje "not a function" na Webu
         val ref = firebase.database().ref("rooms/$roomCode")
         js("ref.update(update)")
     }
