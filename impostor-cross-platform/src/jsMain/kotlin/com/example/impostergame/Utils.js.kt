@@ -1,7 +1,8 @@
 package com.example.impostergame
 
-import kotlinx.datetime.Clock
+import kotlin.js.Date
 
 actual fun currentPlatformMillis(): Long {
-    return Clock.System.now().toEpochMilliseconds()
+    // Koristimo direktni JS Date kako bismo izbjegli LinkageError s kotlinx-datetime na JS-u
+    return Date.now().toLong()
 }

@@ -2,8 +2,7 @@ package com.example.impostergame
 
 import kotlinx.coroutines.flow.Flow
 
-// Expect deklaracija za FirebaseManager
-expect object FirebaseManager {
+interface IFirebaseManager {
     fun generateRoom(username: String, onComplete: (String) -> Unit)
     suspend fun joinRoom(roomCode: String, username: String): Result<Unit>
     fun leaveRoomWithAdminTransfer(roomCode: String, username: String, onComplete: () -> Unit)
@@ -17,5 +16,8 @@ expect object FirebaseManager {
     fun removePlayer(roomCode: String, playerName: String)
 }
 
-// activeFirebaseManager je maknut jer sada koristimo expect/actual
-// GitLiveFirebaseManager je premješten u platform-specifične implementacije (androidMain, jvmMain)
+// Globalni manager koji se koristi u aplikaciji
+expect object FirebaseManager : IFirebaseManager
+
+// Omogućuje dinamičku zamjenu (važno za Desktop/REST verziju)
+var activeFirebaseManager: IFirebaseManager? = null
