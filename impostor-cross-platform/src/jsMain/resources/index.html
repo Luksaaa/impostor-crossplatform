@@ -18,13 +18,12 @@
             touch-action: none;
         }
     </style>
-    <!-- Biblioteka za QR kodove -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- Najpouzdanija, jednostavna biblioteka za QR module (qrcode-generator) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
     <div id="compose-container"></div>
 
-    <!-- Koristimo COMPAT verzije Firebase-a -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -39,12 +38,9 @@
             appId: "1:96950655117:web:0fc5eeb2b12ca36a7a6ac4",
             measurementId: "G-8T89RQW3SS"
         };
-
-        // Inicijalizacija
         firebase.initializeApp(firebaseConfig);
     </script>
 
-    <!-- skiko.js je uklonjen jer ga Compose loader automatski učitava kao .mjs ako je potreban -->
     <script src="impostergame_web.js"></script>
 </body>
 </html>
