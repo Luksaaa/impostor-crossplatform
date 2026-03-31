@@ -11,17 +11,6 @@ import kotlin.js.json
 
 actual object FirebaseManager : IFirebaseManager {
     private val firebaseScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    
-    private var lastTimestamp: Double = 0.0
-
-    private fun getUniqueTimestamp(): Double {
-        var now = currentPlatformMillis().toDouble()
-        if (now <= lastTimestamp) {
-            now = lastTimestamp + 1.0
-        }
-        lastTimestamp = now
-        return now
-    }
 
     private fun isFirebaseReady(): Boolean {
         return js("typeof firebase !== 'undefined' && typeof firebase.database === 'function'").unsafeCast<Boolean>()
@@ -40,7 +29,7 @@ actual object FirebaseManager : IFirebaseManager {
             try {
                 val code = generateRandomCode()
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Igrac" }
-                val now = getUniqueTimestamp()
+                val now = currentPlatformMillis().toDouble()
                 val db = firebase.database()
                 
                 db.ref("rooms/$code").once("value", { snapshot: dynamic ->
@@ -67,7 +56,7 @@ actual object FirebaseManager : IFirebaseManager {
         if (!isFirebaseReady()) return Result.failure(Exception("Firebase not ready"))
         return try {
             val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Gost" }
-            val timestamp = getUniqueTimestamp()
+            val timestamp = currentPlatformMillis().toDouble()
             firebase.database().ref("rooms/$roomCode/players/$sanitizedName").set(json(
                 "name" to sanitizedName, "isReady" to false, "joinedAt" to timestamp
             ))
@@ -84,7 +73,7 @@ actual object FirebaseManager : IFirebaseManager {
         roomRef.once("value", { snapshot: dynamic ->
             val data = snapshot.`val`()
             if (data != null) {
-                val timestamp = getUniqueTimestamp()
+                val timestamp = currentPlatformMillis().toDouble()
                 val updates = json()
                 updates["players/$sanitizedName"] = null
                 
@@ -104,16 +93,16 @@ actual object FirebaseManager : IFirebaseManager {
                         updates["originalAdmin"] = next // STALNI PRIJENOS: Ažurira se originalAdmin (kad sam ode)
                         val msg = "$sanitizedName je izašao, novi admin je $next"
                         updates["messages/exit_${timestamp.toLong()}"] = msg
-                        roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
+                        roomRef.child("chatMessages").push().set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
                     } else {
                         val msg = "$sanitizedName je izašao"
                         updates["messages/exit_${timestamp.toLong()}"] = msg
-                        roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
+                        roomRef.child("chatMessages").push().set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
                     }
                 } else {
                     val msg = "$sanitizedName je izašao"
                     updates["messages/exit_${timestamp.toLong()}"] = msg
-                    roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
+                    roomRef.child("chatMessages").push().set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
                 }
                 roomRef.update(updates, { _ -> onComplete() })
             } else {
@@ -211,14 +200,15 @@ actual object FirebaseManager : IFirebaseManager {
     override fun sendMessage(roomCode: String, username: String, message: String) {
         if (!isFirebaseReady()) return
         val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
-        val timestamp = getUniqueTimestamp()
+        val timestamp = currentPlatformMillis().toDouble()
         val chatMsg = json("sender" to sanitizedName, "message" to message.trim(), "timestamp" to timestamp)
-        firebase.database().ref("rooms/$roomCode/chatMessages").child("msg_${timestamp.toLong()}").set(chatMsg)
+        // Ovdje se koristi push() kako bi Firebase generirao sigurni kronološki ključ
+        firebase.database().ref("rooms/$roomCode/chatMessages").push().set(chatMsg)
     }
 
     override fun startDiscussion(roomCode: String, seconds: Int) {
         if (!isFirebaseReady()) return
-        val now = getUniqueTimestamp()
+        val now = currentPlatformMillis().toDouble()
         val update = if (seconds > 0) json("isDiscussionActive" to true, "discussionStartTime" to now, "discussionEndTime" to (now + seconds * 1000))
                      else json("isDiscussionActive" to false)
         firebase.database().ref("rooms/$roomCode").update(update)
@@ -238,7 +228,7 @@ actual object FirebaseManager : IFirebaseManager {
                 val original = data.originalAdmin?.toString() ?: ""
                 val update = json("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false, "resultMessage" to "")
                 
-                // UVIJEK VRAĆAMO ADMINA NA KREATORA SOBE BEZ UVJETA
+                // UVIJEK VRAĆAMO ADMINA NA ORIGINALNOG KREATORA BEZ UVJETA
                 if (original.isNotEmpty()) {
                     update["admin"] = original
                     if (js("data.players && data.players[original] !== undefined").unsafeCast<Boolean>()) {
@@ -261,7 +251,7 @@ actual object FirebaseManager : IFirebaseManager {
                 val updates = json()
                 updates["players/$playerName"] = null
 
-                val timestamp = getUniqueTimestamp()
+                val timestamp = currentPlatformMillis().toDouble()
                 var msg = "$playerName je izbačen"
                 if (currentAdmin == playerName) {
                     val pKeys = js("Object.keys(data.players)").unsafeCast<Array<String>>()
@@ -275,17 +265,16 @@ actual object FirebaseManager : IFirebaseManager {
                     val next = otherPlayers.sortedBy { it.joinedAt }.firstOrNull()?.name
                     if (next != null) {
                         updates["admin"] = next
-                        // PRIVREMENI PRIJENOS (kad se izbaci): originalAdmin se NE MIJENJA
+                        // PRIVREMENI PRIJENOS: originalAdmin se NE MIJENJA
                         msg = "$playerName je izbačen, privremeni admin je $next"
                     }
                 } else {
-                    // Igrač koji nije admin je izbačen
                     msg = "$playerName je izbačen"
                 }
 
                 updates["messages/exit_${timestamp.toLong()}"] = msg
                 roomRef.update(updates, { _ ->
-                    roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
+                    roomRef.child("chatMessages").push().set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
                 })
             }
         })
