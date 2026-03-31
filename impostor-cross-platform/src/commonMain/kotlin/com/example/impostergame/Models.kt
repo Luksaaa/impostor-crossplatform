@@ -28,6 +28,7 @@ data class ChatMessage(
 @Serializable
 data class Room(
     val admin: String = "",
+    val originalAdmin: String = "",
     val status: String = "waiting", // "waiting", "started", "finished"
     val players: Map<String, PlayerInfo> = emptyMap(),
     val messages: Map<String, String> = emptyMap(),

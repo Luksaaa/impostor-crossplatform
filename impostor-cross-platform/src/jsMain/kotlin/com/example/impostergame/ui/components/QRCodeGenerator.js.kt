@@ -24,12 +24,10 @@ actual fun QRCodeImage(content: String, modifier: Modifier) {
                 val options = js("({ errorCorrectionLevel: 'H' })")
                 val qr = js("QRCode.create(content, options)")
                 val size = qr.modules.size.unsafeCast<Int>()
-                val data = qr.modules.data // dynamic (Uint8Array)
+                val data = qr.modules.data
                 modules = size to data
             }
-        } catch (e: Exception) {
-            console.error("QR Error:", e)
-        }
+        } catch (e: Exception) { }
     }
 
     Box(modifier = modifier.size(200.dp).background(Color.White), contentAlignment = Alignment.Center) {
@@ -39,10 +37,8 @@ actual fun QRCodeImage(content: String, modifier: Modifier) {
                 val size = current.first
                 val data = current.second
                 val cellSize = this.size.width / size
-                
                 for (row in 0 until size) {
                     for (col in 0 until size) {
-                        // Accessing Uint8Array elements via dynamic access
                         val isBlack = js("data[row * size + col] === 1").unsafeCast<Boolean>()
                         if (isBlack) {
                             drawRect(

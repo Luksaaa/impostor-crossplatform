@@ -31,6 +31,7 @@ actual object FirebaseManager : IFirebaseManager {
                 } else {
                     val roomData = mapOf(
                         "admin" to sanitizedName,
+                        "originalAdmin" to sanitizedName,
                         "status" to "waiting",
                         "players" to mapOf(sanitizedName to mapOf("name" to sanitizedName, "isReady" to false, "joinedAt" to now)),
                         "messages" to mapOf("init" to "$sanitizedName je napravio sobu")
@@ -103,20 +104,7 @@ actual object FirebaseManager : IFirebaseManager {
                     val updates = mutableMapOf<String, Any?>()
                     updates["players/$sanitizedName"] = null
                     
-                    val exitMsg: String
-                    if (currentAdmin == sanitizedName) {
-                        val nextActiveAdmin = playersSnapshots
-                            .filter { it.key != sanitizedName }
-                            .mapNotNull { it.getValueSafe<PlayerInfo?>() }
-                            .sortedBy { it.joinedAt }
-                            .firstOrNull()?.name
-                        
-                        exitMsg = "$sanitizedName je izašao, novi admin je $nextActiveAdmin"
-                        updates["admin"] = nextActiveAdmin
-                    } else {
-                        exitMsg = "$sanitizedName je izašao"
-                    }
-                    
+                    val exitMsg = "$sanitizedName je izašao"
                     updates["messages/exit_$timestamp"] = exitMsg
                     
                     val sysMsgKey = roomRef.child("chatMessages").push().key
@@ -221,14 +209,25 @@ actual object FirebaseManager : IFirebaseManager {
     override fun resetToLobby(roomCode: String) {
         firebaseScope.launch {
             try {
-                roomsRef.child(roomCode).updateChildren(mapOf(
+                val roomRef = roomsRef.child(roomCode)
+                val snapshot = roomRef.valueEvents.first()
+                if (snapshot.value == null) return@launch
+                
+                val room = snapshot.getValueSafe<Room>()
+                val updates = mutableMapOf<String, Any?>(
                     "status" to "waiting",
                     "chatMessages" to null,
                     "isDiscussionActive" to false,
                     "discussionStartTime" to 0L,
                     "discussionEndTime" to 0L,
                     "resultMessage" to ""
-                ))
+                )
+                
+                if (room.players.containsKey(room.originalAdmin)) {
+                    updates["admin"] = room.originalAdmin
+                }
+                
+                roomRef.updateChildren(updates)
             } catch (e: Exception) {}
         }
     }
@@ -240,16 +239,16 @@ actual object FirebaseManager : IFirebaseManager {
                 val snapshot = roomRef.valueEvents.first()
                 if (snapshot.value == null) return@launch
 
-                val currentAdmin = snapshot.child("admin").getValueSafe<String?>()
+                val room = snapshot.getValueSafe<Room>()
                 val timestamp = currentPlatformMillis()
                 
                 val updates = mutableMapOf<String, Any?>()
                 updates["players/$playerName"] = null
 
-                if (currentAdmin == playerName) {
-                    val playersSnapshots = mutableListOf<DataSnapshot>()
-                    snapshot.child("players").children.forEach { playersSnapshots.add(it) }
-                    
+                val playersSnapshots = mutableListOf<DataSnapshot>()
+                snapshot.child("players").children.forEach { playersSnapshots.add(it) }
+
+                if (room.admin == playerName) {
                     val nextActiveAdmin = playersSnapshots
                         .filter { it.key != playerName }
                         .mapNotNull { it.getValueSafe<PlayerInfo?>() }
@@ -257,7 +256,7 @@ actual object FirebaseManager : IFirebaseManager {
                         .firstOrNull()?.name
                         
                     updates["admin"] = nextActiveAdmin
-                    val exitMsg = "$playerName je izbačen, novi admin je $nextActiveAdmin"
+                    val exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
                     updates["messages/exit_$timestamp"] = exitMsg
                     val sysMsgKey = roomRef.child("chatMessages").push().key
                     updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
