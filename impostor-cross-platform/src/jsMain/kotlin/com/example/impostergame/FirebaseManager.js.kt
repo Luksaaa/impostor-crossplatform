@@ -149,12 +149,22 @@ actual object FirebaseManager : IFirebaseManager {
                             }
                         }
 
+                        val eventMsgs = mutableMapOf<String, String>()
+                        val mJson = data.messages
+                        if (mJson != null) {
+                            val keys = js("Object.keys(mJson)").unsafeCast<Array<String>>()
+                            for (k in keys) {
+                                eventMsgs[k] = mJson[k]?.toString() ?: ""
+                            }
+                        }
+
                         trySend(Room(
                             admin = data.admin?.toString() ?: "",
                             status = data.status?.toString() ?: "waiting",
                             imposterId = data.imposterId?.toString() ?: "",
                             chatMessages = chatMap,
                             players = playersMap,
+                            messages = eventMsgs,
                             isDiscussionActive = data.isDiscussionActive?.unsafeCast<Boolean>() ?: false,
                             resultMessage = data.resultMessage?.toString() ?: ""
                         ))
@@ -216,5 +226,3 @@ actual object FirebaseManager : IFirebaseManager {
         firebase.database().ref("rooms/$roomCode/players/$playerName").remove()
     }
 }
-
-private external val firebase: dynamic
