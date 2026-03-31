@@ -101,12 +101,11 @@ actual object FirebaseManager : IFirebaseManager {
                     val next = otherPlayers.sortedBy { it.joinedAt }.firstOrNull()?.name
                     if (next != null) {
                         updates["admin"] = next
-                        updates["originalAdmin"] = next // TRAJNI PRIJENOS: Ažurira se originalAdmin
+                        updates["originalAdmin"] = next // STALNI PRIJENOS: Ažurira se originalAdmin (kad sam ode)
                         val msg = "$sanitizedName je izašao, novi admin je $next"
                         updates["messages/exit_${timestamp.toLong()}"] = msg
                         roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
                     } else {
-                        // Nema drugih igrača, soba će biti prazna
                         val msg = "$sanitizedName je izašao"
                         updates["messages/exit_${timestamp.toLong()}"] = msg
                         roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
@@ -239,11 +238,12 @@ actual object FirebaseManager : IFirebaseManager {
                 val original = data.originalAdmin?.toString() ?: ""
                 val update = json("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false, "resultMessage" to "")
                 
-                // UVIJEK VRAĆAMO ADMINA NA KREATORA SOBE
-                update["admin"] = original
-                
-                if (original.isNotEmpty() && js("data.players && data.players[original] !== undefined").unsafeCast<Boolean>()) {
-                    update["players/$original/isReady"] = false
+                // UVIJEK VRAĆAMO ADMINA NA KREATORA SOBE BEZ UVJETA
+                if (original.isNotEmpty()) {
+                    update["admin"] = original
+                    if (js("data.players && data.players[original] !== undefined").unsafeCast<Boolean>()) {
+                        update["players/$original/isReady"] = false
+                    }
                 }
                 
                 roomRef.update(update)
@@ -275,7 +275,7 @@ actual object FirebaseManager : IFirebaseManager {
                     val next = otherPlayers.sortedBy { it.joinedAt }.firstOrNull()?.name
                     if (next != null) {
                         updates["admin"] = next
-                        // PRIVREMENI PRIJENOS: originalAdmin se NE MIJENJA
+                        // PRIVREMENI PRIJENOS (kad se izbaci): originalAdmin se NE MIJENJA
                         msg = "$playerName je izbačen, privremeni admin je $next"
                     }
                 } else {

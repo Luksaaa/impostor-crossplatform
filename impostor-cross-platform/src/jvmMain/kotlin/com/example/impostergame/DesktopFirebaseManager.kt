@@ -4,12 +4,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
-import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.atomic.AtomicLong
 
-@OptIn(ExperimentalSerializationApi::class)
 object DesktopFirebaseManager : IFirebaseManager {
     private const val BASE_URL = "https://gameofimpostor-default-rtdb.europe-west1.firebasedatabase.app/rooms"
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -119,29 +117,29 @@ object DesktopFirebaseManager : IFirebaseManager {
                     val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
                     val timestamp = getUniqueTimestamp()
                     
-                    val updates = buildJsonObject {
-                        put("players/$sanitizedName", JsonNull)
+                    val updates = mutableMapOf<String, JsonElement>()
+                    updates["players/$sanitizedName"] = JsonNull
+                    
+                    if (room.admin == sanitizedName) {
+                        val nextAdmin = room.players.values
+                            .filter { it.name != sanitizedName }
+                            .sortedBy { it.joinedAt }
+                            .firstOrNull()?.name
                         
-                        if (room.admin == sanitizedName) {
-                            val nextAdmin = room.players.values
-                                .filter { it.name != sanitizedName }
-                                .sortedBy { it.joinedAt }
-                                .firstOrNull()?.name
-                            
-                            if (nextAdmin != null) {
-                                put("admin", JsonPrimitive(nextAdmin))
-                                put("originalAdmin", JsonPrimitive(nextAdmin)) // TRAJNI PRIJENOS: Ažurira se originalAdmin
-                                val msg = "$sanitizedName je izašao, novi admin je $nextAdmin"
-                                put("messages/exit_$timestamp", JsonPrimitive(msg))
-                                put("chatMessages/sys_$timestamp", json.encodeToJsonElement(ChatMessage("Sustav", msg, timestamp)))
-                            }
-                        } else {
-                            val msg = "$sanitizedName je izašao"
-                            put("messages/exit_$timestamp", JsonPrimitive(msg))
-                            put("chatMessages/sys_$timestamp", json.encodeToJsonElement(ChatMessage("Sustav", msg, timestamp)))
+                        if (nextAdmin != null) {
+                            updates["admin"] = JsonPrimitive(nextAdmin)
+                            updates["originalAdmin"] = JsonPrimitive(nextAdmin) // STALNI ADMIN (kad sam izađe)
+                            val msg = "$sanitizedName je izašao, novi admin je $nextAdmin"
+                            updates["messages/exit_$timestamp"] = JsonPrimitive(msg)
+                            updates["chatMessages/sys_$timestamp"] = json.encodeToJsonElement(ChatMessage("Sustav", msg, timestamp))
                         }
+                    } else {
+                        val msg = "$sanitizedName je izašao"
+                        updates["messages/exit_$timestamp"] = JsonPrimitive(msg)
+                        updates["chatMessages/sys_$timestamp"] = json.encodeToJsonElement(ChatMessage("Sustav", msg, timestamp))
                     }
-                    patchData(roomCode, updates)
+                    
+                    patchData(roomCode, JsonObject(updates))
                 }
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")
@@ -183,19 +181,19 @@ object DesktopFirebaseManager : IFirebaseManager {
             val imposterId = shuffled.getOrNull(0) ?: ""
             val mrWhiteId = if (shuffled.size >= 3 && (1..100).random() <= 20) shuffled.getOrNull(1) ?: "" else ""
             
-            val updates = buildJsonObject {
-                put("mainWord", JsonPrimitive(mainWord))
-                put("imposterWord", JsonPrimitive(imposterWord))
-                put("imposterId", JsonPrimitive(imposterId))
-                put("mrWhiteId", JsonPrimitive(mrWhiteId))
-                put("status", JsonPrimitive("started"))
-                put("chatMessages", JsonNull)
-                put("isDiscussionActive", JsonPrimitive(false))
-                put("discussionStartTime", JsonPrimitive(0L))
-                put("discussionEndTime", JsonPrimitive(0L))
-                put("resultMessage", JsonPrimitive(""))
-            }
-            patchData(roomCode, updates)
+            val updates = mutableMapOf<String, JsonElement>(
+                "mainWord" to JsonPrimitive(mainWord),
+                "imposterWord" to JsonPrimitive(imposterWord),
+                "imposterId" to JsonPrimitive(imposterId),
+                "mrWhiteId" to JsonPrimitive(mrWhiteId),
+                "status" to JsonPrimitive("started"),
+                "chatMessages" to JsonNull,
+                "isDiscussionActive" to JsonPrimitive(false),
+                "discussionStartTime" to JsonPrimitive(0L),
+                "discussionEndTime" to JsonPrimitive(0L),
+                "resultMessage" to JsonPrimitive("")
+            )
+            patchData(roomCode, JsonObject(updates))
         }
     }
 
@@ -225,29 +223,27 @@ object DesktopFirebaseManager : IFirebaseManager {
             val now = getUniqueTimestamp()
             if (seconds > 0) {
                 val endTime = now + (seconds * 1000L)
-                val updates = buildJsonObject {
-                    put("isDiscussionActive", JsonPrimitive(true))
-                    put("discussionStartTime", JsonPrimitive(now))
-                    put("discussionEndTime", JsonPrimitive(endTime))
-                }
-                patchData(roomCode, updates)
+                val updates = mutableMapOf<String, JsonElement>(
+                    "isDiscussionActive" to JsonPrimitive(true),
+                    "discussionStartTime" to JsonPrimitive(now),
+                    "discussionEndTime" to JsonPrimitive(endTime)
+                )
+                patchData(roomCode, JsonObject(updates))
             } else {
-                val updates = buildJsonObject {
-                    put("isDiscussionActive", JsonPrimitive(false))
-                }
-                patchData(roomCode, updates)
+                val updates = mutableMapOf<String, JsonElement>("isDiscussionActive" to JsonPrimitive(false))
+                patchData(roomCode, JsonObject(updates))
             }
         }
     }
 
     override fun endRound(roomCode: String, resultMessage: String) {
         scope.launch {
-            val updates = buildJsonObject {
-                put("status", JsonPrimitive("finished"))
-                put("resultMessage", JsonPrimitive(resultMessage))
-                put("isDiscussionActive", JsonPrimitive(false))
-            }
-            patchData(roomCode, updates)
+            val updates = mutableMapOf<String, JsonElement>(
+                "status" to JsonPrimitive("finished"),
+                "resultMessage" to JsonPrimitive(resultMessage),
+                "isDiscussionActive" to JsonPrimitive(false)
+            )
+            patchData(roomCode, JsonObject(updates))
         }
     }
 
@@ -263,24 +259,24 @@ object DesktopFirebaseManager : IFirebaseManager {
                 if (response == "null") return@launch
                 val room = json.decodeFromString<Room>(response)
                 
-                val updates = buildJsonObject {
-                    put("status", JsonPrimitive("waiting"))
-                    put("chatMessages", JsonNull)
-                    put("isDiscussionActive", JsonPrimitive(false))
-                    put("discussionStartTime", JsonPrimitive(0L))
-                    put("discussionEndTime", JsonPrimitive(0L))
-                    put("resultMessage", JsonPrimitive(""))
-                    
-                    // UVIJEK vraćamo admina na originalnog kreatora (ako on nije u sobi, čekat će se)
-                    put("admin", JsonPrimitive(room.originalAdmin))
-                    
-                    // Ako je originalni admin prisutan, resetiramo njegov isReady status
-                    if (room.originalAdmin.isNotEmpty() && room.players.containsKey(room.originalAdmin)) {
-                         put("players/${room.originalAdmin}/isReady", JsonPrimitive(false))
+                val updates = mutableMapOf<String, JsonElement>(
+                    "status" to JsonPrimitive("waiting"),
+                    "chatMessages" to JsonNull,
+                    "isDiscussionActive" to JsonPrimitive(false),
+                    "discussionStartTime" to JsonPrimitive(0L),
+                    "discussionEndTime" to JsonPrimitive(0L),
+                    "resultMessage" to JsonPrimitive("")
+                )
+                
+                // UVIJEK VRAĆAMO ADMINA NA ORIGINALNOG KREATORA BEZ UVJETA
+                if (room.originalAdmin.isNotEmpty()) {
+                    updates["admin"] = JsonPrimitive(room.originalAdmin)
+                    if (room.players.containsKey(room.originalAdmin)) {
+                        updates["players/${room.originalAdmin}/isReady"] = JsonPrimitive(false)
                     }
                 }
                 
-                patchData(roomCode, updates)
+                patchData(roomCode, JsonObject(updates))
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")
             }
@@ -300,33 +296,31 @@ object DesktopFirebaseManager : IFirebaseManager {
                 val room = json.decodeFromString<Room>(response)
                 val timestamp = getUniqueTimestamp()
                 
-                val updates = buildJsonObject {
-                    put("players/$playerName", JsonNull)
+                val updates = mutableMapOf<String, JsonElement>()
+                updates["players/$playerName"] = JsonNull
+                
+                val exitMsg: String
+                if (room.admin == playerName) {
+                    val nextActiveAdmin = room.players.values
+                        .filter { it.name != playerName }
+                        .sortedBy { it.joinedAt }
+                        .firstOrNull()?.name
                     
-                    val exitMsg: String
-                    if (room.admin == playerName) {
-                        val nextActiveAdmin = room.players.values
-                            .filter { it.name != playerName }
-                            .sortedBy { it.joinedAt }
-                            .firstOrNull()?.name
-                        
-                        if (nextActiveAdmin != null) {
-                            // PRIVREMENI PRIJENOS: originalAdmin se NE MIJENJA
-                            exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
-                            put("admin", JsonPrimitive(nextActiveAdmin))
-                        } else {
-                            exitMsg = "$playerName je izbačen"
-                        }
+                    if (nextActiveAdmin != null) {
+                        exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
+                        updates["admin"] = JsonPrimitive(nextActiveAdmin)
+                        // ORIGINALADMIN OSTAJE KREATOR (PRIVREMENI PRIJENOS)
                     } else {
-                        // Igrač koji nije admin je izbačen
                         exitMsg = "$playerName je izbačen"
                     }
-                    
-                    put("messages/exit_$timestamp", JsonPrimitive(exitMsg))
-                    put("chatMessages/sys_$timestamp", json.encodeToJsonElement(ChatMessage("Sustav", exitMsg, timestamp)))
+                } else {
+                    exitMsg = "$playerName je izbačen"
                 }
+                
+                updates["messages/exit_$timestamp"] = JsonPrimitive(exitMsg)
+                updates["chatMessages/sys_$timestamp"] = json.encodeToJsonElement(ChatMessage("Sustav", exitMsg, timestamp))
 
-                patchData(roomCode, updates)
+                patchData(roomCode, JsonObject(updates))
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")
             }

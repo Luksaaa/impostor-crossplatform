@@ -68,7 +68,7 @@ fun GameScreen(
     var gameStatus by remember { mutableStateOf("started") }
     var showVoteDialog by remember { mutableStateOf(false) }
     
-    var isDiscussionActive by remember { mutableStateOf(false) } // POPRAVAK: Vraćeno na Boolean
+    var isDiscussionActive by remember { mutableStateOf(false) }
     var discussionStartTime by remember { mutableLongStateOf(0L) }
     var discussionEndTime by remember { mutableLongStateOf(0L) }
     var localStartTime by remember { mutableLongStateOf(0L) }
@@ -77,7 +77,6 @@ fun GameScreen(
     
     val showDiscussion = isDiscussionActive && timeLeft > 0
 
-    // JEDNOSTAVNA LOGIKA: Jesi li ti admin prema onome što piše u bazi?
     val isUserAdmin = remember(currentAdminByServer, sanitizedName) {
         currentAdminByServer == sanitizedName
     }
@@ -93,7 +92,6 @@ fun GameScreen(
     val secondaryBtnBg = if (isDarkTheme) Color(0xFF3E3A33) else Color(0xFFFDF5E6)
     val progressColor = SageGreen.copy(alpha = 0.3f)
 
-    // Detekcija tipkovnice preko paddinga
     val isKeyboardVisible = WindowInsets.ime.asPaddingValues().calculateBottomPadding() > 0.dp
 
     LaunchedEffect(roomCode) {
@@ -115,15 +113,16 @@ fun GameScreen(
                 else -> room.mainWord
             }
 
-            chatMessages = room.chatMessages.values.sortedWith(
-                compareBy<ChatMessage> { it.timestamp }.thenBy { it.message }
-            )
+            chatMessages = room.chatMessages.entries
+                .sortedWith(compareBy<Map.Entry<String, ChatMessage>> { it.value.timestamp }.thenBy { it.key })
+                .map { it.value }
             
             players = room.players
             
             // AUTOMATSKI RESET: Ako je igra u tijeku, a ostao je samo 1 igrač
             if (gameStatus == "started") {
-                if (isUserAdmin) {
+                // Koristimo direktno ime admina iz servera da izbjegnemo recomposition kašnjenje
+                if (room.admin == sanitizedName) {
                     val onlyOneLeft = room.players.size <= 1
                     if (onlyOneLeft) {
                         FirebaseManager.resetToLobby(roomCode)
@@ -146,7 +145,8 @@ fun GameScreen(
 
     LaunchedEffect(players) {
         if (gameStatus == "started" && players.isNotEmpty() && !players.containsKey(sanitizedName)) {
-            onRepeat()
+            // IGRAČ JE IZBAČEN: Ide na početni zaslon (Join/Create), NE U LOBBY!
+            onNewGame()
         }
     }
 
@@ -362,7 +362,7 @@ fun GameScreen(
                             progressColor = progressColor,
                             textColor = textColor,
                             onRepeatHold = { progress -> holdProgress = progress },
-                            onExitHold = { progress -> exitHoldProgress = progress }, // OVDJE JE BIO TIPFELAR
+                            onExitHold = { progress -> exitHoldProgress = progress },
                             onResetToLobby = { FirebaseManager.resetToLobby(roomCode) },
                             onShowVote = { showVoteDialog = true },
                             onLeaveRoom = { FirebaseManager.leaveRoomWithAdminTransfer(roomCode, sanitizedName, onNewGame) },
