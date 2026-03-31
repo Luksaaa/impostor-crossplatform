@@ -113,18 +113,17 @@ fun GameScreen(
                 else -> room.mainWord
             }
 
-            // KONAČNI POPRAVAK CHATA: Sortiramo isključivo po Firebase Push ID ključu koji garantira točan redoslijed!
             chatMessages = room.chatMessages.entries
                 .sortedBy { it.key }
                 .map { it.value }
             
             players = room.players
             
-            // AUTOMATSKI RESET: Ako je igra u tijeku, a ostao je samo 1 igrač
-            if (gameStatus == "started") {
-                if (isUserAdmin) {
-                    val onlyOneLeft = room.players.size <= 1
-                    if (onlyOneLeft) {
+            // KONAČNI POPRAVAK ZA ZADNJEG IGRAČA: Koristimo direktno 'room.admin', a ne 'isUserAdmin' stanje
+            if (room.status == "started") {
+                if (room.admin == sanitizedName) {
+                    if (room.players.size <= 1) {
+                        // Ostao je samo jedan igrač (admin), odmah ga vraćamo u lobby
                         FirebaseManager.resetToLobby(roomCode)
                     }
                 }
