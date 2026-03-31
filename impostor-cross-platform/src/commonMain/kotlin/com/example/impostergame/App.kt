@@ -42,14 +42,13 @@ private class MockSettings : Settings {
 @Preview
 fun App() {
     // Koristimo remember kako bismo izbjegli ponovno kreiranje Settings objekta na svakoj rekompoziciji.
-    // Također koristimo try-catch kako bismo spriječili pucanje u Preview modu.
     val settings: Settings = remember {
         try {
             val s = Settings()
-            // Resetira podatke samo jednom i nikad više
-            if (!s.getBoolean("has_been_reset_once_v3", false)) {
+            // Resetira podatke kako bismo uklonili stare 'JSROOM' vrijednosti
+            if (!s.getBoolean("has_been_reset_once_v5", false)) {
                 s.clear()
-                s.putBoolean("has_been_reset_once_v3", true)
+                s.putBoolean("has_been_reset_once_v5", true)
             }
             s
         } catch (_: Throwable) {
@@ -76,7 +75,7 @@ fun App() {
         settings.putBoolean("isAdmin", isAdmin)
     }
 
-    // Logika za animiranu pozadinu (sada koristimo 0..1 progress)
+    // Logika za animiranu pozadinu
     val infiniteTransition = rememberInfiniteTransition()
     val xProgress by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -127,8 +126,10 @@ fun App() {
                             onCreateRoom = {
                                 isAdmin = true
                                 FirebaseManager.generateRoom(username) { code ->
-                                    roomCode = code
-                                    navigateTo(Screen.LOBBY)
+                                    if (code.isNotEmpty() && !code.startsWith("ERR")) {
+                                        roomCode = code
+                                        navigateTo(Screen.LOBBY)
+                                    }
                                 }
                             },
                             onJoinRoom = {
