@@ -162,6 +162,9 @@ actual object FirebaseManager : IFirebaseManager {
                             admin = data.admin?.toString() ?: "",
                             status = data.status?.toString() ?: "waiting",
                             imposterId = data.imposterId?.toString() ?: "",
+                            mrWhiteId = data.mrWhiteId?.toString() ?: "",
+                            imposterWord = data.imposterWord?.toString() ?: "",
+                            mainWord = data.mainWord?.toString() ?: "",
                             chatMessages = chatMap,
                             players = playersMap,
                             messages = eventMsgs,
@@ -189,11 +192,22 @@ actual object FirebaseManager : IFirebaseManager {
         if (!isFirebaseReady()) return
         val (main, imp) = WordManager.getNextWords()
         val shuffled = playersList.shuffled()
+        val imposterId = shuffled[0]
+        val mrWhiteId = if (shuffled.size >= 3 && (1..100).random() <= 20) shuffled[1] else ""
+
         val update = json(
-            "mainWord" to main, "imposterWord" to imp,
-            "imposterId" to shuffled[0], "status" to "started"
+            "mainWord" to main, 
+            "imposterWord" to imp,
+            "imposterId" to imposterId, 
+            "mrWhiteId" to mrWhiteId,
+            "status" to "started",
+            "chatMessages" to null,
+            "isDiscussionActive" to false,
+            "resultMessage" to ""
         )
-        firebase.database().ref("rooms/$roomCode").asDynamic().update(update)
+        // Uklonjen .asDynamic() jer uzrokuje "not a function" na Webu
+        val ref = firebase.database().ref("rooms/$roomCode")
+        js("ref.update(update)")
     }
 
     override fun sendMessage(roomCode: String, username: String, message: String) {
@@ -206,19 +220,27 @@ actual object FirebaseManager : IFirebaseManager {
     override fun startDiscussion(roomCode: String, seconds: Int) {
         if (!isFirebaseReady()) return
         val now = currentPlatformMillis().toDouble()
-        val update = if (seconds > 0) json("isDiscussionActive" to true, "discussionStartTime" to now, "discussionEndTime" to (now + seconds * 1000))
-                     else json("isDiscussionActive" to false)
-        firebase.database().ref("rooms/$roomCode").asDynamic().update(update)
+        val update = if (seconds > 0) {
+            json("isDiscussionActive" to true, "discussionStartTime" to now, "discussionEndTime" to (now + seconds * 1000))
+        } else {
+            json("isDiscussionActive" to false)
+        }
+        val ref = firebase.database().ref("rooms/$roomCode")
+        js("ref.update(update)")
     }
 
     override fun endRound(roomCode: String, resultMessage: String) {
         if (!isFirebaseReady()) return
-        firebase.database().ref("rooms/$roomCode").asDynamic().update(json("status" to "finished", "resultMessage" to resultMessage, "isDiscussionActive" to false))
+        val update = json("status" to "finished", "resultMessage" to resultMessage, "isDiscussionActive" to false)
+        val ref = firebase.database().ref("rooms/$roomCode")
+        js("ref.update(update)")
     }
 
     override fun resetToLobby(roomCode: String) {
         if (!isFirebaseReady()) return
-        firebase.database().ref("rooms/$roomCode").asDynamic().update(json("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false))
+        val update = json("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false)
+        val ref = firebase.database().ref("rooms/$roomCode")
+        js("ref.update(update)")
     }
 
     override fun removePlayer(roomCode: String, playerName: String) {

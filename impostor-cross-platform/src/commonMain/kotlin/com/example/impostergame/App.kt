@@ -39,7 +39,7 @@ private class MockSettings : Settings {
 }
 
 @Composable
-@   Preview
+@Preview
 fun App() {
     // Koristimo remember kako bismo izbjegli ponovno kreiranje Settings objekta na svakoj rekompoziciji.
     val settings: Settings = remember {
