@@ -119,7 +119,11 @@ fun GameScreen(
                 else -> room.mainWord
             }
 
-            chatMessages = room.chatMessages.values.sortedBy { it.timestamp }
+            // POPRAVAK SORTIRANJA: Sortiramo po timestampu, a zatim po samoj poruci ako je timestamp isti
+            chatMessages = room.chatMessages.values.sortedWith(
+                compareBy<ChatMessage> { it.timestamp }.thenBy { it.message }
+            )
+
             players = room.players
             
             // AUTOMATSKI RESET: Ako je igra u tijeku, a ostao je samo 1 igrač
