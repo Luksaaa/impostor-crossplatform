@@ -76,8 +76,7 @@ fun GameScreen(
     var timeLeft by remember { mutableIntStateOf(0) }
     
     val showDiscussion = isDiscussionActive && timeLeft > 0
-    
-    // Provjera tko ima ovlasti (originalni admin ili najstariji preostali igrač)
+
     val isUserAdmin = remember(currentAdmin, players, sanitizedName) {
         if (currentAdmin == sanitizedName) return@remember true
         if (!players.containsKey(currentAdmin)) {
