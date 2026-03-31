@@ -12,7 +12,6 @@ import kotlin.js.json
 actual object FirebaseManager : IFirebaseManager {
     private val firebaseScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     
-    // Za osiguravanje jedinstvenih timestampova na JS-u
     private var lastTimestamp: Double = 0.0
 
     private fun getUniqueTimestamp(): Double {
@@ -102,7 +101,13 @@ actual object FirebaseManager : IFirebaseManager {
                     val next = otherPlayers.sortedBy { it.joinedAt }.firstOrNull()?.name
                     if (next != null) {
                         updates["admin"] = next
+                        updates["originalAdmin"] = next // Postaje trajni vlasnik
                         val msg = "$sanitizedName je izašao, novi admin je $next"
+                        updates["messages/exit_${timestamp.toLong()}"] = msg
+                        roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
+                    } else {
+                        // Nema drugih igrača, soba će biti prazna
+                        val msg = "$sanitizedName je izašao"
                         updates["messages/exit_${timestamp.toLong()}"] = msg
                         roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
                     }
@@ -184,9 +189,7 @@ actual object FirebaseManager : IFirebaseManager {
                         messages = eventMsgs
                     ))
                 }
-            } catch (e: Exception) {
-                println("Firebase Listener Error: ${e.message}")
-            }
+            } catch (e: Exception) { }
         }
         ref.on("value", callback)
         awaitClose { ref.off("value", callback) }
@@ -211,7 +214,6 @@ actual object FirebaseManager : IFirebaseManager {
         val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
         val timestamp = getUniqueTimestamp()
         val chatMsg = json("sender" to sanitizedName, "message" to message.trim(), "timestamp" to timestamp)
-        // Koristimo timestamp u ključu za bolji redoslijed
         firebase.database().ref("rooms/$roomCode/chatMessages").child("msg_${timestamp.toLong()}").set(chatMsg)
     }
 
@@ -233,18 +235,30 @@ actual object FirebaseManager : IFirebaseManager {
         val roomRef = firebase.database().ref("rooms/$roomCode")
         roomRef.once("value", { snapshot: dynamic ->
             val data = snapshot.`val`()
-            val original = data.originalAdmin?.toString() ?: ""
-            val update = json("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false, "resultMessage" to "")
-            
-            if (original.isNotEmpty()) {
-                update["admin"] = original
-                update["players/$original/name"] = original
-                update["players/$original/isReady"] = false
-                val existingJoinedAt = js("data.players ? data.players[original] : null")?.joinedAt
-                update["players/$original/joinedAt"] = existingJoinedAt ?: getUniqueTimestamp()
+            if (data != null) {
+                val original = data.originalAdmin?.toString() ?: ""
+                val update = json("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false, "resultMessage" to "")
+                
+                // POPRAVAK: Vraćamo admina originalnom kreatoru SAMO ako je on još uvijek u sobi
+                if (original.isNotEmpty() && js("data.players && data.players[original] !== undefined").unsafeCast<Boolean>()) {
+                    update["admin"] = original
+                    update["players/$original/isReady"] = false
+                } else if (original.isNotEmpty() && !js("data.players && data.players[original] !== undefined").unsafeCast<Boolean>()) {
+                    // Ako originalni admin NIJE u sobi, a POSTOJE drugi igrači, postaviti najstarijeg kao admina i originalAdmina
+                    val nextActiveAdmin = js("Object.values(data.players)").unsafeCast<Array<dynamic>>()
+                        .filter { p -> p.name?.toString() != original }
+                        .sortedBy { p -> p.joinedAt?.unsafeCast<Double>() ?: 0.0 }
+                        .firstOrNull()?.name?.toString()
+
+                    if (nextActiveAdmin != null) {
+                        update["admin"] = nextActiveAdmin
+                        update["originalAdmin"] = nextActiveAdmin // Postaje trajni vlasnik
+                        update["players/$nextActiveAdmin/isReady"] = false
+                    }
+                }
+                
+                roomRef.update(update)
             }
-            
-            roomRef.update(update)
         })
     }
 
@@ -253,32 +267,41 @@ actual object FirebaseManager : IFirebaseManager {
         val roomRef = firebase.database().ref("rooms/$roomCode")
         roomRef.once("value", { snapshot: dynamic ->
             val data = snapshot.`val`()
-            val currentAdmin = data.admin?.toString() ?: ""
-            val updates = json()
-            
-            updates["players/$playerName"] = null
+            if (data != null) {
+                val currentAdmin = data.admin?.toString() ?: ""
+                val updates = json()
+                updates["players/$playerName"] = null
 
-            val timestamp = getUniqueTimestamp()
-            var msg = "$playerName je izbačen"
-            if (currentAdmin == playerName) {
-                val pKeys = js("Object.keys(data.players)").unsafeCast<Array<String>>()
-                val otherPlayers = mutableListOf<PlayerInfo>()
-                for (k in pKeys) {
-                    if (k != playerName) {
-                        val p = js("data.players[k]")
-                        otherPlayers.add(PlayerInfo(k, false, (p.joinedAt?.unsafeCast<Double>() ?: 0.0).toLong()))
+                val timestamp = getUniqueTimestamp()
+                var msg = "$playerName je izbačen"
+                if (currentAdmin == playerName) {
+                    val pKeys = js("Object.keys(data.players)").unsafeCast<Array<String>>()
+                    val otherPlayers = mutableListOf<PlayerInfo>()
+                    for (k in pKeys) {
+                        if (k != playerName) {
+                            val p = js("data.players[k]")
+                            otherPlayers.add(PlayerInfo(k, false, (p.joinedAt?.unsafeCast<Double>() ?: 0.0).toLong()))
+                        }
                     }
+                    val next = otherPlayers.sortedBy { it.joinedAt }.firstOrNull()?.name
+                    if (next != null) {
+                        updates["admin"] = next
+                        updates["originalAdmin"] = next // Trajna promjena
+                        msg = "$playerName je izbačen, novi admin je $next"
+                    } else {
+                        // Nema drugih igrača, soba će biti prazna
+                        msg = "$playerName je izbačen"
+                    }
+                } else {
+                    // Igrač koji nije admin je izbačen - admin se ne mijenja, originalAdmin se ne mijenja
+                    msg = "$playerName je izbačen"
                 }
-                val next = otherPlayers.sortedBy { it.joinedAt }.firstOrNull()?.name
-                if (next != null) {
-                    updates["admin"] = next
-                    msg = "$playerName je izbačen, privremeni admin je $next"
-                }
+
+                updates["messages/exit_${timestamp.toLong()}"] = msg
+                roomRef.update(updates, { _ ->
+                    roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
+                })
             }
-            updates["messages/exit_${timestamp.toLong()}"] = msg
-            roomRef.update(updates, { _ ->
-                roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
-            })
         })
     }
 }

@@ -13,7 +13,6 @@ object DesktopFirebaseManager : IFirebaseManager {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
     
-    // Osigurava da je svaki lokalni timestamp jedinstven u milisekundi
     private val lastTimestamp = AtomicLong(0)
 
     private fun getUniqueTimestamp(): Long {
@@ -129,6 +128,7 @@ object DesktopFirebaseManager : IFirebaseManager {
                         
                         if (nextAdmin != null) {
                             updates["admin"] = JsonPrimitive(nextAdmin)
+                            // NE AŽURIRAMO originalAdmin OVDJE - ON OSTAJE KREATOR SOBE
                             val msg = "$sanitizedName je izašao, novi admin je $nextAdmin"
                             updates["messages/exit_$timestamp"] = JsonPrimitive(msg)
                             updates["chatMessages/sys_$timestamp"] = json.encodeToJsonElement(ChatMessage("Sustav", msg, timestamp))
@@ -206,7 +206,7 @@ object DesktopFirebaseManager : IFirebaseManager {
                 
                 val url = URL("$BASE_URL/$roomCode/chatMessages/msg_$timestamp.json")
                 val conn = url.openConnection() as HttpURLConnection
-                conn.requestMethod = "PUT" // Koristimo PUT s timestampom u ključu za bolji redoslijed
+                conn.requestMethod = "PUT"
                 conn.doOutput = true
                 conn.setRequestProperty("Content-Type", "application/json")
                 conn.outputStream.write(json.encodeToString(chatMsg).toByteArray())
@@ -268,10 +268,20 @@ object DesktopFirebaseManager : IFirebaseManager {
                     "resultMessage" to JsonPrimitive("")
                 )
                 
-                if (room.originalAdmin.isNotEmpty()) {
+                // Vraćamo admina originalnom kreatoru SAMO ako je on još uvijek u sobi
+                if (room.originalAdmin.isNotEmpty() && room.players.containsKey(room.originalAdmin)) {
                     updates["admin"] = JsonPrimitive(room.originalAdmin)
-                    if (room.players.containsKey(room.originalAdmin)) {
-                        updates["players/${room.originalAdmin}/isReady"] = JsonPrimitive(false)
+                    updates["players/${room.originalAdmin}/isReady"] = JsonPrimitive(false)
+                } else if (room.players.isNotEmpty()) {
+                    // Ako originalni admin nije u sobi, a POSTOJE drugi igrači, postaviti najstarijeg kao admina
+                    val nextActiveAdmin = room.players.values
+                        .sortedBy { it.joinedAt }
+                        .firstOrNull()?.name
+
+                    if (nextActiveAdmin != null) {
+                        updates["admin"] = JsonPrimitive(nextActiveAdmin)
+                        // originalAdmin OSTAJE KREATOR SOBE, NE MIJENJA SE OVDJE
+                        updates["players/${nextActiveAdmin}/isReady"] = JsonPrimitive(false)
                     }
                 }
                 
@@ -306,12 +316,14 @@ object DesktopFirebaseManager : IFirebaseManager {
                         .firstOrNull()?.name
                     
                     if (nextActiveAdmin != null) {
-                        exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
+                        exitMsg = "$playerName je izbačen, novi admin je $nextActiveAdmin"
                         updates["admin"] = JsonPrimitive(nextActiveAdmin)
+                        // NE AŽURIRAMO originalAdmin OVDJE - ON OSTAJE KREATOR SOBE
                     } else {
                         exitMsg = "$playerName je izbačen"
                     }
                 } else {
+                    // Igrač koji nije admin je izbačen - admin se ne mijenja, originalAdmin se ne mijenja
                     exitMsg = "$playerName je izbačen"
                 }
                 

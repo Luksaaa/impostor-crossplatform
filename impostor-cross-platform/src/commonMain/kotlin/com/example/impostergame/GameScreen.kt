@@ -60,7 +60,7 @@ fun GameScreen(
     var isRevealed by remember { mutableStateOf(false) }
     var holdProgress by remember { mutableStateOf(0f) }
     var exitHoldProgress by remember { mutableStateOf(0f) }
-    var currentAdmin by remember { mutableStateOf("") }
+    var currentAdminByServer by remember { mutableStateOf("") }
     var chatMessages by remember { mutableStateOf(listOf<ChatMessage>()) }
     var chatInput by remember { mutableStateOf("") }
     var players by remember { mutableStateOf<Map<String, PlayerInfo>>(emptyMap()) }
@@ -68,7 +68,7 @@ fun GameScreen(
     var gameStatus by remember { mutableStateOf("started") }
     var showVoteDialog by remember { mutableStateOf(false) }
     
-    var isDiscussionActive by remember { mutableStateOf(false) }
+    var isDiscussionActive by remember { mutableStateOf(false) } // POPRAVAK: Vraćeno na Boolean
     var discussionStartTime by remember { mutableLongStateOf(0L) }
     var discussionEndTime by remember { mutableLongStateOf(0L) }
     var localStartTime by remember { mutableLongStateOf(0L) }
@@ -77,13 +77,9 @@ fun GameScreen(
     
     val showDiscussion = isDiscussionActive && timeLeft > 0
 
-    val isUserAdmin = remember(currentAdmin, players, sanitizedName) {
-        if (currentAdmin == sanitizedName) return@remember true
-        if (!players.containsKey(currentAdmin)) {
-            val oldestPlayer = players.values.sortedBy { it.joinedAt }.firstOrNull()
-            return@remember oldestPlayer?.name == sanitizedName
-        }
-        false
+    // JEDNOSTAVNA LOGIKA: Jesi li ti admin prema onome što piše u bazi?
+    val isUserAdmin = remember(currentAdminByServer, sanitizedName) {
+        currentAdminByServer == sanitizedName
     }
 
     val scope = rememberCoroutineScope()
@@ -104,7 +100,7 @@ fun GameScreen(
         FirebaseManager.listenToRoom(roomCode).collectLatest { room ->
             if (room == null) return@collectLatest
             
-            currentAdmin = room.admin
+            currentAdminByServer = room.admin
             gameStatus = room.status
             val imposterId = room.imposterId
             val mrWhiteId = room.mrWhiteId
@@ -119,19 +115,15 @@ fun GameScreen(
                 else -> room.mainWord
             }
 
-            // POPRAVAK SORTIRANJA: Sortiramo po timestampu, a zatim po samoj poruci ako je timestamp isti
             chatMessages = room.chatMessages.values.sortedWith(
                 compareBy<ChatMessage> { it.timestamp }.thenBy { it.message }
             )
-
+            
             players = room.players
             
             // AUTOMATSKI RESET: Ako je igra u tijeku, a ostao je samo 1 igrač
             if (gameStatus == "started") {
-                val currentEffAdmin = if (room.players.containsKey(room.admin)) room.admin 
-                                     else room.players.values.sortedBy { it.joinedAt }.firstOrNull()?.name
-                
-                if (sanitizedName == currentEffAdmin) {
+                if (isUserAdmin) {
                     val onlyOneLeft = room.players.size <= 1
                     if (onlyOneLeft) {
                         FirebaseManager.resetToLobby(roomCode)
@@ -370,7 +362,7 @@ fun GameScreen(
                             progressColor = progressColor,
                             textColor = textColor,
                             onRepeatHold = { progress -> holdProgress = progress },
-                            onExitHold = { progress -> exitHoldProgress = progress },
+                            onExitHold = { progress -> exitHoldProgress = progress }, // OVDJE JE BIO TIPFELAR
                             onResetToLobby = { FirebaseManager.resetToLobby(roomCode) },
                             onShowVote = { showVoteDialog = true },
                             onLeaveRoom = { FirebaseManager.leaveRoomWithAdminTransfer(roomCode, sanitizedName, onNewGame) },

@@ -13,17 +13,25 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
+import kotlinx.browser.window
 
 @Composable
 actual fun QRCodeImage(content: String, modifier: Modifier) {
     var modules by remember(content) { mutableStateOf<Pair<Int, dynamic>?>(null) }
 
     LaunchedEffect(content) {
+        // Čekamo da se window.QRCode objekt učita, ako već nije
+        if (js("typeof QRCode === 'undefined'").unsafeCast<Boolean>()) {
+            // Mala odgoda, ako skripta nije odmah dostupna
+            kotlinx.coroutines.delay(100)
+        }
+
         try {
             // Sigurna provjera objekta QRCode iz qrcode.min.js
-            if (js("typeof QRCode !== 'undefined'").unsafeCast<Boolean>()) {
+            val qrCodeExists = js("typeof QRCode !== 'undefined'").unsafeCast<Boolean>()
+            if (qrCodeExists) {
                 val options = js("({ errorCorrectionLevel: 'M' })")
-                // qrcode biblioteka (v1.5.3) ima QRCode.create metodu
+                // Biblioteka qrcode (npm qrcode) ima metodu 'create'
                 val qr = js("QRCode.create(content, options)")
                 if (qr != null && qr.modules != null) {
                     val size = qr.modules.size.unsafeCast<Int>()
@@ -31,9 +39,9 @@ actual fun QRCodeImage(content: String, modifier: Modifier) {
                     modules = size to data
                 }
             }
-        } catch (e: Exception) { 
-            // Ne dozvoljavamo da greška sruši UI
-            println("QR Error: ${e.message}")
+        } catch (e: Throwable) {
+            // Ne dopuštamo da greška sruši aplikaciju (Script error)
+            println("QR Code Generator failed silently: ${e.message}")
         }
     }
 
@@ -58,10 +66,12 @@ actual fun QRCodeImage(content: String, modifier: Modifier) {
                             }
                         }
                     }
-                } catch (e: Exception) {}
+                } catch (e: Throwable) {
+                    println("QR Code Canvas drawing error: ${e.message}")
+                }
             }
         } else {
-            // Sivi kvadrat dok se podaci ne učitaju
+            // Sivi kvadrat kao fallback
             Box(modifier = Modifier.fillMaxSize().background(Color.LightGray))
         }
     }
