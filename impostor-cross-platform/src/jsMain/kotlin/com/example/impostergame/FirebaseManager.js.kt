@@ -101,7 +101,7 @@ actual object FirebaseManager : IFirebaseManager {
                     val next = otherPlayers.sortedBy { it.joinedAt }.firstOrNull()?.name
                     if (next != null) {
                         updates["admin"] = next
-                        updates["originalAdmin"] = next // Postaje trajni vlasnik
+                        updates["originalAdmin"] = next // TRAJNI PRIJENOS: Ažurira se originalAdmin
                         val msg = "$sanitizedName je izašao, novi admin je $next"
                         updates["messages/exit_${timestamp.toLong()}"] = msg
                         roomRef.child("chatMessages").child("sys_${timestamp.toLong()}").set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
@@ -239,22 +239,11 @@ actual object FirebaseManager : IFirebaseManager {
                 val original = data.originalAdmin?.toString() ?: ""
                 val update = json("status" to "waiting", "chatMessages" to null, "isDiscussionActive" to false, "resultMessage" to "")
                 
-                // POPRAVAK: Vraćamo admina originalnom kreatoru SAMO ako je on još uvijek u sobi
+                // UVIJEK VRAĆAMO ADMINA NA KREATORA SOBE
+                update["admin"] = original
+                
                 if (original.isNotEmpty() && js("data.players && data.players[original] !== undefined").unsafeCast<Boolean>()) {
-                    update["admin"] = original
                     update["players/$original/isReady"] = false
-                } else if (original.isNotEmpty() && !js("data.players && data.players[original] !== undefined").unsafeCast<Boolean>()) {
-                    // Ako originalni admin NIJE u sobi, a POSTOJE drugi igrači, postaviti najstarijeg kao admina i originalAdmina
-                    val nextActiveAdmin = js("Object.values(data.players)").unsafeCast<Array<dynamic>>()
-                        .filter { p -> p.name?.toString() != original }
-                        .sortedBy { p -> p.joinedAt?.unsafeCast<Double>() ?: 0.0 }
-                        .firstOrNull()?.name?.toString()
-
-                    if (nextActiveAdmin != null) {
-                        update["admin"] = nextActiveAdmin
-                        update["originalAdmin"] = nextActiveAdmin // Postaje trajni vlasnik
-                        update["players/$nextActiveAdmin/isReady"] = false
-                    }
                 }
                 
                 roomRef.update(update)
@@ -286,14 +275,11 @@ actual object FirebaseManager : IFirebaseManager {
                     val next = otherPlayers.sortedBy { it.joinedAt }.firstOrNull()?.name
                     if (next != null) {
                         updates["admin"] = next
-                        updates["originalAdmin"] = next // Trajna promjena
-                        msg = "$playerName je izbačen, novi admin je $next"
-                    } else {
-                        // Nema drugih igrača, soba će biti prazna
-                        msg = "$playerName je izbačen"
+                        // PRIVREMENI PRIJENOS: originalAdmin se NE MIJENJA
+                        msg = "$playerName je izbačen, privremeni admin je $next"
                     }
                 } else {
-                    // Igrač koji nije admin je izbačen - admin se ne mijenja, originalAdmin se ne mijenja
+                    // Igrač koji nije admin je izbačen
                     msg = "$playerName je izbačen"
                 }
 
