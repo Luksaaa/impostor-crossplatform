@@ -246,27 +246,27 @@ actual object FirebaseManager {
                 val updates = mutableMapOf<String, Any?>()
                 updates["players/$playerName"] = null
 
-                val exitMsg: String
+                val playersSnapshots = mutableListOf<DataSnapshot>()
+                snapshot.child("players").children.forEach { playersSnapshots.add(it) }
+
                 if (currentAdmin == playerName) {
-                    val playersSnapshots = mutableListOf<DataSnapshot>()
-                    snapshot.child("players").children.forEach { playersSnapshots.add(it) }
-                    
                     val nextActiveAdmin = playersSnapshots
                         .filter { it.key != playerName }
                         .mapNotNull { it.getValueSafe<PlayerInfo?>() }
                         .sortedBy { it.joinedAt }
                         .firstOrNull()?.name
-                        
+                    
                     updates["admin"] = nextActiveAdmin
-                    exitMsg = "$playerName je izbačen, novi admin je $nextActiveAdmin"
+                    val exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
+                    updates["messages/exit_$timestamp"] = exitMsg
+                    val sysMsgKey = roomRef.child("chatMessages").push().key
+                    updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
                 } else {
-                    exitMsg = "$playerName je izbačen"
+                    val exitMsg = "$playerName je izbačen"
+                    updates["messages/exit_$timestamp"] = exitMsg
+                    val sysMsgKey = roomRef.child("chatMessages").push().key
+                    updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
                 }
-                
-                updates["messages/exit_$timestamp"] = exitMsg
-                
-                val sysMsgKey = roomRef.child("chatMessages").push().key
-                updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
                 
                 roomRef.updateChildren(updates)
             } catch (e: Exception) {}

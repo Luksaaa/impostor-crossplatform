@@ -241,45 +241,35 @@ actual object FirebaseManager {
                 if (snapshot.value == null) return@launch
 
                 val currentAdmin = snapshot.child("admin").getValueSafe<String?>()
-                val playersSnapshots = mutableListOf<DataSnapshot>()
-                snapshot.child("players").children.forEach { playersSnapshots.add(it) }
-                
                 val timestamp = currentPlatformMillis()
                 
-                if (playersSnapshots.size <= 1) {
-                    roomRef.removeValue()
-                } else {
-                    val updates = mutableMapOf<String, Any?>()
-                    updates["players/$playerName"] = null
+                val updates = mutableMapOf<String, Any?>()
+                updates["players/$playerName"] = null
+
+                val playersSnapshots = mutableListOf<DataSnapshot>()
+                snapshot.child("players").children.forEach { playersSnapshots.add(it) }
+
+                if (currentAdmin == playerName) {
+                    val nextActiveAdmin = playersSnapshots
+                        .filter { it.key != playerName }
+                        .mapNotNull { it.getValueSafe<PlayerInfo?>() }
+                        .sortedBy { it.joinedAt }
+                        .firstOrNull()?.name
                     
-                    val exitMsg: String
-                    if (currentAdmin == playerName) {
-                        val nextActiveAdmin = playersSnapshots
-                            .filter { it.key != playerName }
-                            .mapNotNull { it.getValueSafe<PlayerInfo?>() }
-                            .sortedBy { it.joinedAt }
-                            .firstOrNull()?.name
-                        
-                        exitMsg = "$playerName je izbačen, novi admin je $nextActiveAdmin"
-                        updates["admin"] = nextActiveAdmin
-                    } else {
-                        exitMsg = "$playerName je izbačen"
-                    }
-                    
+                    updates["admin"] = nextActiveAdmin
+                    val exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
                     updates["messages/exit_$timestamp"] = exitMsg
-                    
                     val sysMsgKey = roomRef.child("chatMessages").push().key
                     updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
-                    
-                    roomRef.updateChildren(updates)
+                } else {
+                    val exitMsg = "$playerName je izbačen"
+                    updates["messages/exit_$timestamp"] = exitMsg
+                    val sysMsgKey = roomRef.child("chatMessages").push().key
+                    updates["chatMessages/$sysMsgKey"] = ChatMessage("Sustav", exitMsg, timestamp)
                 }
                 
-                withContext(Dispatchers.Main) {
-                    onComplete()
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) { onComplete() }
-            }
+                roomRef.updateChildren(updates)
+            } catch (e: Exception) {}
         }
     }
 }

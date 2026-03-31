@@ -47,7 +47,11 @@ object WordManager {
         "Jabuka" to "Kruška",
         "Automobil" to "Motor",
         "Zagreb" to "Split",
-        "Sunce" to "Mjesec"
+        "Sunce" to "Mjesec",
+        "Kava" to "Čaj",
+        "Pas" to "Mačka",
+        "Ljeto" to "Zima",
+        "Pizza" to "Burger"
     )
 
     fun getNextWords(): Pair<String, String> {
