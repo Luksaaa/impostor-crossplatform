@@ -1,5 +1,6 @@
 package com.example.impostergame
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -9,7 +10,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.example.impostergame.ui.components.AnimatedBackground
 import com.example.impostergame.ui.theme.ImposterGameTheme
 import com.russhwolf.settings.Settings
-
 
 private class MockSettings : Settings {
     private val data = mutableMapOf<String, Any?>()
@@ -38,6 +38,7 @@ private class MockSettings : Settings {
     override fun getBooleanOrNull(key: String): Boolean? = data[key] as? Boolean
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 @Preview
 fun App() {
@@ -113,73 +114,92 @@ fun App() {
     ImposterGameTheme {
         AnimatedBackground(xOffset = xProgress, yOffset = yProgress) {
             Surface(modifier = Modifier.fillMaxSize(), color = androidx.compose.ui.graphics.Color.Transparent) {
-                when (currentScreen) {
-                    Screen.ENTER_NAME -> {
-                        EnterNameScreen(onNameEntered = { name, rememberMe ->
-                            username = name
-                            if (rememberMe) {
-                                settings.putString("username", name)
-                            } else {
-                                settings.remove("username")
-                            }
-                            navigateTo(Screen.HOME)
-                        })
-                    }
-                    Screen.HOME -> {
-                        HomeScreen(
-                            username = username,
-                            onCreateRoom = {
-                                isAdmin = true
-                                FirebaseManager.generateRoom(username) { code ->
-                                    if (code.isNotEmpty() && !code.startsWith("ERR")) {
-                                        roomCode = code
-                                        navigateTo(Screen.LOBBY)
-                                    }
+                // ANIMATED CONTENT: Animiranje sa slide (klizanjem) po vertikali
+                AnimatedContent(
+                    targetState = currentScreen,
+                    transitionSpec = {
+                        // Ako se vraćamo nazad (npr. s JOIN na HOME, target.ordinal < initial.ordinal)
+                        if (targetState.ordinal < initialState.ordinal) {
+                            // "Stari ekran pada prema dolje" + "Novi ekran dolazi odozgo"
+                            (slideInVertically(animationSpec = tween(400)) { height -> -height } + fadeIn(animationSpec = tween(400))) togetherWith
+                                    (slideOutVertically(animationSpec = tween(400)) { height -> height } + fadeOut(animationSpec = tween(400)))
+                        } else {
+                            // Ako idemo naprijed (npr. s HOME na JOIN, target.ordinal > initial.ordinal)
+                            // "Novi ekran dolazi odozdo" + "Stari ekran bježi prema gore"
+                            (slideInVertically(animationSpec = tween(400)) { height -> height } + fadeIn(animationSpec = tween(400))) togetherWith
+                                    (slideOutVertically(animationSpec = tween(400)) { height -> -height } + fadeOut(animationSpec = tween(400)))
+                        }
+                    },
+                    label = "ScreenTransition"
+                ) { targetScreen ->
+                    when (targetScreen) {
+                        Screen.ENTER_NAME -> {
+                            EnterNameScreen(onNameEntered = { name, rememberMe ->
+                                username = name
+                                if (rememberMe) {
+                                    settings.putString("username", name)
+                                } else {
+                                    settings.remove("username")
                                 }
-                            },
-                            onJoinRoom = {
-                                navigateTo(Screen.JOIN)
-                            }
-                        )
-                    }
-                    Screen.JOIN -> {
-                        JoinRoomScreen(
-                            username = username,
-                            onJoined = { code ->
-                                roomCode = code
-                                isAdmin = false
-                                navigateTo(Screen.LOBBY)
-                            },
-                            onBack = {
                                 navigateTo(Screen.HOME)
-                            }
-                        )
-                    }
-                    Screen.LOBBY -> {
-                        LobbyScreen(
-                            roomCode = roomCode,
-                            username = username,
-                            isAdmin = isAdmin,
-                            onLeaveRoom = {
-                                navigateTo(Screen.HOME)
-                            },
-                            onGameStarted = {
-                                navigateTo(Screen.GAME)
-                            }
-                        )
-                    }
-                    Screen.GAME -> {
-                        GameScreen(
-                            roomCode = roomCode,
-                            username = username,
-                            isAdmin = isAdmin,
-                            onRepeat = {
-                                navigateTo(Screen.LOBBY)
-                            },
-                            onNewGame = {
-                                navigateTo(Screen.HOME)
-                            }
-                        )
+                            })
+                        }
+                        Screen.HOME -> {
+                            HomeScreen(
+                                username = username,
+                                onCreateRoom = {
+                                    isAdmin = true
+                                    FirebaseManager.generateRoom(username) { code ->
+                                        if (code.isNotEmpty() && !code.startsWith("ERR")) {
+                                            roomCode = code
+                                            navigateTo(Screen.LOBBY)
+                                        }
+                                    }
+                                },
+                                onJoinRoom = {
+                                    navigateTo(Screen.JOIN)
+                                }
+                            )
+                        }
+                        Screen.JOIN -> {
+                            JoinRoomScreen(
+                                username = username,
+                                onJoined = { code ->
+                                    roomCode = code
+                                    isAdmin = false
+                                    navigateTo(Screen.LOBBY)
+                                },
+                                onBack = {
+                                    navigateTo(Screen.HOME)
+                                }
+                            )
+                        }
+                        Screen.LOBBY -> {
+                            LobbyScreen(
+                                roomCode = roomCode,
+                                username = username,
+                                isAdmin = isAdmin,
+                                onLeaveRoom = {
+                                    navigateTo(Screen.HOME)
+                                },
+                                onGameStarted = {
+                                    navigateTo(Screen.GAME)
+                                }
+                            )
+                        }
+                        Screen.GAME -> {
+                            GameScreen(
+                                roomCode = roomCode,
+                                username = username,
+                                isAdmin = isAdmin,
+                                onRepeat = {
+                                    navigateTo(Screen.LOBBY)
+                                },
+                                onNewGame = {
+                                    navigateTo(Screen.HOME)
+                                }
+                            )
+                        }
                     }
                 }
             }

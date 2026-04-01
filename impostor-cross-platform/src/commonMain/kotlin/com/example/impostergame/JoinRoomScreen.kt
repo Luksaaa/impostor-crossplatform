@@ -145,7 +145,7 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                 .widthIn(max = 700.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
+                .padding(horizontal = if (isWide) 48.dp else 24.dp, vertical = 24.dp), // POVEĆAN HORIZONTAL PADDING ZA WIDE
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -161,13 +161,13 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
             Spacer(modifier = Modifier.height(if (isWide) 64.dp else 48.dp))
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = if (isWide) 32.dp else 0.dp), // PADDING DA CARD NE DIRA RUBOVE
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = inputContainerColor.copy(alpha = 0.9f)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(if (isWide) 48.dp else 24.dp),
+                    modifier = Modifier.padding(if (isWide) 48.dp else 24.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -179,55 +179,57 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                     
                     Spacer(modifier = Modifier.height(if (isWide) 24.dp else 16.dp))
 
-                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
-                            value = inputCode,
-                            onValueChange = { 
-                                if (it.length <= 6) inputCode = it.uppercase() 
-                                errorMessage = ""
-                            },
-                            placeholder = { 
-                                Text(
-                                    "ABC 123", 
-                                    color = textColor.copy(alpha = 0.4f), 
-                                    fontSize = if (isWide) 20.sp else 16.sp,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center
-                                ) 
-                            },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth().height(if (isWide) 80.dp else 64.dp)
-                                .onKeyEvent { event ->
-                                    if (event.key == Key.Enter && event.type == KeyEventType.KeyDown) {
-                                        if (inputCode.length == 6) {
-                                            attemptJoin(inputCode)
-                                        } else {
-                                            errorMessage = "Kod mora imati 6 znakova"
-                                        }
-                                        true
-                                    } else {
-                                        false
-                                    }
-                                },
-                            shape = RoundedCornerShape(12.dp),
-                            textStyle = LocalTextStyle.current.copy(
+                    OutlinedTextField(
+                        value = inputCode,
+                        onValueChange = { 
+                            if (it.length <= 6) inputCode = it.uppercase() 
+                            errorMessage = ""
+                        },
+                        placeholder = { 
+                            Text(
+                                "ABC 123", 
+                                color = textColor.copy(alpha = 0.4f), 
                                 fontSize = if (isWide) 20.sp else 16.sp,
+                                modifier = Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Center
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Text,
-                                capitalization = KeyboardCapitalization.Characters
-                            ),
-                            isError = errorMessage.isNotEmpty(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = accentColor,
-                                unfocusedBorderColor = textColor.copy(alpha = 0.2f),
-                                focusedTextColor = textColor,
-                                unfocusedTextColor = textColor
-                            ),
-                            enabled = !isJoining
-                        )
-                    }
+                            ) 
+                        },
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = if (isWide) 32.dp else 0.dp) // PADDING UNUTAR CARDA
+                            .height(if (isWide) 80.dp else 64.dp)
+                            .onKeyEvent { event ->
+                                if (event.key == Key.Enter && event.type == KeyEventType.KeyDown) {
+                                    if (inputCode.length == 6) {
+                                        attemptJoin(inputCode)
+                                    } else {
+                                        errorMessage = "Kod mora imati 6 znakova"
+                                    }
+                                    true
+                                } else {
+                                    false
+                                }
+                            },
+                        shape = RoundedCornerShape(12.dp),
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = if (isWide) 24.sp else 16.sp, // VEĆA SLOVA KODA
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 2.sp
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            capitalization = KeyboardCapitalization.Characters
+                        ),
+                        isError = errorMessage.isNotEmpty(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = accentColor,
+                            unfocusedBorderColor = textColor.copy(alpha = 0.2f),
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor
+                        ),
+                        enabled = !isJoining
+                    )
                     
                     if (errorMessage.isNotEmpty()) {
                         Text(
@@ -238,7 +240,7 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(if (isWide) 32.dp else 24.dp))
+                    Spacer(modifier = Modifier.height(if (isWide) 48.dp else 24.dp)) // VEĆI RAZMAK
                     
                     Button(
                         onClick = {
@@ -248,7 +250,10 @@ fun JoinRoomScreen(username: String, onJoined: (String) -> Unit, onBack: () -> U
                                 errorMessage = "Kod mora imati 6 znakova"
                             }
                         },
-                        modifier = Modifier.fillMaxWidth().height(if (isWide) 80.dp else 56.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = if (isWide) 32.dp else 0.dp) // PADDING ZA GUMB
+                            .height(if (isWide) 80.dp else 56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (inputCode.length == 6 && !isJoining) accentColor else accentColor.copy(alpha = 0.5f),
