@@ -41,6 +41,11 @@ private class MockSettings : Settings {
 @Composable
 @Preview
 fun App() {
+    // Učitaj rječnik na samom početku aplikacije
+    LaunchedEffect(Unit) {
+        WordManager.loadDictionary()
+    }
+
     // Koristimo remember kako bismo izbjegli ponovno kreiranje Settings objekta na svakoj rekompoziciji.
     val settings: Settings = remember {
         try {

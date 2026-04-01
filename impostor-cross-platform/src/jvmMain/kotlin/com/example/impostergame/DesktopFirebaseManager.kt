@@ -53,12 +53,24 @@ object DesktopFirebaseManager : IFirebaseManager {
         }
     }
 
+    fun deleteData(path: String) {
+        try {
+            val url = URL("$BASE_URL/$path.json")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.requestMethod = "DELETE"
+            conn.responseCode
+            conn.disconnect()
+        } catch (e: Exception) {
+            println("Firebase Desktop Error: ${e.message}")
+        }
+    }
+
     private fun postChatMessage(roomCode: String, chatMsg: ChatMessage) {
         scope.launch {
             try {
                 val url = URL("$BASE_URL/$roomCode/chatMessages.json")
                 val conn = url.openConnection() as HttpURLConnection
-                conn.requestMethod = "POST" // KREIRA JEDINSTVEN FIREBASE KEY (-Nxyz...)
+                conn.requestMethod = "POST"
                 conn.doOutput = true
                 conn.setRequestProperty("Content-Type", "application/json")
                 conn.outputStream.write(json.encodeToString(chatMsg).toByteArray())
@@ -122,29 +134,34 @@ object DesktopFirebaseManager : IFirebaseManager {
                     val room = json.decodeFromString<Room>(response)
                     val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
                     
-                    val updates = buildJsonObject {
-                        put("players/$sanitizedName", JsonNull)
+                    val remainingPlayers = room.players.filterKeys { it != sanitizedName }
+                    if (remainingPlayers.isEmpty()) {
+                        // Soba je prazna, brišemo je cijelu!
+                        deleteData(roomCode)
+                    } else {
+                        val updates = mutableMapOf<String, JsonElement>()
+                        updates["players/$sanitizedName"] = JsonNull
                         
                         if (room.admin == sanitizedName) {
-                            val nextAdmin = room.players.values
-                                .filter { it.name != sanitizedName }
+                            val nextAdmin = remainingPlayers.values
                                 .sortedBy { it.joinedAt }
                                 .firstOrNull()?.name
                             
                             if (nextAdmin != null) {
-                                put("admin", JsonPrimitive(nextAdmin))
-                                put("originalAdmin", JsonPrimitive(nextAdmin))
+                                updates["admin"] = JsonPrimitive(nextAdmin)
+                                updates["originalAdmin"] = JsonPrimitive(nextAdmin) // Trajni prijenos
                                 val msg = "$sanitizedName je izašao, novi admin je $nextAdmin"
-                                put("messages/exit_${System.currentTimeMillis()}", JsonPrimitive(msg))
+                                updates["messages/exit_${System.currentTimeMillis()}"] = JsonPrimitive(msg)
                                 postChatMessage(roomCode, ChatMessage("Sustav", msg, System.currentTimeMillis()))
                             }
                         } else {
                             val msg = "$sanitizedName je izašao"
-                            put("messages/exit_${System.currentTimeMillis()}", JsonPrimitive(msg))
+                            updates["messages/exit_${System.currentTimeMillis()}"] = JsonPrimitive(msg)
                             postChatMessage(roomCode, ChatMessage("Sustav", msg, System.currentTimeMillis()))
                         }
+                        
+                        patchData(roomCode, JsonObject(updates))
                     }
-                    patchData(roomCode, updates)
                 }
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")
@@ -250,23 +267,23 @@ object DesktopFirebaseManager : IFirebaseManager {
                 if (response == "null") return@launch
                 val room = json.decodeFromString<Room>(response)
                 
-                val updates = buildJsonObject {
-                    put("status", JsonPrimitive("waiting"))
-                    put("chatMessages", JsonNull)
-                    put("isDiscussionActive", JsonPrimitive(false))
-                    put("discussionStartTime", JsonPrimitive(0L))
-                    put("discussionEndTime", JsonPrimitive(0L))
-                    put("resultMessage", JsonPrimitive(""))
-                    
-                    // UVIJEK VRAĆAMO ADMINA NA KREATORA SOBE BEZ UVJETA
-                    if (room.originalAdmin.isNotEmpty()) {
-                        put("admin", JsonPrimitive(room.originalAdmin))
-                        if (room.players.containsKey(room.originalAdmin)) {
-                            put("players/${room.originalAdmin}/isReady", JsonPrimitive(false))
-                        }
+                val updates = mutableMapOf<String, JsonElement>(
+                    "status" to JsonPrimitive("waiting"),
+                    "chatMessages" to JsonNull,
+                    "isDiscussionActive" to JsonPrimitive(false),
+                    "discussionStartTime" to JsonPrimitive(0L),
+                    "discussionEndTime" to JsonPrimitive(0L),
+                    "resultMessage" to JsonPrimitive("")
+                )
+                
+                if (room.originalAdmin.isNotEmpty()) {
+                    updates["admin"] = JsonPrimitive(room.originalAdmin)
+                    if (room.players.containsKey(room.originalAdmin)) {
+                        updates["players/${room.originalAdmin}/isReady"] = JsonPrimitive(false)
                     }
                 }
-                patchData(roomCode, updates)
+                
+                patchData(roomCode, JsonObject(updates))
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")
             }
@@ -285,33 +302,37 @@ object DesktopFirebaseManager : IFirebaseManager {
                 if (response == "null") return@launch
                 val room = json.decodeFromString<Room>(response)
                 
-                val updates = buildJsonObject {
-                    put("players/$playerName", JsonNull)
+                val remainingPlayers = room.players.filterKeys { it != playerName }
+                
+                if (remainingPlayers.isEmpty()) {
+                    // Soba je prazna, brišemo je!
+                    deleteData(roomCode)
+                } else {
+                    val updates = mutableMapOf<String, JsonElement>()
+                    updates["players/$playerName"] = JsonNull
                     
                     val exitMsg: String
                     if (room.admin == playerName) {
-                        val nextActiveAdmin = room.players.values
-                            .filter { it.name != playerName }
+                        val nextActiveAdmin = remainingPlayers.values
                             .sortedBy { it.joinedAt }
                             .firstOrNull()?.name
                         
                         if (nextActiveAdmin != null) {
                             exitMsg = "$playerName je izbačen, privremeni admin je $nextActiveAdmin"
-                            put("admin", JsonPrimitive(nextActiveAdmin))
-                            // ORIGINALADMIN SE OVDJE NE MIJENJA, OSTaje kreator sobe
+                            updates["admin"] = JsonPrimitive(nextActiveAdmin)
+                            // ORIGINALADMIN OSTAJE KREATOR SOBE
                         } else {
                             exitMsg = "$playerName je izbačen"
                         }
                     } else {
-                        // Igrač koji nije admin je izbačen - admin se ne mijenja
                         exitMsg = "$playerName je izbačen"
                     }
                     
-                    put("messages/exit_${System.currentTimeMillis()}", JsonPrimitive(exitMsg))
+                    updates["messages/exit_${System.currentTimeMillis()}"] = JsonPrimitive(exitMsg)
                     postChatMessage(roomCode, ChatMessage("Sustav", exitMsg, System.currentTimeMillis()))
+                    
+                    patchData(roomCode, JsonObject(updates))
                 }
-
-                patchData(roomCode, updates)
             } catch (e: Exception) {
                 println("Firebase Desktop Error: ${e.message}")
             }

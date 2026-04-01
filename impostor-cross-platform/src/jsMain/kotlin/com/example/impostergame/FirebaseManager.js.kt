@@ -11,6 +11,17 @@ import kotlin.js.json
 
 actual object FirebaseManager : IFirebaseManager {
     private val firebaseScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    
+    private var lastTimestamp: Double = 0.0
+
+    private fun getUniqueTimestamp(): Double {
+        var now = currentPlatformMillis().toDouble()
+        if (now <= lastTimestamp) {
+            now = lastTimestamp + 1.0
+        }
+        lastTimestamp = now
+        return now
+    }
 
     private fun isFirebaseReady(): Boolean {
         return js("typeof firebase !== 'undefined' && typeof firebase.database === 'function'").unsafeCast<Boolean>()
@@ -29,7 +40,7 @@ actual object FirebaseManager : IFirebaseManager {
             try {
                 val code = generateRandomCode()
                 val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Igrac" }
-                val now = currentPlatformMillis().toDouble()
+                val now = getUniqueTimestamp()
                 val db = firebase.database()
                 
                 db.ref("rooms/$code").once("value", { snapshot: dynamic ->
@@ -56,7 +67,7 @@ actual object FirebaseManager : IFirebaseManager {
         if (!isFirebaseReady()) return Result.failure(Exception("Firebase not ready"))
         return try {
             val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }.ifBlank { "Gost" }
-            val timestamp = currentPlatformMillis().toDouble()
+            val timestamp = getUniqueTimestamp()
             firebase.database().ref("rooms/$roomCode/players/$sanitizedName").set(json(
                 "name" to sanitizedName, "isReady" to false, "joinedAt" to timestamp
             ))
@@ -73,29 +84,33 @@ actual object FirebaseManager : IFirebaseManager {
         roomRef.once("value", { snapshot: dynamic ->
             val data = snapshot.`val`()
             if (data != null) {
-                val timestamp = currentPlatformMillis().toDouble()
+                val pKeys = if (data.players != null) js("Object.keys(data.players)").unsafeCast<Array<String>>() else emptyArray()
+                val otherPlayers = mutableListOf<PlayerInfo>()
+                for (k in pKeys) {
+                    if (k != sanitizedName) {
+                        val p = js("data.players[k]")
+                        otherPlayers.add(PlayerInfo(k, false, (p.joinedAt?.unsafeCast<Double>() ?: 0.0).toLong()))
+                    }
+                }
+                
+                // Ako u sobi više nema drugih igrača, obriši cijelu sobu
+                if (otherPlayers.isEmpty()) {
+                    roomRef.remove({ _ -> onComplete() })
+                    return@once
+                }
+                
+                // Ako ima drugih igrača, prenesi prava
+                val timestamp = getUniqueTimestamp()
                 val updates = json()
                 updates["players/$sanitizedName"] = null
                 
                 val currentAdmin = data.admin?.toString() ?: ""
                 if (currentAdmin == sanitizedName) {
-                    val pKeys = js("Object.keys(data.players)").unsafeCast<Array<String>>()
-                    val otherPlayers = mutableListOf<PlayerInfo>()
-                    for (k in pKeys) {
-                        if (k != sanitizedName) {
-                            val p = js("data.players[k]")
-                            otherPlayers.add(PlayerInfo(k, false, (p.joinedAt?.unsafeCast<Double>() ?: 0.0).toLong()))
-                        }
-                    }
                     val next = otherPlayers.sortedBy { it.joinedAt }.firstOrNull()?.name
                     if (next != null) {
                         updates["admin"] = next
-                        updates["originalAdmin"] = next // STALNI PRIJENOS: Ažurira se originalAdmin (kad sam ode)
+                        updates["originalAdmin"] = next // STALNI PRIJENOS: Ažurira se originalAdmin
                         val msg = "$sanitizedName je izašao, novi admin je $next"
-                        updates["messages/exit_${timestamp.toLong()}"] = msg
-                        roomRef.child("chatMessages").push().set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
-                    } else {
-                        val msg = "$sanitizedName je izašao"
                         updates["messages/exit_${timestamp.toLong()}"] = msg
                         roomRef.child("chatMessages").push().set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
                     }
@@ -202,7 +217,6 @@ actual object FirebaseManager : IFirebaseManager {
         val sanitizedName = username.filter { it.isLetterOrDigit() || it == '_' }
         val timestamp = currentPlatformMillis().toDouble()
         val chatMsg = json("sender" to sanitizedName, "message" to message.trim(), "timestamp" to timestamp)
-        // Ovdje se koristi push() kako bi Firebase generirao sigurni kronološki ključ
         firebase.database().ref("rooms/$roomCode/chatMessages").push().set(chatMsg)
     }
 
@@ -247,35 +261,40 @@ actual object FirebaseManager : IFirebaseManager {
         roomRef.once("value", { snapshot: dynamic ->
             val data = snapshot.`val`()
             if (data != null) {
+                val pKeys = if (data.players != null) js("Object.keys(data.players)").unsafeCast<Array<String>>() else emptyArray()
+                val otherPlayers = mutableListOf<PlayerInfo>()
+                for (k in pKeys) {
+                    if (k != playerName) {
+                        val p = js("data.players[k]")
+                        otherPlayers.add(PlayerInfo(k, false, (p.joinedAt?.unsafeCast<Double>() ?: 0.0).toLong()))
+                    }
+                }
+
+                // Ako u sobi više nema drugih igrača nakon izbacivanja, obriši cijelu sobu
+                if (otherPlayers.isEmpty()) {
+                    roomRef.remove()
+                    return@once
+                }
+
                 val currentAdmin = data.admin?.toString() ?: ""
                 val updates = json()
                 updates["players/$playerName"] = null
 
                 val timestamp = currentPlatformMillis().toDouble()
                 var msg = "$playerName je izbačen"
+                
                 if (currentAdmin == playerName) {
-                    val pKeys = js("Object.keys(data.players)").unsafeCast<Array<String>>()
-                    val otherPlayers = mutableListOf<PlayerInfo>()
-                    for (k in pKeys) {
-                        if (k != playerName) {
-                            val p = js("data.players[k]")
-                            otherPlayers.add(PlayerInfo(k, false, (p.joinedAt?.unsafeCast<Double>() ?: 0.0).toLong()))
-                        }
-                    }
                     val next = otherPlayers.sortedBy { it.joinedAt }.firstOrNull()?.name
                     if (next != null) {
                         updates["admin"] = next
-                        // PRIVREMENI PRIJENOS: originalAdmin se NE MIJENJA
+                        // PRIVREMENI PRIJENOS (kad se izbaci): originalAdmin se NE MIJENJA
                         msg = "$playerName je izbačen, privremeni admin je $next"
                     }
-                } else {
-                    msg = "$playerName je izbačen"
                 }
 
                 updates["messages/exit_${timestamp.toLong()}"] = msg
-                roomRef.update(updates, { _ ->
-                    roomRef.child("chatMessages").push().set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
-                })
+                roomRef.child("chatMessages").push().set(json("sender" to "Sustav", "message" to msg, "timestamp" to timestamp))
+                roomRef.update(updates)
             }
         })
     }

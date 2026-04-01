@@ -1,6 +1,8 @@
 package com.example.impostergame
 
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import impostergame.impostor_cross_platform.generated.resources.Res
 
 @Serializable
 enum class Screen {
@@ -44,7 +46,7 @@ data class Room(
 )
 
 object WordManager {
-    private val wordPairs: List<Pair<String, String>> = listOf(
+    var wordPairs: List<Pair<String, String>> = listOf(
         "Jabuka" to "Kruška",
         "Automobil" to "Motor",
         "Zagreb" to "Split",
@@ -54,6 +56,25 @@ object WordManager {
         "Ljeto" to "Zima",
         "Pizza" to "Burger"
     )
+
+    @OptIn(ExperimentalResourceApi::class)
+    suspend fun loadDictionary() {
+        try {
+            // Učitavanje cijelog hrvatskog rječnika iz composeResources mape
+            val bytes = Res.readBytes("files/hrvatski_rijecnik.txt")
+            val text = bytes.decodeToString()
+            val parsed = text.lines().mapNotNull { line ->
+                val parts = line.split("/")
+                if (parts.size == 2) parts[0].trim() to parts[1].trim() else null
+            }
+            if (parsed.isNotEmpty()) {
+                wordPairs = parsed
+                println("Uspješno učitan rječnik s \${parsed.size} parova!")
+            }
+        } catch (e: Exception) {
+            println("Greška pri učitavanju rječnika: \${e.message}")
+        }
+    }
 
     fun getNextWords(): Pair<String, String> {
         val pair = wordPairs.random()
