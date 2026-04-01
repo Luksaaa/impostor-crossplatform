@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -456,7 +457,7 @@ fun ChatCard(
                     fontWeight = FontWeight.Bold, 
                     color = if (showDiscussion) MutedRose else accentColor,
                     modifier = Modifier.defaultMinSize(minWidth = 100.dp),
-                    fontSize = if (isWideScreen) 20.sp else 16.sp
+                    fontSize = if (isWideScreen) 28.sp else 16.sp
                 )
                 
                 Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.CenterEnd) {
@@ -465,7 +466,7 @@ fun ChatCard(
                         Box {
                             IconButton(onClick = { showTimerMenu = true }) { Icon(Icons.Default.Timer, null, tint = accentColor) }
                             DropdownMenu(expanded = showTimerMenu, onDismissRequest = { showTimerMenu = false }) {
-                                listOf(30, 45, 60).forEach { sec ->
+                                listOf(15, 30, 45, 60).forEach { sec ->
                                     DropdownMenuItem(text = { Text("$sec sekundi") }, onClick = {
                                         onStartTimer(sec)
                                         showTimerMenu = false
@@ -486,7 +487,7 @@ fun ChatCard(
                         if (isNewGroup) {
                             Text(
                                 text = msg.sender,
-                                fontSize = if (isWideScreen) 13.sp else 11.sp, 
+                                fontSize = if (isWideScreen) 16.sp else 11.sp, 
                                 color = textColor.copy(alpha = 0.5f), 
                                 modifier = Modifier.padding(start = if(isMe) 0.dp else 4.dp, end = if(isMe) 4.dp else 0.dp, bottom = 2.dp)
                             )
@@ -502,7 +503,7 @@ fun ChatCard(
                             ), 
                             contentColor = if (isMe && !isDarkTheme) Color.White else textColor
                         ) {
-                            Text(msg.message, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp), fontSize = if (isWideScreen) 18.sp else 15.sp)
+                            Text(msg.message, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp), fontSize = if (isWideScreen) 24.sp else 15.sp)
                         }
                     }
                 }
@@ -520,7 +521,8 @@ fun ChatCard(
                             false
                         }
                     },
-                    placeholder = { Text("Napiši nešto...", fontSize = if (isWideScreen) 18.sp else 16.sp) }, 
+                    placeholder = { Text("Napiši nešto...", fontSize = if (isWideScreen) 20.sp else 16.sp) },
+                    textStyle = TextStyle(fontSize = if (isWideScreen) 22.sp else 16.sp, color = textColor),
                     colors = TextFieldDefaults.colors(focusedContainerColor = textColor.copy(alpha = 0.05f), unfocusedContainerColor = textColor.copy(alpha = 0.05f), focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent), 
                     shape = RoundedCornerShape(24.dp),
                     singleLine = true,
