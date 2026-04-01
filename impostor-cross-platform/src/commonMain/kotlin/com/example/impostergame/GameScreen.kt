@@ -2,6 +2,10 @@
 
 package com.example.impostergame
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -483,27 +487,41 @@ fun ChatCard(
                     val isNewGroup = index == 0 || chatMessages[index - 1].sender != msg.sender
                     val verticalPadding = if (isNewGroup) 6.dp else 2.dp
 
-                    Column(modifier = Modifier.fillMaxWidth().padding(vertical = verticalPadding), horizontalAlignment = if (isMe) Alignment.End else Alignment.Start) {
-                        if (isNewGroup) {
-                            Text(
-                                text = msg.sender,
-                                fontSize = if (isWideScreen) 16.sp else 11.sp, 
-                                color = textColor.copy(alpha = 0.5f), 
-                                modifier = Modifier.padding(start = if(isMe) 0.dp else 4.dp, end = if(isMe) 4.dp else 0.dp, bottom = 2.dp)
-                            )
-                        }
-                        Surface(
-                            color = if (isMe) accentColor.copy(alpha = if(isDarkTheme) 0.25f else 0.85f) 
-                                    else (if (isDarkTheme) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f)), 
-                            shape = RoundedCornerShape(
-                                topStart = if (isNewGroup || isMe) 16.dp else 4.dp, 
-                                topEnd = if (isNewGroup || !isMe) 16.dp else 4.dp, 
-                                bottomStart = if (isMe) 16.dp else 4.dp, 
-                                bottomEnd = if (isMe) 4.dp else 16.dp
-                            ), 
-                            contentColor = if (isMe && !isDarkTheme) Color.White else textColor
-                        ) {
-                            Text(msg.message, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp), fontSize = if (isWideScreen) 24.sp else 15.sp)
+                    // ANIMACIJA: Dodan AnimatedVisibility s FadeIn i SlideIn odozdo za nove poruke!
+                    var isVisible by remember { mutableStateOf(false) }
+                    LaunchedEffect(msg.timestamp) {
+                        isVisible = true
+                    }
+
+                    AnimatedVisibility(
+                        visible = isVisible,
+                        enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
+                            initialOffsetY = { it / 2 },
+                            animationSpec = tween(400)
+                        )
+                    ) {
+                        Column(modifier = Modifier.fillMaxWidth().padding(vertical = verticalPadding), horizontalAlignment = if (isMe) Alignment.End else Alignment.Start) {
+                            if (isNewGroup) {
+                                Text(
+                                    text = msg.sender,
+                                    fontSize = if (isWideScreen) 16.sp else 11.sp, 
+                                    color = textColor.copy(alpha = 0.5f), 
+                                    modifier = Modifier.padding(start = if(isMe) 0.dp else 4.dp, end = if(isMe) 4.dp else 0.dp, bottom = 2.dp)
+                                )
+                            }
+                            Surface(
+                                color = if (isMe) accentColor.copy(alpha = if(isDarkTheme) 0.25f else 0.85f) 
+                                        else (if (isDarkTheme) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f)), 
+                                shape = RoundedCornerShape(
+                                    topStart = if (isNewGroup || isMe) 16.dp else 4.dp, 
+                                    topEnd = if (isNewGroup || !isMe) 16.dp else 4.dp, 
+                                    bottomStart = if (isMe) 16.dp else 4.dp, 
+                                    bottomEnd = if (isMe) 4.dp else 16.dp
+                                ), 
+                                contentColor = if (isMe && !isDarkTheme) Color.White else textColor
+                            ) {
+                                Text(msg.message, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp), fontSize = if (isWideScreen) 24.sp else 15.sp)
+                            }
                         }
                     }
                 }
