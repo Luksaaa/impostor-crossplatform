@@ -1,95 +1,85 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM), Server.
+# Impostor Game 🕵️‍♂️
 
-* [/impostor-cross-platform](./impostor-cross-platform/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./impostor-cross-platform/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./impostor-cross-platform/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./impostor-cross-platform/src/jvmMain/kotlin)
-    folder is the appropriate location.
+A modern, fast-paced social deduction game built with **Kotlin Multiplatform** and **Compose Multiplatform**. Play with your friends across Android, iOS, Web, and Desktop (Windows/macOS) in real-time.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## 🎮 What is Impostor Game?
 
-* [/server](./server/src/main/kotlin) is for the Ktor server application.
+Impostor is a social game of deception and intuition. Players are given a secret word, but one or more players (the **Impostors**) receive a slightly different word or no word at all (the **Mr. White**).
 
-* [/shared](./shared/src) is for the code that will be shared between all targets in the project.
-  The most important subfolder is [commonMain](./shared/src/commonMain/kotlin). If preferred, you
-  can add code to the platform-specific folders here too.
+The goal of the citizens is to identify the Impostor through discussion, while the Impostor tries to blend in and guess the secret word of the majority.
 
-### Build and Run Android Application
-
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :impostor-cross-platform:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :impostor-cross-platform:assembleDebug
-  ```
-
-### Build and Run Desktop (JVM) Application
-
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :impostor-cross-platform:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :impostor-cross-platform:run
-  ```
-
-### Build and Run Server
-
-To build and run the development version of the server, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :server:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :server:run
-  ```
-
-### Build and Run Web Application
-
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :impostor-cross-platform:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :impostor-cross-platform:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :impostor-cross-platform:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :impostor-cross-platform:jsBrowserDevelopmentRun
-    ```
-
-### Build and Run iOS Application
-
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+### Game Rules:
+1. **Secret Words:** Everyone is assigned a role. Citizens get the "Main Word," while the Impostor gets a "Secret Word" from the same category.
+2. **The Discussion:** Players take turns describing their word without being too obvious.
+3. **The Vote:** After the discussion, players vote on who they think the Impostor is.
+4. **Winning:**
+   - **Citizens win** if they correctly identify and eject all Impostors.
+   - **Impostors win** if they remain undetected or correctly guess the Citizens' word.
 
 ---
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+## 🚀 Features
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+- **Cross-Platform Play:** Seamless real-time gameplay between mobile, web, and desktop.
+- **Huge Vocabulary:** Over 1,000 hand-picked Croatian word pairs across various categories.
+- **Real-Time Interaction:** Powered by Firebase for instant synchronization of chat and game states.
+- **Smart Admin System:** Dynamic transfer of room ownership if the host leaves.
+- **QR Code Entry:** Quickly join rooms by scanning a QR code from the host's screen.
+- **Animated UI:** Smooth transitions and modern design for an engaging experience.
+
+---
+
+## 🛠 Tech Stack
+
+- **Language:** Kotlin
+- **UI Framework:** Compose Multiplatform
+- **Backend:** Firebase Realtime Database
+- **Networking:** Ktor
+- **Web Hosting:** Cloudflare Pages
+
+---
+
+## 📦 Building and Running
+
+### Desktop (Windows/macOS)
+To run the native desktop application:
+```bash
+./gradlew :impostor-cross-platform:run
+```
+
+### Web (Cloudflare Pages)
+To build the production version for web deployment:
+```bash
+./gradlew :impostor-cross-platform:jsBrowserDistribution
+```
+The output will be in `impostor-cross-platform/build/dist/js/productionExecutable`.
+
+### Android
+Build the debug APK:
+```bash
+./gradlew :impostor-cross-platform:assembleDebug
+```
+
+### iOS
+Open the `iosApp` folder in **Xcode** and run it on a simulator or a physical device.
+
+---
+
+## 🔧 Installation & Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Luksaaa/impostor-crossplatform.git
+   ```
+2. **Firebase Setup:**
+   - Add your `google-services.json` to the `impostor-cross-platform` module.
+   - Update the Firebase config in `index.html` for the web version.
+3. **Sync Gradle** and you are ready to go!
+
+---
+
+## 📄 License
+This project is for educational and entertainment purposes. Feel free to use and modify!
+
+---
+*Created with ❤️ using Kotlin Multiplatform.*
