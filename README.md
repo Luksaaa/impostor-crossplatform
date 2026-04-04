@@ -70,4 +70,5 @@ To establish a private backend instance:
 ## License
 
 This project is for personal use and educational purposes.
+
 © 2025 Luka Lukšić. All rights reserved.
