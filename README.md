@@ -65,3 +65,9 @@ To establish a private backend instance:
 1. Provide a valid `google-services.json` within the `:impostor-cross-platform` module.
 2. Configure the Firebase JS SDK parameters within `src/jsMain/resources/index.html`.
 3. Apply appropriate Firebase Security Rules to secure the `rooms/` node against unauthorized access.
+
+
+## License
+
+This project is for personal use and educational purposes.
+© 2025 Luka Lukšić. All rights reserved.
