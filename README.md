@@ -1,85 +1,67 @@
-# Impostor Game 🕵️‍♂️
+# Impostor Game: Cross-Platform Social Deduction Framework
 
-A modern, fast-paced social deduction game built with **Kotlin Multiplatform** and **Compose Multiplatform**. Play with your friends across Android, iOS, Web, and Desktop (Windows/macOS) in real-time.
+This repository contains the source code for Impostor Game, a real-time social deduction platform built using Kotlin Multiplatform and Compose Multiplatform. The project enables synchronous multiplayer gameplay across Android, iOS, Web (WebAssembly/JS), and Desktop (Windows/macOS) systems from a single shared codebase.
 
-## 🎮 What is Impostor Game?
+## Overview
 
-Impostor is a social game of deception and intuition. Players are given a secret word, but one or more players (the **Impostors**) receive a slightly different word or no word at all (the **Mr. White**).
+Impostor Game is a strategic social deduction experience designed for group interaction. The system utilizes a centralized real-time database to synchronize game states among participants. During a session, players are assigned specific roles and secret words based on a sophisticated dictionary pairing system.
 
-The goal of the citizens is to identify the Impostor through discussion, while the Impostor tries to blend in and guess the secret word of the majority.
+### Core Objectives
 
-### Game Rules:
-1. **Secret Words:** Everyone is assigned a role. Citizens get the "Main Word," while the Impostor gets a "Secret Word" from the same category.
-2. **The Discussion:** Players take turns describing their word without being too obvious.
-3. **The Vote:** After the discussion, players vote on who they think the Impostor is.
-4. **Winning:**
-   - **Citizens win** if they correctly identify and eject all Impostors.
-   - **Impostors win** if they remain undetected or correctly guess the Citizens' word.
+- **Citizens:** Facilitate strategic discussion to identify and eliminate the hidden Impostor.
+- **Impostors:** Obfuscate their identity and attempt to deduce the Citizens' secret word through linguistic patterns and contextual clues.
+- **Mr. White:** A specialized role receiving no word, requiring high-level social engineering to remain undetected.
 
----
+## Technical Features
 
-## 🚀 Features
+- **Multiplatform Architecture:** Utilizes Kotlin Multiplatform (KMP) to share 95% of business logic and UI components across five target environments.
+- **Real-Time Data Synchronization:** Integrated with Firebase Realtime Database for low-latency state updates, messaging, and player presence management.
+- **Dynamic Content Management:** Implements an automated word pair loader utilizing the Compose Resources API, featuring a comprehensive Croatian dictionary with over 1,000 entries.
+- **Advanced Session Handling:**
+    - **Automated Ownership Transfer:** Intelligent algorithm for persistent room administrator handover upon host disconnection.
+    - **Database Optimization:** Self-cleaning logic that prunes inactive sessions to maintain database performance and integrity.
+- **Discovery and Onboarding:** Efficient room access via high-speed QR code generation and 6-digit alphanumeric session identifiers.
+- **Responsive Interface:** Adaptive layout design utilizing Material 3 components, optimized for both mobile aspect ratios and widescreen desktop environments.
 
-- **Cross-Platform Play:** Seamless real-time gameplay between mobile, web, and desktop.
-- **Huge Vocabulary:** Over 1,000 hand-picked Croatian word pairs across various categories.
-- **Real-Time Interaction:** Powered by Firebase for instant synchronization of chat and game states.
-- **Smart Admin System:** Dynamic transfer of room ownership if the host leaves.
-- **QR Code Entry:** Quickly join rooms by scanning a QR code from the host's screen.
-- **Animated UI:** Smooth transitions and modern design for an engaging experience.
+## Technical Architecture
 
----
+- **UI Framework:** Compose Multiplatform (Material 3).
+- **Core Logic:** Kotlin Multiplatform (Common).
+- **Backend Services:** Firebase Realtime Database (via Platform Interop and REST).
+- **Web Runtime:** WebAssembly (Wasm) and JavaScript targets.
+- **Deployment:** Continuous delivery via Cloudflare Pages.
 
-## 🛠 Tech Stack
+## Building and Deployment
 
-- **Language:** Kotlin
-- **UI Framework:** Compose Multiplatform
-- **Backend:** Firebase Realtime Database
-- **Networking:** Ktor
-- **Web Hosting:** Cloudflare Pages
+### Development Requirements
+- Java Development Kit (JDK) 17.
+- Android Studio Koala or IntelliJ IDEA 2024.1 or later.
+- Xcode (required for iOS compilation on macOS).
 
----
+### Build Commands
 
-## 📦 Building and Running
+#### Web Distribution
+To generate the production-ready distribution for web environments:
+```bash
+./gradlew :impostor-cross-platform:jsBrowserDistribution
+```
+Output location: `impostor-cross-platform/build/dist/js/productionExecutable`
 
-### Desktop (Windows/macOS)
-To run the native desktop application:
+#### Native Desktop Application
+To execute the native desktop build:
 ```bash
 ./gradlew :impostor-cross-platform:run
 ```
 
-### Web (Cloudflare Pages)
-To build the production version for web deployment:
+#### Android Application
+To install the debug build on a connected device or emulator:
 ```bash
-./gradlew :impostor-cross-platform:jsBrowserDistribution
-```
-The output will be in `impostor-cross-platform/build/dist/js/productionExecutable`.
-
-### Android
-Build the debug APK:
-```bash
-./gradlew :impostor-cross-platform:assembleDebug
+./gradlew :impostor-cross-platform:installDebug
 ```
 
-### iOS
-Open the `iosApp` folder in **Xcode** and run it on a simulator or a physical device.
+## Configuration
 
----
-
-## 🔧 Installation & Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Luksaaa/impostor-crossplatform.git
-   ```
-2. **Firebase Setup:**
-   - Add your `google-services.json` to the `impostor-cross-platform` module.
-   - Update the Firebase config in `index.html` for the web version.
-3. **Sync Gradle** and you are ready to go!
-
----
-
-## 📄 License
-This project is for educational and entertainment purposes. Feel free to use and modify!
-
----
-*Created with ❤️ using Kotlin Multiplatform.*
+To establish a private backend instance:
+1. Provide a valid `google-services.json` within the `:impostor-cross-platform` module.
+2. Configure the Firebase JS SDK parameters within `src/jsMain/resources/index.html`.
+3. Apply appropriate Firebase Security Rules to secure the `rooms/` node against unauthorized access.
